@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Block Clock</string>
+    <string name="widget_name">@string/app_name</string>
+    <string name="widget_time_name">Только время</string>
+    <string name="widget_date_name">Только дата</string>
+    <string name="widget_date_and_time_name">Время и дата</string>
+    <string name="section_background">Фон</string>
+    <string name="section_text">Текст</string>
+    <string name="label_color">Цвет</string>
+    <string name="label_transparency">Прозрачность</string>
+    <string name="label_corner_radius">Закругление</string>
+    <string name="label_gap">Отступы</string>
+    <string name="option_month_first">Сначала месяц</string>
+    <string name="button_done">Готово</string>
+    <string name="button_cancel">Отмена</string>
+</resources>
