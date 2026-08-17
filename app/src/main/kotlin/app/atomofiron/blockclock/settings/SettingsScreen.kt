@@ -240,6 +240,7 @@ private fun WidgetPreviewCard(settings: WidgetSettings) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(top = PreviewSideInset)
             .padding(horizontal = PreviewSideInset),
         contentAlignment = Alignment.Center,
     ) {
