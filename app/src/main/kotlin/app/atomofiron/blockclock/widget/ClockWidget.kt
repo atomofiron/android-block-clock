@@ -3,9 +3,12 @@ package app.atomofiron.blockclock.widget
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.S
 import android.util.TypedValue
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
@@ -48,6 +51,7 @@ import app.atomofiron.blockclock.MainActivity
 import app.atomofiron.blockclock.R
 import kotlin.math.roundToInt
 import android.os.Build.VERSION_CODES.P as AndroidP
+import androidx.core.graphics.createBitmap
 
 private const val LAYOUT_HORIZONTAL_MIN_ASPECT = 2.5f
 private const val FULL_WIDGET_SECTION_AREA = 0.5f
@@ -166,15 +170,16 @@ internal fun TimeSection(
     val rectColor = settings.effectiveRectColor
     val textColor = settings.textColor
     val gap = settings.gapDp.dp
-    val cornerRadius = settings.cornerRadiusDp.dp
+    val cornerRadiusDp = settings.cornerRadiusDp
 
     val gridSize = letterboxSize(area, ratio = SECTION_ASPECT)
     val fontSize = (gridSize.height.value * TIME_TEXT_HEIGHT_FACTOR).sp
+    val cellSize = DpSize(gridSize.width / 2, gridSize.height)
 
     Row(modifier = modifier.size(gridSize.width, gridSize.height).clickable(onClick)) {
-        Cell(ClockTextPart.HOURS, rectColor, textColor, gap, cornerRadius, fontSize,
+        Cell(ClockTextPart.HOURS, rectColor, textColor, gap, cornerRadiusDp, cellSize, fontSize,
             modifier = GlanceModifier.defaultWeight().fillMaxHeight())
-        Cell(ClockTextPart.MINUTES, rectColor, textColor, gap, cornerRadius, fontSize,
+        Cell(ClockTextPart.MINUTES, rectColor, textColor, gap, cornerRadiusDp, cellSize, fontSize,
             modifier = GlanceModifier.defaultWeight().fillMaxHeight())
     }
 }
@@ -196,7 +201,7 @@ internal fun DateSection(
     val rectColor = settings.effectiveRectColor
     val textColor = settings.textColor
     val gap = settings.gapDp.dp
-    val cornerRadius = settings.cornerRadiusDp.dp
+    val cornerRadiusDp = settings.cornerRadiusDp
     val (dayPart, monthPart) = when {
         settings.dayFirst -> ClockTextPart.DAY to ClockTextPart.MONTH
         else -> ClockTextPart.MONTH to ClockTextPart.DAY
@@ -204,20 +209,23 @@ internal fun DateSection(
 
     val gridSize = letterboxSize(area, ratio = SECTION_ASPECT)
     val fontSize = ((gridSize.height / 2 - gap).value * DATE_TEXT_HEIGHT_FACTOR).sp
+    val topCellSize = DpSize(gridSize.width, gridSize.height / 2)
+    val quarterCellSize = DpSize(gridSize.width / 4, gridSize.height / 2)
+    val halfCellSize = DpSize(gridSize.width / 2, gridSize.height / 2)
 
     Column(modifier = modifier.size(gridSize.width, gridSize.height).clickable(onClick)) {
         Row(GlanceModifier.fillMaxWidth().defaultWeight()) {
-            Cell(ClockTextPart.WEEKDAY, rectColor, textColor, gap, cornerRadius, fontSize,
+            Cell(ClockTextPart.WEEKDAY, rectColor, textColor, gap, cornerRadiusDp, topCellSize, fontSize,
                 modifier = GlanceModifier.defaultWeight().fillMaxHeight())
         }
         Row(GlanceModifier.fillMaxWidth().defaultWeight()) {
             Row(GlanceModifier.fillMaxHeight().defaultWeight()) {
-                Cell(dayPart, rectColor, textColor, gap, cornerRadius, fontSize,
+                Cell(dayPart, rectColor, textColor, gap, cornerRadiusDp, quarterCellSize, fontSize,
                     modifier = GlanceModifier.defaultWeight().fillMaxHeight())
-                Cell(monthPart, rectColor, textColor, gap, cornerRadius, fontSize,
+                Cell(monthPart, rectColor, textColor, gap, cornerRadiusDp, quarterCellSize, fontSize,
                     modifier = GlanceModifier.defaultWeight().fillMaxHeight())
             }
-            Cell(ClockTextPart.YEAR, rectColor, textColor, gap, cornerRadius, fontSize,
+            Cell(ClockTextPart.YEAR, rectColor, textColor, gap, cornerRadiusDp, halfCellSize, fontSize,
                 modifier = GlanceModifier.defaultWeight().fillMaxHeight())
         }
     }
@@ -226,10 +234,9 @@ internal fun DateSection(
 /**
  * Одна «квадратная» ячейка с закруглёнными углами и отступом [gap] вокруг неё.
  *
- * Текст — нативный [android.widget.TextClock] через AndroidRemoteViews:
- * он сам обновляет время/дату, без запуска кода приложения.
- * Внешний Box задаёт только зазор: в RemoteViews padding не сжимает фон view,
- * поэтому фон рисует отдельный внутренний Box.
+ * На Android 12+ скругление рисует Glance. На Android 11 и ниже фон —
+ * Cell bitmap с запечёнными цветом (включая прозрачность) и углами.
+ * Текст — нативный [android.widget.TextClock], обновляется сам.
  */
 @Composable
 internal fun Cell(
@@ -237,33 +244,75 @@ internal fun Cell(
     rectColor: Color,
     textColor: Color,
     gap: Dp,
-    cornerRadius: Dp,
+    cornerRadiusDp: Int,
+    cellSize: DpSize,
     fontSize: TextUnit,
     modifier: GlanceModifier = GlanceModifier,
 ) {
     val context = LocalContext.current
     Box(modifier = modifier.padding(gap / 2)) {
-        Box(
-            modifier = GlanceModifier
-                .fillMaxSize()
-                .background(rectColor)
-                .cornerRadius(cornerRadius),
-            contentAlignment = Alignment.Center,
-        ) {
-            val remoteViews = RemoteViews(context.packageName, part.layoutRes)
-            remoteViews.setTextColor(R.id.clock_text, textColor.toArgb())
-            remoteViews.setPadding(R.id.clock_text, fontSize, FontWeight.Bold)
-            remoteViews.setTextViewTextSize(
-                R.id.clock_text,
-                TypedValue.COMPLEX_UNIT_SP,
-                fontSize.value,
-            )
+        if (SDK_INT >= S) {
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .background(rectColor)
+                    .cornerRadius(cornerRadiusDp.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                AndroidRemoteViews(
+                    remoteViews = textRemoteViews(context, part, textColor, fontSize),
+                    modifier = GlanceModifier.fillMaxSize(),
+                )
+            }
+        } else {
+            val density = context.resources.displayMetrics.density
+            val bg = RemoteViews(context.packageName, R.layout.cell_bg)
+            bg.setImageViewBitmap(R.id.cell_bg, cellBitmap(cellSize, rectColor, cornerRadiusDp, density))
+            bg.addView(R.id.cell_root, textRemoteViews(context, part, textColor, fontSize))
             AndroidRemoteViews(
-                remoteViews = remoteViews,
+                remoteViews = bg,
                 modifier = GlanceModifier.fillMaxSize(),
             )
         }
     }
+}
+
+/** RemoteViews текста ячейки: цвет, размер и вертикальная компенсация. */
+@Composable
+private fun textRemoteViews(
+    context: Context,
+    part: ClockTextPart,
+    textColor: Color,
+    fontSize: TextUnit,
+): RemoteViews {
+    val views = RemoteViews(context.packageName, part.layoutRes)
+    views.setTextColor(R.id.clock_text, textColor.toArgb())
+    views.setPadding(R.id.clock_text, fontSize, FontWeight.Bold)
+    views.setTextViewTextSize(
+        R.id.clock_text,
+        TypedValue.COMPLEX_UNIT_SP,
+        fontSize.value,
+    )
+    return views
+}
+
+/** Растровый фон ячейки: цвет с прозрачностью и скруглённые углы. */
+private fun cellBitmap(
+    size: DpSize,
+    color: Color,
+    cornerRadiusDp: Int,
+    density: Float,
+): Bitmap {
+    val width = (size.width.value * density).roundToInt().coerceAtLeast(1)
+    val height = (size.height.value * density).roundToInt().coerceAtLeast(1)
+    val radius = cornerRadiusDp * density
+    val bitmap = createBitmap(width, height)
+    val canvas = Canvas(bitmap)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        this.color = color.toArgb()
+    }
+    canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), radius, radius, paint)
+    return bitmap
 }
 
 @Composable
