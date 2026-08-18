@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Block Clock</string>
+    <string name="app_name" translatable="false">Block Clock</string>
     <string name="widget_name">@string/app_name</string>
+
     <string name="widget_time_name">Только время</string>
     <string name="widget_date_name">Только дата</string>
     <string name="widget_date_and_time_name">Время и дата</string>
@@ -13,4 +14,6 @@
     <string name="option_month_first">Сначала месяц</string>
     <string name="button_done">Готово</string>
     <string name="button_cancel">Отмена</string>
+
+    <string name="github" translatable="false">GitHub</string>
 </resources>

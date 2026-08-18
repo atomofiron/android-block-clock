@@ -1,5 +1,6 @@
 package app.atomofiron.blockclock.settings
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -58,11 +60,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
 import app.atomofiron.blockclock.R
 import app.atomofiron.blockclock.util.statusBarAndCutout
@@ -94,7 +98,11 @@ private val SliderLabelSpacing = 4.dp
 private const val PercentFactor = 100f
 private val TransparencyRange = 0f..1f
 private val GapRange = 0f..8f
-private val SwitchRowVerticalPadding = 6.dp
+private val RowVerticalPadding = 6.dp
+private val IconSize = 24.dp
+
+/** Адрес репозитория проекта на GitHub. */
+private const val GITHUB_URL = "https://github.com/atomofiron/android-block-clock"
 private val DialogSpacing = 12.dp
 private val DialogSwatchSize = 32.dp
 private val DialogSwatchCornerRadius = 8.dp
@@ -234,6 +242,31 @@ fun SettingsScreen() {
                                 apply(settings.copy(dayFirst = !checked))
                             },
                         )
+                    }
+                }
+                item {
+                    SectionCard(title = null) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(FieldCornerRadius))
+                                .clickable {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, GITHUB_URL.toUri()))
+                                }
+                                .padding(vertical = RowVerticalPadding),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_github),
+                                contentDescription = null,
+                                modifier = Modifier.size(IconSize),
+                            )
+                            Text(
+                                text = stringResource(R.string.github),
+                                modifier = Modifier.padding(start = FieldSpacing).weight(1f),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        }
                     }
                 }
             }
@@ -441,7 +474,7 @@ private fun SettingSwitch(
             .fillMaxWidth()
             .clip(RoundedCornerShape(FieldCornerRadius))
             .clickable { onCheckedChange(!checked) }
-            .padding(vertical = SwitchRowVerticalPadding),
+            .padding(vertical = RowVerticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
