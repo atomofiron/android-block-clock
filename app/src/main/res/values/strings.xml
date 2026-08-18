@@ -1,19 +1,19 @@
 <resources>
     <string name="app_name" translatable="false">Block Clock</string>
-    <string name="widget_name">@string/app_name</string>
+    <string name="widget_name" translatable="false">@string/app_name</string>
 
-    <string name="widget_time_name">Только время</string>
-    <string name="widget_date_name">Только дата</string>
-    <string name="widget_date_and_time_name">Время и дата</string>
-    <string name="section_background">Фон</string>
-    <string name="section_text">Текст</string>
-    <string name="label_color">Цвет</string>
-    <string name="label_transparency">Прозрачность</string>
-    <string name="label_corner_radius">Закругление</string>
-    <string name="label_gap">Отступы</string>
-    <string name="option_month_first">Сначала месяц</string>
-    <string name="button_done">Готово</string>
-    <string name="button_cancel">Отмена</string>
+    <string name="widget_time_name">Time only</string>
+    <string name="widget_date_name">Date only</string>
+    <string name="widget_date_and_time_name">Time and date</string>
+    <string name="section_background">Background</string>
+    <string name="section_text">Text</string>
+    <string name="label_color">Color</string>
+    <string name="label_transparency">Transparency</string>
+    <string name="label_corner_radius">Rounding</string>
+    <string name="label_gap">Spacing</string>
+    <string name="option_month_first">Month first</string>
+    <string name="button_done">Done</string>
+    <string name="button_cancel">Cancel</string>
 
     <string name="github" translatable="false">GitHub</string>
 </resources>
