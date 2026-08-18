@@ -78,14 +78,10 @@ import kotlin.math.roundToInt
 private val PaddingCommon = 16.dp
 private val ClipCornerRadius = 28.dp
 private val GridColumnMinWidth = 320.dp
-private val GridSpacing = 16.dp
-private val GridBottomPadding = 16.dp
 private val CornerRadiusRange = 1f..32f
-private val PreviewSideInset = 16.dp
 private val PreviewMaxWidthInset = 32.dp
 private const val PreviewAspectRatio = 4f / 1f
 private val CardCornerRadius = 28.dp
-private val CardContentPadding = 16.dp
 private val CardSpacing = 12.dp
 private val FieldCornerRadius = 12.dp
 private val FieldVerticalPadding = 10.dp
@@ -185,10 +181,10 @@ fun SettingsScreen() {
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = WindowInsets.navigationBars
                     .only(WindowInsetsSides.Bottom)
-                    .add(WindowInsets(bottom = GridBottomPadding))
+                    .add(WindowInsets(bottom = PaddingCommon))
                     .asPaddingValues(),
-                horizontalArrangement = Arrangement.spacedBy(GridSpacing),
-                verticalItemSpacing = GridSpacing,
+                horizontalArrangement = Arrangement.spacedBy(PaddingCommon),
+                verticalItemSpacing = PaddingCommon,
             ) {
                 item {
                     SectionCard(stringResource(R.string.section_background)) {
@@ -256,8 +252,8 @@ private fun WidgetPreviewCard(settings: WidgetSettings) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = PreviewSideInset)
-            .padding(horizontal = PreviewSideInset),
+            .padding(top = PaddingCommon)
+            .padding(horizontal = PaddingCommon),
         contentAlignment = Alignment.Center,
     ) {
         GlanceWidgetPreview(
@@ -284,7 +280,7 @@ private fun SectionCard(title: String? = null, content: @Composable ColumnScope.
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(CardContentPadding),
+                .padding(PaddingCommon),
             verticalArrangement = Arrangement.spacedBy(CardSpacing),
         ) {
             if (title != null) {
