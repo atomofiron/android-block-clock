@@ -10,15 +10,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,9 +58,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.updateAll
 import app.atomofiron.blockclock.R
@@ -163,14 +167,16 @@ fun SettingsScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .navigationBarsPadding()
                 .padding(start = ClipInset, top = ClipInset, end = ClipInset)
                 .clip(RoundedCornerShape(topStart = ClipCornerRadius, topEnd = ClipCornerRadius)),
         ) {
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Adaptive(GridColumnMinWidth),
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = GridBottomPadding),
+                contentPadding = WindowInsets.navigationBars
+                    .only(WindowInsetsSides.Bottom)
+                    .add(WindowInsets(bottom = GridBottomPadding))
+                    .asPaddingValues(),
                 horizontalArrangement = Arrangement.spacedBy(GridSpacing),
                 verticalItemSpacing = GridSpacing,
             ) {
