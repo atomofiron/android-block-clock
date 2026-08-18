@@ -16,6 +16,7 @@
             android:exported="true"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleInstance"
             android:configChanges="orientation|keyboard|keyboardHidden|layoutDirection|screenLayout|screenSize|fontScale|smallestScreenSize|navigation|uiMode|colorMode"
             >
             <intent-filter>
