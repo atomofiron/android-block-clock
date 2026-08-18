@@ -75,8 +75,15 @@ class ClockWidget(
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val settings = preview ?: WidgetSettingsStore.load(context)
         val openSettings = actionStartActivity(Intent(context, MainActivity::class.java))
+        val openClockApp = clockAppAction(context)
+        val openCalendarApp = calendarAppAction(context)
         provideContent {
-            ClockWidgetContent(initialSettings = settings, openSettings = openSettings)
+            ClockWidgetContent(
+                initialSettings = settings,
+                openSettings = openSettings,
+                openClockApp = openClockApp,
+                openCalendarApp = openCalendarApp,
+            )
         }
     }
 }
@@ -85,6 +92,8 @@ class ClockWidget(
 private fun ClockWidgetContent(
     initialSettings: WidgetSettings,
     openSettings: Action,
+    openClockApp: Action,
+    openCalendarApp: Action,
 ) {
     val settings = rememberWidgetSettings(initialSettings)
     val available = LocalSize.current
@@ -98,13 +107,13 @@ private fun ClockWidgetContent(
     ) {
         if (useHorizontalLayout) {
             Row {
-                TimeSection(settings = settings, area = DpSize(width = available.width * FULL_WIDGET_SECTION_AREA, height = available.height))
-                DateSection(settings = settings, area = DpSize(width = available.width * FULL_WIDGET_SECTION_AREA, height = available.height))
+                TimeSection(settings = settings, area = DpSize(width = available.width * FULL_WIDGET_SECTION_AREA, height = available.height), onClick = openClockApp)
+                DateSection(settings = settings, area = DpSize(width = available.width * FULL_WIDGET_SECTION_AREA, height = available.height), onClick = openCalendarApp)
             }
         } else {
             Column {
-                TimeSection(settings = settings, area = DpSize(width = available.width, height = available.height * FULL_WIDGET_SECTION_AREA))
-                DateSection(settings = settings, area = DpSize(width = available.width, height = available.height * FULL_WIDGET_SECTION_AREA))
+                TimeSection(settings = settings, area = DpSize(width = available.width, height = available.height * FULL_WIDGET_SECTION_AREA), onClick = openClockApp)
+                DateSection(settings = settings, area = DpSize(width = available.width, height = available.height * FULL_WIDGET_SECTION_AREA), onClick = openCalendarApp)
             }
         }
     }
@@ -152,6 +161,7 @@ internal fun TimeSection(
     settings: WidgetSettings,
     area: DpSize,
     modifier: GlanceModifier = GlanceModifier,
+    onClick: Action,
 ) {
     val rectColor = settings.effectiveRectColor
     val textColor = settings.textColor
@@ -161,7 +171,7 @@ internal fun TimeSection(
     val gridSize = letterboxSize(area, ratio = SECTION_ASPECT)
     val fontSize = (gridSize.height.value * TIME_TEXT_HEIGHT_FACTOR).sp
 
-    Row(modifier = modifier.size(gridSize.width, gridSize.height)) {
+    Row(modifier = modifier.size(gridSize.width, gridSize.height).clickable(onClick)) {
         Cell(ClockTextPart.HOURS, rectColor, textColor, gap, cornerRadius, fontSize,
             modifier = GlanceModifier.defaultWeight().fillMaxHeight())
         Cell(ClockTextPart.MINUTES, rectColor, textColor, gap, cornerRadius, fontSize,
@@ -181,6 +191,7 @@ internal fun DateSection(
     settings: WidgetSettings,
     area: DpSize,
     modifier: GlanceModifier = GlanceModifier,
+    onClick: Action,
 ) {
     val rectColor = settings.effectiveRectColor
     val textColor = settings.textColor
@@ -194,7 +205,7 @@ internal fun DateSection(
     val gridSize = letterboxSize(area, ratio = SECTION_ASPECT)
     val fontSize = ((gridSize.height / 2 - gap).value * DATE_TEXT_HEIGHT_FACTOR).sp
 
-    Column(modifier = modifier.size(gridSize.width, gridSize.height)) {
+    Column(modifier = modifier.size(gridSize.width, gridSize.height).clickable(onClick)) {
         Row(GlanceModifier.fillMaxWidth().defaultWeight()) {
             Cell(ClockTextPart.WEEKDAY, rectColor, textColor, gap, cornerRadius, fontSize,
                 modifier = GlanceModifier.defaultWeight().fillMaxHeight())

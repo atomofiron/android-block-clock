@@ -78,4 +78,27 @@
         </receiver>
     </application>
 
+    <queries>
+        <package android:name="com.android.alarmclock" />
+        <package android:name="com.android.calendar" />
+        <package android:name="com.android.deskclock" />
+        <package android:name="com.asus.deskclock" />
+        <package android:name="com.google.android.calendar" />
+        <package android:name="com.google.android.deskclock" />
+        <package android:name="com.htc.android.worldclock" />
+        <package android:name="com.htc.calendar" />
+        <package android:name="com.lenovo.app.Calendar" />
+        <package android:name="com.lenovo.deskclock" />
+        <package android:name="com.lge.alarm" />
+        <package android:name="com.lge.clock" />
+        <package android:name="com.motorola.blur.alarmclock" />
+        <package android:name="com.motorola.calendar" />
+        <package android:name="com.oneplus.deskclock" />
+        <package android:name="com.samsung.android.calendar" />
+        <package android:name="com.sec.android.app.alarm" />
+        <package android:name="com.sec.android.app.clockpackage" />
+        <package android:name="com.sonyericsson.organizer" />
+        <package android:name="com.sonymobile.calendar" />
+    </queries>
+
 </manifest>
