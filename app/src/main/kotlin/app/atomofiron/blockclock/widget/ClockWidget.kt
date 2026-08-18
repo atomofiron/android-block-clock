@@ -56,8 +56,8 @@ import androidx.core.graphics.createBitmap
 private const val LAYOUT_HORIZONTAL_MIN_ASPECT = 2.5f
 private const val FULL_WIDGET_SECTION_AREA = 0.5f
 private const val SECTION_ASPECT = 2f
-private const val TIME_TEXT_HEIGHT_FACTOR = 0.75f
-private const val DATE_TEXT_HEIGHT_FACTOR = 0.7f
+private const val TIME_TEXT_HEIGHT_FACTOR = 0.7f
+private const val DATE_TEXT_HEIGHT_FACTOR = 0.6f
 
 /**
  * Полный виджет «время + дата»: 4 × 1 клеток рабочего стола.
@@ -335,8 +335,8 @@ private fun textRemoteViews(
     views.setPadding(R.id.clock_text, fontSize, FontWeight.Bold)
     views.setTextViewTextSize(
         R.id.clock_text,
-        TypedValue.COMPLEX_UNIT_SP,
-        fontSize.value,
+        TypedValue.COMPLEX_UNIT_PX,
+        fontSize.value * context.resources.displayMetrics.density,
     )
     return views
 }
