@@ -11,7 +11,7 @@ import androidx.core.content.edit
  */
 data class WidgetSettings(
     val backgroundColor: Color = Color.White,
-    val backgroundTransparency: Float = 0f,
+    val backgroundTransparency: Float = 0.3f,
     val textColor: Color = Color.Black,
     val dayFirst: Boolean = true,
     /** Отступ между прямоугольниками в dp: 1..16. */
