@@ -1,6 +1,8 @@
 package app.atomofiron.blockclock.settings
 
 import android.content.Intent
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -70,6 +72,7 @@ import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
 import app.atomofiron.blockclock.R
 import app.atomofiron.blockclock.util.statusBarAndCutout
+import app.atomofiron.blockclock.licenses.LicensesDialog
 import app.atomofiron.blockclock.widget.ClockWidget
 import app.atomofiron.blockclock.widget.DateOnlyWidget
 import app.atomofiron.blockclock.widget.TimeOnlyWidget
@@ -79,7 +82,6 @@ import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private val PaddingCommon = 16.dp
 private val ClipCornerRadius = 28.dp
 private val GridColumnMinWidth = 320.dp
 private val CornerRadiusRange = 1f..32f
@@ -130,6 +132,7 @@ fun SettingsScreen() {
 
     var previewSettings by remember { mutableStateOf(settings) }
     var colorTarget by remember { mutableStateOf<ColorTarget?>(null) }
+    var showLicenses by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     fun apply(newSettings: WidgetSettings) {
@@ -173,14 +176,14 @@ fun SettingsScreen() {
             ?.inc() ?: 1
         val clipShape = StaggeredGridClipShape(
             columns = columns,
-            padding = PaddingCommon,
+            padding = Padding.Common,
             cornerRadius = ClipCornerRadius,
         )
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(start = PaddingCommon, top = PaddingCommon, end = PaddingCommon)
+                .padding(start = Padding.Common, top = Padding.Common, end = Padding.Common)
                 .clip(clipShape),
         ) {
             LazyVerticalStaggeredGrid(
@@ -189,10 +192,10 @@ fun SettingsScreen() {
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = WindowInsets.navigationBars
                     .only(WindowInsetsSides.Bottom)
-                    .add(WindowInsets(bottom = PaddingCommon))
+                    .add(WindowInsets(bottom = Padding.Common))
                     .asPaddingValues(),
-                horizontalArrangement = Arrangement.spacedBy(PaddingCommon),
-                verticalItemSpacing = PaddingCommon,
+                horizontalArrangement = Arrangement.spacedBy(Padding.Common),
+                verticalItemSpacing = Padding.Common,
             ) {
                 item {
                     SectionCard(stringResource(R.string.section_background)) {
@@ -246,31 +249,59 @@ fun SettingsScreen() {
                 }
                 item {
                     SectionCard(title = null) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(FieldCornerRadius))
-                                .clickable {
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, GITHUB_URL.toUri()))
-                                }
-                                .padding(vertical = RowVerticalPadding),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_github),
-                                contentDescription = null,
-                                modifier = Modifier.size(IconSize),
-                            )
-                            Text(
-                                text = stringResource(R.string.github),
-                                modifier = Modifier.padding(start = FieldSpacing).weight(1f),
-                                style = MaterialTheme.typography.titleMedium,
-                            )
+                        Row {
+                            ClickablePoint(
+                                modifier = Modifier.weight(1f),
+                                R.drawable.ic_github,
+                                R.string.github,
+                            ) {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, GITHUB_URL.toUri()))
+                            }
+                            Spacer(Modifier.width(Padding.Common))
+                            ClickablePoint(
+                                modifier = Modifier.weight(1f),
+                                R.drawable.ic_license,
+                                R.string.licenses,
+                            ) {
+                                showLicenses = true
+                            }
                         }
                     }
                 }
             }
         }
+    }
+    if (showLicenses) {
+        LicensesDialog(onDismiss = { showLicenses = false })
+    }
+}
+
+@Composable
+private fun ClickablePoint(
+    modifier: Modifier = Modifier,
+    @DrawableRes icon: Int,
+    @StringRes label: Int,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(FieldCornerRadius))
+            .clickable(onClick = onClick)
+            .padding(vertical = RowVerticalPadding),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            modifier = Modifier.size(IconSize),
+            painter = painterResource(icon),
+            contentDescription = null,
+        )
+        Text(
+            modifier = Modifier
+                .padding(start = FieldSpacing)
+                .weight(1f),
+            text = stringResource(label),
+            style = MaterialTheme.typography.titleMedium,
+        )
     }
 }
 
@@ -285,8 +316,8 @@ private fun WidgetPreviewCard(settings: WidgetSettings) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = PaddingCommon)
-            .padding(horizontal = PaddingCommon),
+            .padding(top = Padding.Common)
+            .padding(horizontal = Padding.Common),
         contentAlignment = Alignment.Center,
     ) {
         GlanceWidgetPreview(
@@ -313,11 +344,15 @@ private fun SectionCard(title: String? = null, content: @Composable ColumnScope.
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(PaddingCommon),
+                .padding(Padding.Common),
             verticalArrangement = Arrangement.spacedBy(CardSpacing),
         ) {
             if (title != null) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
             content()
         }
@@ -474,7 +509,7 @@ private fun SettingSwitch(
             .fillMaxWidth()
             .clip(RoundedCornerShape(FieldCornerRadius))
             .clickable { onCheckedChange(!checked) }
-            .padding(vertical = RowVerticalPadding),
+            .padding(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -533,7 +568,7 @@ private fun ColorPickerDialog(
                             .border(
                                 SwatchBorderWidth,
                                 SwatchBorderColor,
-                                RoundedCornerShape(DialogSwatchCornerRadius)
+                                RoundedCornerShape(DialogSwatchCornerRadius),
                             ),
                     )
                     Spacer(Modifier.width(FieldSpacing))

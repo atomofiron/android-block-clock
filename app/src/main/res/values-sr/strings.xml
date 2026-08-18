@@ -11,4 +11,7 @@
     <string name="option_month_first">Прво месец</string>
     <string name="button_done">Готово</string>
     <string name="button_cancel">Откажи</string>
+    <string name="button_close">Затвори</string>
+    <string name="button_ok">ОК</string>
+    <string name="licenses">Лиценце</string>
 </resources>

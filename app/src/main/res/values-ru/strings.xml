@@ -11,4 +11,7 @@
     <string name="option_month_first">Сначала месяц</string>
     <string name="button_done">Готово</string>
     <string name="button_cancel">Отмена</string>
+    <string name="button_close">Закрыть</string>
+    <string name="button_ok">ОК</string>
+    <string name="licenses">Лицензии</string>
 </resources>

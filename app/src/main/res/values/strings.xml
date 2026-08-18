@@ -14,6 +14,9 @@
     <string name="option_month_first">Month first</string>
     <string name="button_done">Done</string>
     <string name="button_cancel">Cancel</string>
+    <string name="button_close">Close</string>
+    <string name="button_ok">Ok</string>
+    <string name="licenses">Licenses</string>
 
     <string name="github" translatable="false">GitHub</string>
 </resources>

@@ -11,4 +11,7 @@
     <string name="option_month_first">Prvo mesec</string>
     <string name="button_done">Gotovo</string>
     <string name="button_cancel">Otkaži</string>
+    <string name="button_close">Zatvori</string>
+    <string name="button_ok">Ok</string>
+    <string name="licenses">Licence</string>
 </resources>
