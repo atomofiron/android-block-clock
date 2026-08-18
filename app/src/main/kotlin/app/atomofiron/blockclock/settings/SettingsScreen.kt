@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -74,7 +75,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private val ClipInset = 16.dp
+private val PaddingCommon = 16.dp
 private val ClipCornerRadius = 28.dp
 private val GridColumnMinWidth = 320.dp
 private val GridSpacing = 16.dp
@@ -162,15 +163,24 @@ fun SettingsScreen() {
             .statusBarAndCutout(),
     ) {
         WidgetPreviewCard(previewSettings)
-
+        val gridState = rememberLazyStaggeredGridState()
+        val columns = gridState.layoutInfo.visibleItemsInfo
+            .maxOfOrNull { it.lane }
+            ?.inc() ?: 1
+        val clipShape = StaggeredGridClipShape(
+            columns = columns,
+            padding = PaddingCommon,
+            cornerRadius = ClipCornerRadius,
+        )
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(start = ClipInset, top = ClipInset, end = ClipInset)
-                .clip(RoundedCornerShape(topStart = ClipCornerRadius, topEnd = ClipCornerRadius)),
+                .padding(start = PaddingCommon, top = PaddingCommon, end = PaddingCommon)
+                .clip(clipShape),
         ) {
             LazyVerticalStaggeredGrid(
+                state = gridState,
                 columns = StaggeredGridCells.Adaptive(GridColumnMinWidth),
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = WindowInsets.navigationBars
