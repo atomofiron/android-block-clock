@@ -38,14 +38,18 @@ private fun DateOnlyWidgetContent(
     openCalendarApp: Action,
 ) {
     val settings = rememberWidgetSettings(initialSettings)
+    val available = LocalSize.current
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .clickable(openCalendarApp),
         contentAlignment = Alignment.Center,
     ) {
+        if (settings.gapDp == 0) {
+            CellBackground(settings.effectiveRectColor, settings.cornerRadiusDp, letterboxSize(available, 2f))
+        }
         Row {
-            DateSection(settings = settings, area = LocalSize.current, onClick = openCalendarApp)
+            DateSection(settings = settings, area = available, onClick = openCalendarApp)
         }
     }
 }

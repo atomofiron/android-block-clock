@@ -38,14 +38,18 @@ private fun TimeOnlyWidgetContent(
     openClockApp: Action,
 ) {
     val settings = rememberWidgetSettings(initialSettings)
+    val available = LocalSize.current
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .clickable(openClockApp),
         contentAlignment = Alignment.Center,
     ) {
+        if (settings.gapDp == 0) {
+            CellBackground(settings.effectiveRectColor, settings.cornerRadiusDp, letterboxSize(available, 2f))
+        }
         Row {
-            TimeSection(settings = settings, area = LocalSize.current, onClick = openClockApp)
+            TimeSection(settings = settings, area = available, onClick = openClockApp)
         }
     }
 }

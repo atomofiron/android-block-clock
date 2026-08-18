@@ -8,7 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.S
+import android.os.Build.VERSION_CODES.S as AndroidS
 import android.util.TypedValue
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
@@ -102,6 +102,10 @@ private fun ClockWidgetContent(
     val settings = rememberWidgetSettings(initialSettings)
     val available = LocalSize.current
     val useHorizontalLayout = available.width / available.height >= LAYOUT_HORIZONTAL_MIN_ASPECT
+    val gridSize = letterboxSize(
+        available,
+        if (useHorizontalLayout) 4f else 1f,
+    )
 
     Box(
         modifier = GlanceModifier
@@ -109,6 +113,9 @@ private fun ClockWidgetContent(
             .clickable(openSettings),
         contentAlignment = Alignment.Center,
     ) {
+        if (settings.gapDp == 0) {
+            CellBackground(settings.effectiveRectColor, settings.cornerRadiusDp, gridSize)
+        }
         if (useHorizontalLayout) {
             Row {
                 TimeSection(settings = settings, area = DpSize(width = available.width * FULL_WIDGET_SECTION_AREA, height = available.height), onClick = openClockApp)
@@ -251,7 +258,9 @@ internal fun Cell(
 ) {
     val context = LocalContext.current
     Box(modifier = modifier.padding(gap / 2)) {
-        if (SDK_INT >= S) {
+        if (gap <= 0.dp) {
+            CellRemoteViews(textRemoteViews(context, part, textColor, fontSize))
+        } else if (SDK_INT >= AndroidS) {
             Box(
                 modifier = GlanceModifier
                     .fillMaxSize()
@@ -259,21 +268,57 @@ internal fun Cell(
                     .cornerRadius(cornerRadiusDp.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                AndroidRemoteViews(
-                    remoteViews = textRemoteViews(context, part, textColor, fontSize),
-                    modifier = GlanceModifier.fillMaxSize(),
-                )
+                CellRemoteViews(textRemoteViews(context, part, textColor, fontSize))
             }
         } else {
             val density = context.resources.displayMetrics.density
-            val bg = RemoteViews(context.packageName, R.layout.cell_bg)
-            bg.setImageViewBitmap(R.id.cell_bg, cellBitmap(cellSize, rectColor, cornerRadiusDp, density))
-            bg.addView(R.id.cell_root, textRemoteViews(context, part, textColor, fontSize))
-            AndroidRemoteViews(
-                remoteViews = bg,
-                modifier = GlanceModifier.fillMaxSize(),
-            )
+            val cell = RemoteViews(context.packageName, R.layout.cell_bg)
+            cell.setImageViewBitmap(R.id.cell_bg, cellBitmap(cellSize, rectColor, cornerRadiusDp, density))
+            cell.addView(R.id.cell_root, textRemoteViews(context, part, textColor, fontSize))
+            CellRemoteViews(cell)
         }
+    }
+}
+
+@Composable
+private fun CellRemoteViews(remoteViews: RemoteViews) {
+    AndroidRemoteViews(
+        remoteViews = remoteViews,
+        modifier = GlanceModifier.fillMaxSize(),
+    )
+}
+
+/**
+ * Общий фон сетки виджета: один скруглённый прямоугольник вместо фонов
+ * отдельных ячеек (используется при нулевом зазоре).
+ */
+@Composable
+internal fun CellBackground(
+    rectColor: Color,
+    cornerRadiusDp: Int,
+    size: DpSize,
+    modifier: GlanceModifier = GlanceModifier,
+) {
+    if (SDK_INT >= AndroidS) {
+        Box(
+            modifier = modifier
+                .size(size.width, size.height)
+                .background(rectColor)
+                .cornerRadius(cornerRadiusDp.dp),
+        ) {
+        }
+    } else {
+        val context = LocalContext.current
+        val density = context.resources.displayMetrics.density
+        val bg = RemoteViews(context.packageName, R.layout.cell_bg)
+        bg.setImageViewBitmap(
+            R.id.cell_bg,
+            cellBitmap(size, rectColor, cornerRadiusDp, density),
+        )
+        AndroidRemoteViews(
+            remoteViews = bg,
+            modifier = modifier.size(size.width, size.height),
+        )
     }
 }
 
