@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextClock xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- высота 300dp необходима на случай если высота текста окажется
+     больше чем высота контейнера, а с явным указанием большой
+     высоты TextClock разместится в соответствии с layout_gravity="center" -->
+<TextClock
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/clock_text"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="300dp"
+    android:layout_gravity="center"
     android:format12Hour="mm"
     android:format24Hour="mm"
     android:gravity="center"
     android:textColor="#FFFFFF"
     android:textSize="14sp"
-    android:textStyle="bold" />
+    android:textStyle="bold"
+    />
