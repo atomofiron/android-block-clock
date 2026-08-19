@@ -180,7 +180,7 @@ internal fun TimeSection(
     val cornerRadiusDp = settings.cornerRadiusDp
 
     val gridSize = letterboxSize(area, ratio = SECTION_ASPECT)
-    val fontSize = (gridSize.height.value * TIME_TEXT_HEIGHT_FACTOR).sp
+    val fontSize = ((gridSize.height - gap).value * TIME_TEXT_HEIGHT_FACTOR).sp
     val cellSize = DpSize(gridSize.width / 2, gridSize.height)
 
     Row(modifier = modifier.size(gridSize.width, gridSize.height).clickable(onClick)) {
