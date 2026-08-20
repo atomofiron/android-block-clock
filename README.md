@@ -1,5 +1,5 @@
 # Block Clock
 Android clock widget
 
-<img width="400" alt="block-clock" src="https://github.com/user-attachments/assets/ce61d8b5-8763-4f6b-8506-49288a2b21b7" />
-<img width="400" alt="block-clock-settings" src="https://github.com/user-attachments/assets/556fd1df-5e0e-4585-8b4b-9f05ca3d61ff" />
+<img width="400" alt="block-clock" src="https://github.com/user-attachments/assets/cc08f7ab-3fea-4d0f-9b13-e4dd1bab1a28" />
+<img width="400" alt="block-clock-settings" src="https://github.com/user-attachments/assets/da56ee5c-b464-4ea4-b26f-559872d617fa" />
