@@ -7,6 +7,6 @@ import androidx.glance.appwidget.GlanceAppWidget
  * Класс виджета тот же, что и у 4 × 1 — компоновка (горизонтальная 4:1
  * или квадратная 1:1) выбирается сама по доступному пространству.
  */
-class ClockWidget2x2Receiver : BaseClockWidgetReceiver() {
+class ThreeLevelWidgetReceiver : BaseClockWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ClockWidget()
 }

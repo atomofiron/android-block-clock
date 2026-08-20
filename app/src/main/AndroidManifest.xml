@@ -39,7 +39,7 @@
         </receiver>
 
         <receiver
-            android:name=".widget.ClockWidget2x2Receiver"
+            android:name=".widget.ThreeLevelWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_date_and_time_name">
             <intent-filter>
@@ -48,7 +48,20 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/clock_widget_2x2_info" />
+                android:resource="@xml/three_level_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.TwoLevelWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_date_and_time_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/two_level_widget_info" />
         </receiver>
 
         <receiver

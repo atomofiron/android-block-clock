@@ -2,6 +2,8 @@
     <string name="widget_time_name">Само време</string>
     <string name="widget_date_name">Само датум</string>
     <string name="widget_date_and_time_name">Време и датум</string>
+    <string name="widget_two_level_name">2 нивоа</string>
+    <string name="widget_three_level_name">3 нивоа</string>
     <string name="section_background">Позадина</string>
     <string name="section_text">Текст</string>
     <string name="label_color">Боја</string>

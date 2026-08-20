@@ -5,6 +5,8 @@
     <string name="widget_time_name">Time only</string>
     <string name="widget_date_name">Date only</string>
     <string name="widget_date_and_time_name">Time and date</string>
+    <string name="widget_two_level_name">Two levels</string>
+    <string name="widget_three_level_name">Three levels</string>
     <string name="section_background">Background</string>
     <string name="section_text">Text</string>
     <string name="label_color">Color</string>

@@ -43,7 +43,6 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.FontWeight
@@ -55,7 +54,7 @@ import androidx.core.graphics.createBitmap
 
 private const val LAYOUT_HORIZONTAL_MIN_ASPECT = 2.5f
 private const val FULL_WIDGET_SECTION_AREA = 0.5f
-private const val SECTION_ASPECT = 2f
+internal const val SECTION_ASPECT = 2f
 private const val TIME_TEXT_HEIGHT_FACTOR = 0.7f
 private const val DATE_TEXT_HEIGHT_FACTOR = 0.6f
 
@@ -117,14 +116,34 @@ private fun ClockWidgetContent(
             CellBackground(settings.effectiveRectColor, settings.cornerRadiusDp, gridSize)
         }
         if (useHorizontalLayout) {
+            val dateGrid = letterboxSize(
+                DpSize(
+                    width = available.width * FULL_WIDGET_SECTION_AREA,
+                    height = available.height,
+                ),
+                ratio = SECTION_ASPECT,
+            )
             Row {
                 TimeSection(settings = settings, area = DpSize(width = available.width * FULL_WIDGET_SECTION_AREA, height = available.height), onClick = openClockApp)
-                DateSection(settings = settings, area = DpSize(width = available.width * FULL_WIDGET_SECTION_AREA, height = available.height), onClick = openCalendarApp)
+                Column {
+                    WeekdaySection(settings = settings, area = DpSize(dateGrid.width, dateGrid.height / 2), onClick = openCalendarApp)
+                    DateSection(settings = settings, area = DpSize(dateGrid.width, dateGrid.height / 2), onClick = openCalendarApp)
+                }
             }
         } else {
+            val dateGrid = letterboxSize(
+                DpSize(
+                    width = available.width,
+                    height = available.height / 2,
+                ),
+                ratio = SECTION_ASPECT,
+            )
             Column {
                 TimeSection(settings = settings, area = DpSize(width = available.width, height = available.height * FULL_WIDGET_SECTION_AREA), onClick = openClockApp)
-                DateSection(settings = settings, area = DpSize(width = available.width, height = available.height * FULL_WIDGET_SECTION_AREA), onClick = openCalendarApp)
+                Column {
+                    WeekdaySection(settings = settings, area = DpSize(dateGrid.width, dateGrid.height / 2), onClick = openCalendarApp)
+                    DateSection(settings = settings, area = DpSize(dateGrid.width, dateGrid.height / 2), onClick = openCalendarApp)
+                }
             }
         }
     }
@@ -192,11 +211,31 @@ internal fun TimeSection(
 }
 
 /**
- * Дата: день недели на всю ширину сверху; снизу — день, месяц и год
- * (порядок день/месяц зависит от настройки).
- *
- * Секция сама вычисляет letterbox с пропорцией 2:1 от переданной области
- * [area] и размер текста (70% высоты ячейки).
+ * День недели: одна ячейка на всю переданную область [area].
+ */
+@Composable
+internal fun WeekdaySection(
+    settings: WidgetSettings,
+    area: DpSize,
+    modifier: GlanceModifier = GlanceModifier,
+    onClick: Action,
+) {
+    val rectColor = settings.effectiveRectColor
+    val textColor = settings.textColor
+    val gap = settings.gapDp.dp
+    val cornerRadiusDp = settings.cornerRadiusDp
+
+    val fontSize = ((area.height - gap).value * DATE_TEXT_HEIGHT_FACTOR).sp
+
+    Row(modifier = modifier.size(area.width, area.height).clickable(onClick)) {
+        Cell(ClockTextPart.WEEKDAY, rectColor, textColor, gap, cornerRadiusDp, area, fontSize,
+            modifier = GlanceModifier.defaultWeight().fillMaxHeight())
+    }
+}
+
+/**
+ * Дата: день, месяц и год в один ряд (порядок день/месяц зависит
+ * от настройки), на всю переданную область [area].
  */
 @Composable
 internal fun DateSection(
@@ -214,27 +253,19 @@ internal fun DateSection(
         else -> ClockTextPart.MONTH to ClockTextPart.DAY
     }
 
-    val gridSize = letterboxSize(area, ratio = SECTION_ASPECT)
-    val fontSize = ((gridSize.height / 2 - gap).value * DATE_TEXT_HEIGHT_FACTOR).sp
-    val topCellSize = DpSize(gridSize.width, gridSize.height / 2)
-    val quarterCellSize = DpSize(gridSize.width / 4, gridSize.height / 2)
-    val halfCellSize = DpSize(gridSize.width / 2, gridSize.height / 2)
+    val fontSize = ((area.height - gap).value * DATE_TEXT_HEIGHT_FACTOR).sp
+    val quarterCellSize = DpSize(area.width / 4, area.height)
+    val halfCellSize = DpSize(area.width / 2, area.height)
 
-    Column(modifier = modifier.size(gridSize.width, gridSize.height).clickable(onClick)) {
-        Row(GlanceModifier.fillMaxWidth().defaultWeight()) {
-            Cell(ClockTextPart.WEEKDAY, rectColor, textColor, gap, cornerRadiusDp, topCellSize, fontSize,
+    Row(modifier = modifier.size(area.width, area.height).clickable(onClick)) {
+        Row(GlanceModifier.fillMaxHeight().defaultWeight()) {
+            Cell(dayPart, rectColor, textColor, gap, cornerRadiusDp, quarterCellSize, fontSize,
+                modifier = GlanceModifier.defaultWeight().fillMaxHeight())
+            Cell(monthPart, rectColor, textColor, gap, cornerRadiusDp, quarterCellSize, fontSize,
                 modifier = GlanceModifier.defaultWeight().fillMaxHeight())
         }
-        Row(GlanceModifier.fillMaxWidth().defaultWeight()) {
-            Row(GlanceModifier.fillMaxHeight().defaultWeight()) {
-                Cell(dayPart, rectColor, textColor, gap, cornerRadiusDp, quarterCellSize, fontSize,
-                    modifier = GlanceModifier.defaultWeight().fillMaxHeight())
-                Cell(monthPart, rectColor, textColor, gap, cornerRadiusDp, quarterCellSize, fontSize,
-                    modifier = GlanceModifier.defaultWeight().fillMaxHeight())
-            }
-            Cell(ClockTextPart.YEAR, rectColor, textColor, gap, cornerRadiusDp, halfCellSize, fontSize,
-                modifier = GlanceModifier.defaultWeight().fillMaxHeight())
-        }
+        Cell(ClockTextPart.YEAR, rectColor, textColor, gap, cornerRadiusDp, halfCellSize, fontSize,
+            modifier = GlanceModifier.defaultWeight().fillMaxHeight())
     }
 }
 

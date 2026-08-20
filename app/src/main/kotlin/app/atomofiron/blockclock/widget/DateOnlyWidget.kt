@@ -2,6 +2,7 @@ package app.atomofiron.blockclock.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.DpSize
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalSize
@@ -12,7 +13,7 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
-import androidx.glance.layout.Row
+import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 
 /**
@@ -48,8 +49,10 @@ private fun DateOnlyWidgetContent(
         if (settings.gapDp == 0) {
             CellBackground(settings.effectiveRectColor, settings.cornerRadiusDp, letterboxSize(available, 2f))
         }
-        Row {
-            DateSection(settings = settings, area = available, onClick = openCalendarApp)
+        val grid = letterboxSize(available, ratio = SECTION_ASPECT)
+        Column {
+            WeekdaySection(settings = settings, area = DpSize(grid.width, grid.height / 2), onClick = openCalendarApp)
+            DateSection(settings = settings, area = DpSize(grid.width, grid.height / 2), onClick = openCalendarApp)
         }
     }
 }

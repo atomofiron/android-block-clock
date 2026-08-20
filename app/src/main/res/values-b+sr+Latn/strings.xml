@@ -2,6 +2,8 @@
     <string name="widget_time_name">Samo vreme</string>
     <string name="widget_date_name">Samo datum</string>
     <string name="widget_date_and_time_name">Vreme i datum</string>
+    <string name="widget_two_level_name">2 nivoa</string>
+    <string name="widget_three_level_name">3 nivoa</string>
     <string name="section_background">Pozadina</string>
     <string name="section_text">Tekst</string>
     <string name="label_color">Boja</string>

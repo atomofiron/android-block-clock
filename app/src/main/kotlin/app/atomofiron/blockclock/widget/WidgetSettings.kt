@@ -15,7 +15,7 @@ data class WidgetSettings(
     val textColor: Color = Color.Black,
     val dayFirst: Boolean = true,
     /** Отступ между прямоугольниками в dp: 1..16. */
-    val gapDp: Int = 4,
+    val gapDp: Int = 6,
     /** Радиус скругления углов прямоугольников в dp: 1..32. */
     val cornerRadiusDp: Int = 16,
 ) {
