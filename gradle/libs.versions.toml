@@ -4,9 +4,9 @@ coreKtx = "1.19.0"
 junit = "4.13.2"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
-appcompat = "1.7.1"
-kotlin = "2.2.10"
-composeBom = "2026.02.01"
+appcompat = "1.8.0"
+kotlin = "2.4.10"
+composeBom = "2026.08.00"
 glance = "1.1.1"
 
 [libraries]
