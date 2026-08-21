@@ -99,7 +99,7 @@ private val SwatchBorderColor = Color(0x33000000)
 private val SliderLabelSpacing = 4.dp
 private const val PercentFactor = 100f
 private val TransparencyRange = 0f..1f
-private val GapRange = 0f..8f
+private val GapRange = 0f..16f
 private val RowVerticalPadding = 6.dp
 private val IconSize = 24.dp
 
