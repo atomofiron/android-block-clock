@@ -45,6 +45,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,8 +72,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
 import app.atomofiron.blockclock.R
-import app.atomofiron.blockclock.util.statusBarAndCutout
 import app.atomofiron.blockclock.licenses.LicensesDialog
+import app.atomofiron.blockclock.util.animatedBackgroundColor
+import app.atomofiron.blockclock.util.statusBarAndCutout
 import app.atomofiron.blockclock.widget.ClockWidget
 import app.atomofiron.blockclock.widget.DateOnlyWidget
 import app.atomofiron.blockclock.widget.TimeOnlyWidget
@@ -126,7 +128,7 @@ private const val HueDegrees = 360f
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(uiStarted: Boolean) {
     val context = LocalContext.current
     var settings by remember { mutableStateOf(WidgetSettingsStore.load(context)) }
 
@@ -167,6 +169,7 @@ fun SettingsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(animatedBackgroundColor(transparent = uiStarted))
             .statusBarAndCutout(),
     ) {
         WidgetPreviewCard(previewSettings)
