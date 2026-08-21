@@ -26,7 +26,7 @@
         </activity>
 
         <receiver
-            android:name=".widget.ClockWidgetReceiver"
+            android:name=".widget.OneLevelWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_date_and_time_name">
             <intent-filter>
@@ -35,7 +35,7 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/clock_widget_info" />
+                android:resource="@xml/one_level_widget_info" />
         </receiver>
 
         <receiver
