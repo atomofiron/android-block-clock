@@ -15,6 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
+import androidx.glance.GlanceModifier
+import androidx.glance.layout.size
 
 @Composable
 fun Modifier.statusBarAndCutout() = windowInsetsPadding(WindowInsets.run { statusBars.union(displayCutout) })
@@ -29,3 +32,5 @@ fun animatedBackgroundColor(transparent: Boolean): Color {
     }
     return backgroundColor
 }
+
+fun GlanceModifier.size(size: DpSize) = size(width = size.width, height = size.height)

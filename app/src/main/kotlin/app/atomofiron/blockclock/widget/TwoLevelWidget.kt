@@ -3,7 +3,7 @@ package app.atomofiron.blockclock.widget
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalSize
@@ -17,7 +17,7 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
-import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.wrapContentSize
 import app.atomofiron.blockclock.MainActivity
 
 /**
@@ -48,9 +48,10 @@ class TwoLevelWidget : GlanceAppWidget() {
 /**
  * Контент двухуровневого виджета.
  *
- * Пропорции: строка дня недели и даты — всегда 8:1 (ширина к высоте),
- * сам виджет при этом получается 8:5: высота = ширина/2 + ширина/8.
- * Сетка вписывается в доступную область по fitCenter.
+ * Пропорции и отступы заданы в [Structure.TwoLevel]: размер клетки и
+ * сетки вычисляются [Structure.resolve] из доступной области; сверху —
+ * время, снизу в один ряд день недели и дата (размеры ячеек — клетка
+ * × веса частей).
  */
 @Composable
 private fun TwoLevelWidgetContent(
@@ -61,24 +62,23 @@ private fun TwoLevelWidgetContent(
 ) {
     val settings = rememberWidgetSettings(initialSettings)
     val available = LocalSize.current
-    val gridWidth = minOf(available.width, available.height * 8f / 5f)
-    val gridHeight = gridWidth * 5f / 8f
-    val bottom = gridWidth / 8
+    val structure = Structure.TwoLevel
+    val (cellSize, gridSize) = structure.resolve(available, settings.gapDp.dp)
 
     Box(
         modifier = GlanceModifier
-            .fillMaxSize()
+            .wrapContentSize()
             .clickable(openSettings),
         contentAlignment = Alignment.Center,
     ) {
         if (settings.gapDp == 0) {
-            CellBackground(settings.effectiveRectColor, settings.cornerRadiusDp, DpSize(gridWidth, gridHeight))
+            CellBackground(settings.effectiveRectColor, settings.cornerRadiusDp, gridSize)
         }
         Column {
-            TimeSection(settings = settings, area = DpSize(gridWidth, gridWidth / 2), onClick = openClockApp)
+            TimeSection(settings, structure, cellSize, onClick = openClockApp)
             Row {
-                WeekdaySection(settings = settings, area = DpSize(gridWidth / 2, bottom), onClick = openCalendarApp)
-                DateSection(settings = settings, area = DpSize(gridWidth / 2, bottom), onClick = openCalendarApp)
+                WeekdaySection(settings, part = structure.weekday, cellSize, onClick = openCalendarApp)
+                DateSection(settings, structure, cellSize, onClick = openCalendarApp)
             }
         }
     }

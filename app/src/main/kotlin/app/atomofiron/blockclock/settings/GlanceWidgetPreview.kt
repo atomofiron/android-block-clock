@@ -1,9 +1,17 @@
 package app.atomofiron.blockclock.settings
+
 import android.widget.FrameLayout
 import android.widget.RemoteViews
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.DpSize
@@ -12,17 +20,17 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.compose
 
 /**
- * Рендерит Glance-виджет в Compose: запускает его композицию один
- * раз и показывает полученные RemoteViews. [previewSize] задаёт
- * размер области (LocalSize внутри виджета). При изменении [refreshKey]
- * виджет перерисовывается, а предыдущий кадр виден до готовности нового.
+ * Рендерит Glance-виджет в Compose: запускает его композицию с размером
+ * [previewSize] (этот размер видит LocalSize внутри виджета) и показывает
+ * полученные RemoteViews. При изменении [refreshKey] композиция
+ * запускается заново.
  */
 @Composable
 fun GlanceWidgetPreview(
-    widget: GlanceAppWidget,
     modifier: Modifier = Modifier,
+    widget: GlanceAppWidget,
     previewSize: DpSize,
-    refreshKey: Any? = null,
+    refreshKey: Any?,
 ) {
     val context = LocalContext.current
     var remoteViews by remember { mutableStateOf<RemoteViews?>(null) }
@@ -31,22 +39,24 @@ fun GlanceWidgetPreview(
         remoteViews = widget.compose(context, size = previewSize)
     }
 
-    Box(modifier = modifier) {
-        remoteViews?.let { rv ->
+    Box(
+        modifier = modifier.size(previewSize),
+        contentAlignment = Alignment.Center,
+    ) {
+        remoteViews?.run {
             AndroidView(
-                modifier = Modifier.fillMaxSize(),
                 factory = { ctx ->
                     val frameLayout = FrameLayout(ctx)
-                    val view = rv.apply(ctx.applicationContext, frameLayout)
+                    val view = apply(ctx.applicationContext, frameLayout)
                     frameLayout.addView(view)
                     frameLayout
                 },
                 update = { frameLayout ->
                     frameLayout.removeAllViews()
-                    val view = rv.apply(frameLayout.context.applicationContext, frameLayout)
+                    val view = apply(frameLayout.context.applicationContext, frameLayout)
                     frameLayout.addView(view)
                 }
             )
-        }
+        } ?: CircularProgressIndicator()
     }
 }

@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
@@ -312,26 +310,19 @@ private fun WidgetPreviewCard(settings: WidgetSettings) {
     val windowSize = LocalWindowInfo.current.containerSize
     val minWindowSide = with(density) { min(windowSize.width, windowSize.height).toDp() }
     val maxPreviewWidth = (minWindowSide - PreviewMaxWidthInset).coerceAtLeast(0.dp)
-
-    Box(
+    val previewSize = DpSize(
+        width = maxPreviewWidth,
+        height = maxPreviewWidth / PreviewAspectRatio + GapRange.endInclusive.dp,
+    )
+    GlanceWidgetPreview(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = Padding.Common)
             .padding(horizontal = Padding.Common),
-        contentAlignment = Alignment.Center,
-    ) {
-        GlanceWidgetPreview(
-            widget = ClockWidget(settings),
-            refreshKey = settings,
-            previewSize = DpSize(
-                width = maxPreviewWidth,
-                height = maxPreviewWidth / PreviewAspectRatio,
-            ),
-            modifier = Modifier
-                .widthIn(max = maxPreviewWidth)
-                .aspectRatio(PreviewAspectRatio),
-        )
-    }
+        widget = ClockWidget(settings),
+        previewSize = previewSize,
+        refreshKey = settings,
+    )
 }
 
 /** Карточка-секция с необязательным заголовком. */
