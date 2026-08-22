@@ -1,5 +1,4 @@
-import java.io.ByteArrayOutputStream
-import java.io.File
+import org.gradle.api.tasks.Copy
 
 plugins {
     alias(libs.plugins.android.application)
@@ -58,56 +57,25 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
 
-aboutLibraries {
-    fetchRemoteLicense = true
-    outputFileName = "licenses.json"
+afterEvaluate {
+    registerUpdateBundledOssLicensesTask()
 }
 
 fun Project.registerUpdateBundledOssLicensesTask() {
-    tasks.register("updateBundledLicenses") {
+    val releaseTaskName = "releaseOssLicensesTask"
+    if (tasks.findByName(releaseTaskName) == null) {
+        return logger.lifecycle("OSS release task not found, skipping OSS license bundling for $path")
+    }
+    tasks.register<Copy>("updateBundledLicenses") {
         group = "licenses"
-        description = "Generate bundled OSS licenses (third_party_licenses format) into src/main/assets/licenses"
+        description = "Generate OSS licenses (release) and bundle them into src/main/assets"
 
-        dependsOn("exportLibraryDefinitions")
+        dependsOn(releaseTaskName)
 
-        val input = layout.buildDirectory.file("generated/aboutLibraries/licenses.json")
-        val outputDir = layout.projectDirectory.dir("src/main/assets/licenses")
-        inputs.file(input)
-        outputs.dir(outputDir)
-
-        doLast {
-            val json = input.get().asFile.readText()
-            val root = groovy.json.JsonSlurper().parseText(json) as Map<*, *>
-            val libraries = root["libraries"] as List<Map<String, Any?>>
-
-            val licensesBytes = ByteArrayOutputStream()
-            val metadata = StringBuilder()
-            libraries.forEach { library ->
-                val licenseArray = library["licenses"] as? List<*> ?: emptyList<Any?>()
-                var content: Any? = licenseArray.firstOrNull()
-                    ?.takeIf { it is Map<*, *> }
-                    ?.let {
-                        val license = it as Map<*, *>
-                        license["content"] ?: license["url"]
-                    }
-                if (content == null || content.toString().isEmpty()) {
-                    content = library["website"]
-                }
-                if (content == null || content.toString().isEmpty()) return@forEach
-                val bytes = content.toString().toByteArray(Charsets.UTF_8)
-                val index = licensesBytes.size()
-                licensesBytes.write(bytes)
-                licensesBytes.write('\n'.code)
-                val name = library["name"] ?: library["artifactId"]
-                metadata.append("$index:${bytes.size}:$name\n")
-            }
-
-            outputDir.asFile.mkdirs()
-            File(outputDir.asFile, "third_party_licenses").writeBytes(licensesBytes.toByteArray())
-            File(outputDir.asFile, "third_party_license_metadata")
-                .writeText(metadata.toString(), Charsets.UTF_8)
+        from(layout.buildDirectory.dir("generated/res/releaseOssLicensesTask/raw"))
+        into(layout.projectDirectory.dir("src/main/assets/licenses"))
+        doFirst {
+            logger.lifecycle("Updating bundled OSS licenses for $path")
         }
     }
 }
-
-registerUpdateBundledOssLicensesTask()

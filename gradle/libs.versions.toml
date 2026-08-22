@@ -27,5 +27,5 @@ androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidge
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-licenses = { id = "com.mikepenz.aboutlibraries.plugin", version = "11.6.0" }
+licenses = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.13.0" }
 
