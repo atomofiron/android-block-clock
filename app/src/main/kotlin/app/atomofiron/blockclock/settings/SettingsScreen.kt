@@ -3,6 +3,7 @@ package app.atomofiron.blockclock.settings
 import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,12 +37,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -67,22 +72,27 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
-import app.atomofiron.blockclock.R
 import app.atomofiron.blockclock.licenses.LicensesDialog
+import app.atomofiron.blockclock.update.AppSource
+import app.atomofiron.blockclock.update.UpdateService
+import app.atomofiron.blockclock.update.model.UpdateState
+import app.atomofiron.blockclock.update.UpdateStore
+import app.atomofiron.blockclock.update.model.UpdateType
 import app.atomofiron.blockclock.util.animatedBackgroundColor
 import app.atomofiron.blockclock.util.statusBarAndCutout
+import app.atomofiron.blockclock.util.steps
 import app.atomofiron.blockclock.widget.ClockWidget
 import app.atomofiron.blockclock.widget.DateOnlyWidget
 import app.atomofiron.blockclock.widget.TimeOnlyWidget
 import app.atomofiron.blockclock.widget.WidgetSettings
 import app.atomofiron.blockclock.widget.WidgetSettingsStore
+import app.blockclock.R
 import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.math.roundToInt
 
 private val ClipCornerRadius = 28.dp
 private val GridColumnMinWidth = 320.dp
-private val CornerRadiusRange = 1f..32f
 private val PreviewMaxWidthInset = 32.dp
 private const val PreviewAspectRatio = 4f / 1f
 private val CardCornerRadius = 28.dp
@@ -97,11 +107,11 @@ private val SwatchBorderColor = Color(0x33000000)
 private val SliderLabelSpacing = 4.dp
 private const val PercentFactor = 100f
 private val TransparencyRange = 0f..1f
+private val RoundingRange = 0f..32f
 private val GapRange = 0f..16f
 private val RowVerticalPadding = 6.dp
 private val IconSize = 24.dp
 
-/** Адрес репозитория проекта на GitHub. */
 private const val GITHUB_URL = "https://github.com/atomofiron/android-block-clock"
 private val DialogSpacing = 12.dp
 private val DialogSwatchSize = 32.dp
@@ -209,10 +219,9 @@ fun SettingsScreen(uiStarted: Boolean) {
                             },
                             onChangeFinished = { apply(settings.copy(backgroundTransparency = it)) },
                         )
-                        DpSlider(
+                        RoundingSlider(
                             label = stringResource(R.string.label_corner_radius),
                             value = settings.cornerRadiusDp,
-                            range = CornerRadiusRange,
                             onChange = {
                                 previewSettings = previewSettings.copy(cornerRadiusDp = it)
                             },
@@ -264,6 +273,43 @@ fun SettingsScreen(uiStarted: Boolean) {
                                 showLicenses = true
                             }
                         }
+                        val updateState by UpdateStore.self.state.collectAsState()
+                        ClickablePoint(
+                            modifier = Modifier.fillMaxWidth(),
+                            icon = updateState.icon(),
+                            label = updateState.label(),
+                            clickable = updateState.interactable,
+                            onClick = updateState::action,
+                        )
+                        when (val state = updateState) {
+                            is UpdateState.Installing,
+                            is UpdateState.Checking,
+                            is UpdateState.Downloading -> ProgressIndicator(
+                                modifier = Modifier.fillMaxWidth(),
+                                progress = state.progress(),
+                            )
+                            else -> Unit
+                        }
+                        Row(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            val (icon, tint) = when (UpdateStore.self.source) {
+                                AppSource.GitHub -> R.drawable.ic_github to ColorFilter.tint(LocalContentColor.current)
+                                AppSource.GooglePlay -> R.drawable.ic_google_play to null
+                            }
+                            Image(
+                                modifier = Modifier.size(18.dp),
+                                painter = painterResource(icon),
+                                colorFilter = tint,
+                                contentDescription = null,
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = Padding.Mini),
+                                text = stringResource(R.string.version_name),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
                     }
                 }
             }
@@ -275,16 +321,32 @@ fun SettingsScreen(uiStarted: Boolean) {
 }
 
 @Composable
+fun ProgressIndicator(
+    modifier: Modifier,
+    progress: Float? = null,
+) {
+    progress?.let {
+        LinearProgressIndicator(
+            modifier = modifier,
+            progress = { progress },
+        )
+    } ?: LinearProgressIndicator(
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun ClickablePoint(
     modifier: Modifier = Modifier,
     @DrawableRes icon: Int,
     @StringRes label: Int,
+    clickable: Boolean = true,
     onClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(FieldCornerRadius))
-            .clickable(onClick = onClick)
+            .clickable(enabled = clickable, onClick = onClick)
             .padding(vertical = RowVerticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -446,17 +508,16 @@ private fun GapSlider(gap: Int, onChange: (Int) -> Unit, onChangeFinished: (Int)
             },
             onValueChangeFinished = { onChangeFinished(value.roundToInt()) },
             valueRange = GapRange,
-            steps = GapRange.run { endInclusive - start }.toInt().dec(),
+            steps = GapRange.steps(),
         )
     }
 }
 
 /** Слайдер целого значения в dp: значение показывается справа от подписи. */
 @Composable
-private fun DpSlider(
+private fun RoundingSlider(
     label: String,
     value: Int,
-    range: ClosedFloatingPointRange<Float>,
     onChange: (Int) -> Unit,
     onChangeFinished: (Int) -> Unit,
 ) {
@@ -482,8 +543,9 @@ private fun DpSlider(
                 current = it
                 onChange(current.toInt())
             },
-            onValueChangeFinished = { onChangeFinished(current.toInt()) },
-            valueRange = range,
+            onValueChangeFinished = { onChangeFinished(current.toInt() * 2) },
+            valueRange = RoundingRange,
+            steps = RoundingRange.steps() / 2,
         )
     }
 }
@@ -687,4 +749,37 @@ private fun HueSlider(hue: Float, onChange: (Float) -> Unit) {
                 .border(MarkerBorderWidth, Color.White, CircleShape),
         )
     }
+}
+
+private fun UpdateState.icon() = when (this) {
+    is UpdateState.Unknown,
+    is UpdateState.Checking,
+    is UpdateState.Error -> R.drawable.ic_update
+    is UpdateState.Available,
+    is UpdateState.Downloading,
+    is UpdateState.Completable,
+    is UpdateState.Installing -> R.drawable.ic_download
+    is UpdateState.UpToDate -> R.drawable.ic_circle_check
+}
+
+private fun UpdateState.label() = when (this) {
+    is UpdateState.Available -> R.string.download_update
+    is UpdateState.Downloading -> R.string.update_downloading
+    is UpdateState.Completable -> R.string.install_update
+    is UpdateState.Installing -> R.string.update_installing
+    is UpdateState.Error -> R.string.retry
+    is UpdateState.Checking -> R.string.checking
+    is UpdateState.Unknown -> R.string.check_updates
+    is UpdateState.UpToDate -> R.string.is_up_to_date
+}
+
+private fun UpdateState.action() = when (this) {
+    is UpdateState.Available -> UpdateService.self.startUpdate(type as UpdateType.Variant)
+    is UpdateState.Completable -> UpdateService.self.completeUpdate()
+    is UpdateState.Error -> UpdateService.self.retry()
+    is UpdateState.Unknown -> UpdateService.self.check(userAction = true)
+    is UpdateState.Checking,
+    is UpdateState.Downloading,
+    is UpdateState.Installing,
+    is UpdateState.UpToDate -> Unit
 }

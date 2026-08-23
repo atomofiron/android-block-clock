@@ -16,4 +16,13 @@
     <string name="button_close">Затвори</string>
     <string name="button_ok">ОК</string>
     <string name="licenses">Лиценце</string>
+    <string name="unknown_error">Непозната грешка</string>
+    <string name="is_up_to_date">Апликација је ажурна</string>
+    <string name="check_updates">Провери ажурирања</string>
+    <string name="download_update">Преузмите ажурирање</string>
+    <string name="update_downloading">Преузимање…</string>
+    <string name="install_update">Инсталирај ажурирање</string>
+    <string name="update_installing">Инсталација…</string>
+    <string name="retry">Покушај поново</string>
+    <string name="checking">Провера…</string>
 </resources>

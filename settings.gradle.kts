@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -22,5 +23,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "blockclock"
+rootProject.name = "Block Clock"
+include(":appGoogle")
+include(":appGithub")
 include(":app")

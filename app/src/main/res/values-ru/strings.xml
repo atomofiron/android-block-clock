@@ -16,4 +16,13 @@
     <string name="button_close">Закрыть</string>
     <string name="button_ok">ОК</string>
     <string name="licenses">Лицензии</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="is_up_to_date">У вас последняя версия приложения</string>
+    <string name="check_updates">Проверить обновления</string>
+    <string name="download_update">Скачать обновление</string>
+    <string name="update_downloading">Скачивание…</string>
+    <string name="install_update">Установить обновление</string>
+    <string name="update_installing">Установка…</string>
+    <string name="checking">Проверка…</string>
+    <string name="retry">Повторить</string>
 </resources>

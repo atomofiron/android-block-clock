@@ -46,8 +46,8 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.wrapContentSize
 import androidx.glance.text.FontWeight
 import app.atomofiron.blockclock.MainActivity
-import app.atomofiron.blockclock.R
 import app.atomofiron.blockclock.util.size
+import app.blockclock.R
 import kotlin.math.roundToInt
 import android.os.Build.VERSION_CODES.P as AndroidP
 import android.os.Build.VERSION_CODES.S as AndroidS

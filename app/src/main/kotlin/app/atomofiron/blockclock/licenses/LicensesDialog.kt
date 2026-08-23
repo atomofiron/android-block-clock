@@ -22,8 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import app.atomofiron.blockclock.R
 import app.atomofiron.blockclock.settings.Padding
+import app.blockclock.R
 
 /**
  * Диалог OSS-лицензий: список библиотек. Тап по лицензии с текстом

@@ -1,7 +1,7 @@
 package app.atomofiron.blockclock.widget
 
 import androidx.annotation.LayoutRes
-import app.atomofiron.blockclock.R
+import app.blockclock.R
 
 /**
  * Часть времени/даты, отображаемая нативным [android.widget.TextClock]
