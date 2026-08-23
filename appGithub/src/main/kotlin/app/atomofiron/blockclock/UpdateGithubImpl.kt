@@ -1,6 +1,9 @@
 package app.atomofiron.blockclock
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageInstaller
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.blockclock.model.GithubAsset
 import app.atomofiron.blockclock.model.GithubRelease
@@ -11,21 +14,22 @@ import app.atomofiron.blockclock.update.model.UpdateState
 import app.atomofiron.blockclock.update.model.UpdateType
 import app.atomofiron.blockclock.util.Alert
 import app.atomofiron.blockclock.util.AlertErr
+import app.atomofiron.blockclock.util.Android
 import app.atomofiron.blockclock.util.AppScope
 import app.atomofiron.blockclock.util.Rslt
 import app.atomofiron.blockclock.util.apkInfo
 import app.atomofiron.blockclock.util.debugFailUnreachable
+import app.atomofiron.blockclock.util.toRslt
 import app.blockclock.R
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileInputStream
 
 private const val EXT_APK = ".apk"
-private const val SUBDIR = "updates"
 
 class AppUpdateServiceGithubImpl(
     private val context: Context,
     private val scope: AppScope,
-    private val apks: ApkService,
     private val api: UpdateApi,
     private val store: UpdateStore,
 ) : UpdateService {
@@ -37,7 +41,6 @@ class AppUpdateServiceGithubImpl(
         ): UpdateService = AppUpdateServiceGithubImpl(
             context,
             scope,
-            ApkService(context, context.packageManager.packageInstaller),
             UpdateApi(),
             updateStore,
         )
@@ -88,7 +91,7 @@ class AppUpdateServiceGithubImpl(
                 val state = store.state.value
                 store.set(UpdateState.Installing)
                 scope.launch {
-                    val rslt = apks.installApk(file.path, UpdateService.ACTION_INSTALL_UPDATE, silently = true)
+                    val rslt = installApk(file.path, UpdateService.ACTION_INSTALL_UPDATE, silently = true)
                     if (rslt is Rslt.Err) {
                         store.set(state)
                         store.showUpdateAlert(AlertErr(rslt.message))
@@ -129,7 +132,7 @@ class AppUpdateServiceGithubImpl(
         }
     }
 
-    private fun getFile(id: Int) = File(context.cacheDir, "$SUBDIR/$id$EXT_APK")
+    private fun getFile(id: Int) = File(context.cacheDir, "updates/$id$EXT_APK")
 
     private fun File.verify(asset: GithubAsset): File? = when {
         !exists() -> false
@@ -140,5 +143,37 @@ class AppUpdateServiceGithubImpl(
     }.let { verified ->
         if (!verified) delete()
         takeIf { verified }
+    }
+
+    private fun installApk(path: String, action: String, stringId: String? = null, silently: Boolean = false): Rslt<Unit> = try {
+        val stream = FileInputStream(path)
+        val length = stream.available().toLong()
+        val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+        if (silently) {
+            params.setAppPackageName(context.packageName)
+            params.setSize(length)
+            if (Android.S) params.setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
+            if (Android.T) params.setPackageSource(PackageInstaller.PACKAGE_SOURCE_STORE)
+        }
+        val installer = context.packageManager.packageInstaller
+        val sessionId = installer.createSession(params)
+        installer.openSession(sessionId).use { session ->
+            session.openWrite(stringId ?: "unused", 0, length).use { output ->
+                stream.use {
+                    it.copyTo(output)
+                    session.fsync(output)
+                }
+            }
+            val intent = Intent(context, UpdateInstallReceiver::class.java)
+            intent.action = action
+            intent.setPackage(context.packageName)
+            intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
+            val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            val pendingIntent = PendingIntent.getBroadcast(context, sessionId, intent, flags)
+            session.commit(pendingIntent.intentSender)
+        }
+        Rslt.Ok
+    } catch (e: Exception) {
+        e.toRslt()
     }
 }
