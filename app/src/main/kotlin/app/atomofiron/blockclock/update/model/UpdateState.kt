@@ -14,4 +14,11 @@ sealed class UpdateState(val interactable: Boolean = false) {
         is Downloading -> progress
         else -> null
     }
+
+    fun processing(): Boolean = when (this) {
+        is Installing,
+        is Checking,
+        is Downloading -> true
+        else -> false
+    }
 }

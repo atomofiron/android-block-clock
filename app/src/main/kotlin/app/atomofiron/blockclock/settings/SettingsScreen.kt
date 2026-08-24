@@ -56,6 +56,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -290,19 +291,13 @@ fun SettingsScreen(uiStarted: Boolean) {
                             clickable = updateState.interactable,
                             onClick = updateState::action,
                         )
-                        when (val state = updateState) {
-                            is UpdateState.Installing,
-                            is UpdateState.Checking,
-                            is UpdateState.Downloading -> ProgressIndicator(
-                                modifier = Modifier.fillMaxWidth(),
-                                progress = state.progress(),
-                            )
-                            else -> Unit
-                        }
+                        ProgressIndicator(
+                            modifier = Modifier.fillMaxWidth().offset(y = (-6).dp),
+                            progress = updateState.progress(),
+                            visible = updateState.processing(),
+                        )
                         Row(
-                            modifier = Modifier
-                                .padding(top = Padding.Mini)
-                                .align(Alignment.CenterHorizontally),
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             val (icon, tint) = when (UpdateStore.self.source) {
@@ -335,14 +330,16 @@ fun SettingsScreen(uiStarted: Boolean) {
 private fun ProgressIndicator(
     modifier: Modifier,
     progress: Float? = null,
-) {
-    progress?.let {
-        LinearProgressIndicator(
-            modifier = modifier,
-            progress = { progress },
-        )
-    } ?: LinearProgressIndicator(
+    visible: Boolean = true,
+) = when {
+    !visible -> LinearProgressIndicator(
+        modifier = modifier.alpha(0f),
+        progress = { 0f },
+    )
+    progress == null -> LinearProgressIndicator(modifier = modifier)
+    else -> LinearProgressIndicator(
         modifier = modifier,
+        progress = { progress },
     )
 }
 
