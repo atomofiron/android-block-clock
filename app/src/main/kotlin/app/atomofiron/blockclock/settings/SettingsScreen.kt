@@ -179,7 +179,7 @@ fun SettingsScreen(uiStarted: Boolean) {
             else -> WidgetPreview(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(Padding.Common),
+                    .padding(vertical = Padding.Common),
                 settings = previewSettings,
             )
         }

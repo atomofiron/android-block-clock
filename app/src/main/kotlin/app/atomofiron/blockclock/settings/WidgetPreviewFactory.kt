@@ -47,7 +47,6 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
         rememberGraphicsLayer(),
         rememberGraphicsLayer(),
     )
-    val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
@@ -118,6 +117,7 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
         )
     }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     Button(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         shape = ShapeDefaults.Medium,
