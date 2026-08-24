@@ -94,7 +94,6 @@ import kotlin.math.roundToInt
 private val ClipCornerRadius = 28.dp
 private val GridColumnMinWidth = 320.dp
 private val CardCornerRadius = 28.dp
-private val CardSpacing = 12.dp
 private val FieldCornerRadius = 12.dp
 private val FieldVerticalPadding = 10.dp
 private val FieldSpacing = 12.dp
@@ -102,12 +101,10 @@ private val SwatchSize = 36.dp
 private val SwatchCornerRadius = 10.dp
 private val SwatchBorderWidth = 1.dp
 private val SwatchBorderColor = Color(0x33000000)
-private val SliderLabelSpacing = 4.dp
 private const val PercentFactor = 100f
 private val TransparencyRange = 0f..1f
 private val RoundingRange = 0f..32f
 private val GapRange = 0f..16f
-private val RowVerticalPadding = 6.dp
 private val IconSize = 24.dp
 private val DialogSpacing = 12.dp
 private val DialogSwatchSize = 32.dp
@@ -154,17 +151,17 @@ fun SettingsScreen(uiStarted: Boolean) {
 
     colorTarget?.let { target ->
         ColorPickerDialog(
-            title = stringResource(R.string.label_color),
+            title = stringResource(R.string.color),
             initialColor = when (target) {
-                ColorTarget.Rect -> settings.backgroundColor
-                else -> settings.textColor
+                ColorTarget.Rect -> settings.background
+                else -> settings.text
             },
             onDismiss = { colorTarget = null },
             onConfirm = { color ->
                 colorTarget = null
                 when (target) {
-                    ColorTarget.Rect -> apply(settings.copy(backgroundColor = color))
-                    else -> apply(settings.copy(textColor = color))
+                    ColorTarget.Rect -> apply(settings.copy(background = color))
+                    else -> apply(settings.copy(text = color))
                 }
             },
         )
@@ -214,19 +211,32 @@ fun SettingsScreen(uiStarted: Boolean) {
                 verticalItemSpacing = Padding.Common,
             ) {
                 item {
-                    SectionCard(stringResource(R.string.section_background)) {
-                        ColorField(
-                            label = stringResource(R.string.label_color),
-                            color = settings.backgroundColor,
-                            onClick = { colorTarget = ColorTarget.Rect },
-                        )
+                    SectionCard(stringResource(R.string.color)) {
+                        Row {
+                            ColorField(
+                                modifier = Modifier.padding(end = Padding.Half).weight(1f),
+                                label = stringResource(R.string.background),
+                                color = settings.background,
+                                onClick = { colorTarget = ColorTarget.Rect },
+                            )
+                            ColorField(
+                                modifier = Modifier.padding(start = Padding.Half).weight(1f),
+                                label = stringResource(R.string.text),
+                                color = settings.text,
+                                onClick = { colorTarget = ColorTarget.Text },
+                            )
+                        }
                         TransparencySlider(
-                            transparency = settings.backgroundTransparency,
+                            transparency = settings.transparency,
                             onChange = {
-                                previewSettings = previewSettings.copy(backgroundTransparency = it)
+                                previewSettings = previewSettings.copy(transparency = it)
                             },
-                            onChangeFinished = { apply(settings.copy(backgroundTransparency = it)) },
+                            onChangeFinished = { apply(settings.copy(transparency = it)) },
                         )
+                    }
+                }
+                item {
+                    SectionCard(stringResource(R.string.shape)) {
                         RoundingSlider(
                             label = stringResource(R.string.label_corner_radius),
                             value = settings.cornerRadiusDp,
@@ -239,15 +249,6 @@ fun SettingsScreen(uiStarted: Boolean) {
                             gap = settings.gapDp,
                             onChange = { previewSettings = previewSettings.copy(gapDp = it) },
                             onChangeFinished = { apply(settings.copy(gapDp = it)) },
-                        )
-                    }
-                }
-                item {
-                    SectionCard(stringResource(R.string.section_text)) {
-                        ColorField(
-                            label = stringResource(R.string.label_color),
-                            color = settings.textColor,
-                            onClick = { colorTarget = ColorTarget.Text },
                         )
                     }
                 }
@@ -299,7 +300,9 @@ fun SettingsScreen(uiStarted: Boolean) {
                             else -> Unit
                         }
                         Row(
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            modifier = Modifier
+                                .padding(top = Padding.Mini)
+                                .align(Alignment.CenterHorizontally),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             val (icon, tint) = when (UpdateStore.self.source) {
@@ -355,7 +358,7 @@ private fun ClickablePoint(
         modifier = modifier
             .clip(RoundedCornerShape(FieldCornerRadius))
             .clickable(enabled = clickable, onClick = onClick)
-            .padding(vertical = RowVerticalPadding),
+            .padding(vertical = Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -387,11 +390,11 @@ private fun SectionCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(Padding.Common),
-            verticalArrangement = Arrangement.spacedBy(CardSpacing),
         ) {
             if (title != null) {
                 Text(
                     title,
+                    modifier = Modifier.padding(bottom = Padding.Half),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -401,12 +404,34 @@ private fun SectionCard(
     }
 }
 
+@Composable
+private fun SubTitle(title: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = Padding.Half, bottom = Padding.Mini),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
 /** Плитка текущего цвета — по тапу открывает диалог с градиентным полем. */
 @Composable
-private fun ColorField(label: String, color: Color, onClick: () -> Unit) {
+private fun ColorField(
+    modifier: Modifier,
+    label: String,
+    color: Color,
+    onClick: () -> Unit,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .clip(RoundedCornerShape(FieldCornerRadius))
             .clickable(onClick = onClick)
             .padding(vertical = FieldVerticalPadding),
@@ -425,11 +450,6 @@ private fun ColorField(label: String, color: Color, onClick: () -> Unit) {
         )
         Spacer(Modifier.width(FieldSpacing))
         Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-        Text(
-            text = "#%06X".format(color.toArgb() and 0xFFFFFF),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 
@@ -441,21 +461,11 @@ private fun TransparencySlider(
     onChangeFinished: (Float) -> Unit,
 ) {
     var value by remember { mutableFloatStateOf(transparency) }
-    Column(verticalArrangement = Arrangement.spacedBy(SliderLabelSpacing)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = stringResource(R.string.label_transparency),
-                style = MaterialTheme.typography.labelLarge,
-            )
-            Text(
-                text = "${(value * PercentFactor).toInt()} %",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+    Column {
+        SubTitle(
+            title = stringResource(R.string.label_transparency),
+            value = "${(value * PercentFactor).toInt()} %",
+        )
         Slider(
             value = value,
             onValueChange = {
@@ -475,20 +485,10 @@ private fun TransparencySlider(
 private fun GapSlider(gap: Int, onChange: (Int) -> Unit, onChangeFinished: (Int) -> Unit) {
     var value by remember { mutableFloatStateOf(gap.toFloat().coerceIn(GapRange)) }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = stringResource(R.string.label_gap),
-                style = MaterialTheme.typography.labelLarge,
-            )
-            Text(
-                text = value.roundToInt().toString(),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        SubTitle(
+            title = stringResource(R.string.label_gap),
+            value = value.roundToInt().toString(),
+        )
         Slider(
             value = value,
             onValueChange = {
@@ -511,21 +511,11 @@ private fun RoundingSlider(
     onChangeFinished: (Int) -> Unit,
 ) {
     var current by remember { mutableFloatStateOf(value.toFloat()) }
-    Column(verticalArrangement = Arrangement.spacedBy(SliderLabelSpacing)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelLarge,
-            )
-            Text(
-                text = current.toInt().toString(),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+    Column {
+        SubTitle(
+            title = label,
+            value = current.toInt().toString(),
+        )
         Slider(
             value = current,
             onValueChange = {

@@ -10,9 +10,9 @@ import androidx.core.content.edit
  * Параметры оформления и поведения виджета.
  */
 data class WidgetSettings(
-    val backgroundColor: Color = Color.White,
-    val backgroundTransparency: Float = 0.3f,
-    val textColor: Color = Color.Black,
+    val background: Color = Color.White,
+    val transparency: Float = 0.3f,
+    val text: Color = Color.Black,
     val dayFirst: Boolean = true,
     /** Отступ между прямоугольниками в dp: 1..16. */
     val gapDp: Int = 6,
@@ -20,7 +20,7 @@ data class WidgetSettings(
     val cornerRadiusDp: Int = 16,
 ) {
     /** Цвет прямоугольников с учётом прозрачности. */
-    val effectiveRectColor: Color get() = backgroundColor.copy(alpha = 1f - backgroundTransparency)
+    val effectiveRectColor: Color get() = background.copy(alpha = 1f - transparency)
 }
 
 /**
@@ -50,9 +50,9 @@ object WidgetSettingsStore {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val defaults = WidgetSettings()
         return WidgetSettings(
-            backgroundColor = Color(prefs.getInt(KEY_RECT_COLOR, defaults.backgroundColor.toArgb())),
-            backgroundTransparency = prefs.getFloat(KEY_RECT_TRANSPARENCY, defaults.backgroundTransparency),
-            textColor = Color(prefs.getInt(KEY_TEXT_COLOR, defaults.textColor.toArgb())),
+            background = Color(prefs.getInt(KEY_RECT_COLOR, defaults.background.toArgb())),
+            transparency = prefs.getFloat(KEY_RECT_TRANSPARENCY, defaults.transparency),
+            text = Color(prefs.getInt(KEY_TEXT_COLOR, defaults.text.toArgb())),
             
             dayFirst = if (prefs.contains(KEY_DAY_FIRST)) {
                 prefs.getBoolean(KEY_DAY_FIRST, defaults.dayFirst)
@@ -66,9 +66,9 @@ object WidgetSettingsStore {
 
     fun save(context: Context, settings: WidgetSettings) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
-            putInt(KEY_RECT_COLOR, settings.backgroundColor.toArgb())
-            putFloat(KEY_RECT_TRANSPARENCY, settings.backgroundTransparency)
-            putInt(KEY_TEXT_COLOR, settings.textColor.toArgb())
+            putInt(KEY_RECT_COLOR, settings.background.toArgb())
+            putFloat(KEY_RECT_TRANSPARENCY, settings.transparency)
+            putInt(KEY_TEXT_COLOR, settings.text.toArgb())
             putInt(KEY_GAP_DP, settings.gapDp)
             putInt(KEY_CORNER_RADIUS_DP, settings.cornerRadiusDp)
 

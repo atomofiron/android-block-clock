@@ -163,7 +163,7 @@ internal fun TimeSection(
     onClick: Action,
 ) {
     val rectColor = settings.effectiveRectColor
-    val textColor = settings.textColor
+    val textColor = settings.text
     val gap = settings.gapDp.dp
     val cornerRadiusDp = settings.cornerRadiusDp
 
@@ -185,7 +185,7 @@ internal fun WeekdaySection(
     onClick: Action,
 ) {
     val rectColor = settings.effectiveRectColor
-    val textColor = settings.textColor
+    val textColor = settings.text
     val gap = settings.gapDp.dp
     val cornerRadiusDp = settings.cornerRadiusDp
 
@@ -206,7 +206,7 @@ internal fun DateSection(
     onClick: Action,
 ) {
     val rectColor = settings.effectiveRectColor
-    val textColor = settings.textColor
+    val textColor = settings.text
     val gap = settings.gapDp.dp
     val cornerRadiusDp = settings.cornerRadiusDp
     val (firstPart, secondPart) = when {
