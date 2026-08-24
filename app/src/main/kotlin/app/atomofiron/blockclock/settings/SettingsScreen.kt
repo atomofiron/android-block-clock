@@ -543,7 +543,7 @@ private fun RoundingSlider(
                 current = it
                 onChange(current.toInt())
             },
-            onValueChangeFinished = { onChangeFinished(current.toInt() * 2) },
+            onValueChangeFinished = { onChangeFinished(current.toInt()) },
             valueRange = RoundingRange,
             steps = RoundingRange.steps() / 2,
         )
