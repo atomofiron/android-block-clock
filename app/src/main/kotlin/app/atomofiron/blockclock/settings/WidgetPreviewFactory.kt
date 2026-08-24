@@ -126,7 +126,8 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
                 try {
                     graphicsLayers.forEachIndexed { i, layer ->
                         val bitmap = layer.toImageBitmap().asAndroidBitmap()
-                        val file = File(context.filesDir, "${Names[i]}.png")
+                        val file = File(context.filesDir, "previews/${Names[i]}.png")
+                        file.parentFile?.mkdirs()
                         FileOutputStream(file).use {
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
                         }
