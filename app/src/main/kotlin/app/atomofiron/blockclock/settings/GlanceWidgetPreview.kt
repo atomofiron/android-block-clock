@@ -22,20 +22,18 @@ import androidx.glance.appwidget.compose
 /**
  * Рендерит Glance-виджет в Compose: запускает его композицию с размером
  * [previewSize] (этот размер видит LocalSize внутри виджета) и показывает
- * полученные RemoteViews. При изменении [refreshKey] композиция
- * запускается заново.
+ * полученные RemoteViews.
  */
 @Composable
 fun GlanceWidgetPreview(
     modifier: Modifier = Modifier,
     widget: GlanceAppWidget,
     previewSize: DpSize,
-    refreshKey: Any?,
 ) {
     val context = LocalContext.current
     var remoteViews by remember { mutableStateOf<RemoteViews?>(null) }
 
-    LaunchedEffect(widget, refreshKey) {
+    LaunchedEffect(widget) {
         remoteViews = widget.compose(context, size = previewSize)
     }
 

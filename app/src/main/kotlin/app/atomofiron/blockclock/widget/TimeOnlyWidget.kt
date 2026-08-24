@@ -20,12 +20,14 @@ import androidx.glance.layout.wrapContentSize
  * Виджет «только время»: 2 × 1 клеток рабочего стола, часы и минуты.
  * Клик открывает системное приложение часов.
  */
-class TimeOnlyWidget : GlanceAppWidget() {
+class TimeOnlyWidget(
+    private var preview: WidgetSettings? = null,
+) : GlanceAppWidget() {
 
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val settings = WidgetSettingsStore.load(context)
+        val settings = preview ?: WidgetSettingsStore.load(context)
         val openClockApp = clockAppAction(context)
         provideContent {
             TimeOnlyWidgetContent(initialSettings = settings, openClockApp = openClockApp)

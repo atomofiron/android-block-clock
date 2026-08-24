@@ -64,11 +64,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -77,8 +74,8 @@ import androidx.glance.appwidget.updateAll
 import app.atomofiron.blockclock.licenses.LicensesDialog
 import app.atomofiron.blockclock.update.AppSource
 import app.atomofiron.blockclock.update.UpdateService
-import app.atomofiron.blockclock.update.model.UpdateState
 import app.atomofiron.blockclock.update.UpdateStore
+import app.atomofiron.blockclock.update.model.UpdateState
 import app.atomofiron.blockclock.update.model.UpdateType
 import app.atomofiron.blockclock.util.animatedBackgroundColor
 import app.atomofiron.blockclock.util.horizontal
@@ -92,13 +89,10 @@ import app.atomofiron.blockclock.widget.WidgetSettings
 import app.atomofiron.blockclock.widget.WidgetSettingsStore
 import app.blockclock.R
 import kotlinx.coroutines.launch
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 private val ClipCornerRadius = 28.dp
 private val GridColumnMinWidth = 320.dp
-private val PreviewMaxWidthInset = 32.dp
-private const val PreviewAspectRatio = 4f / 1f
 private val CardCornerRadius = 28.dp
 private val CardSpacing = 12.dp
 private val FieldCornerRadius = 12.dp
@@ -115,8 +109,6 @@ private val RoundingRange = 0f..32f
 private val GapRange = 0f..16f
 private val RowVerticalPadding = 6.dp
 private val IconSize = 24.dp
-
-private const val GITHUB_URL = "https://github.com/atomofiron/android-block-clock"
 private val DialogSpacing = 12.dp
 private val DialogSwatchSize = 32.dp
 private val DialogSwatchCornerRadius = 8.dp
@@ -129,6 +121,9 @@ private val SvBoxCornerRadius = 12.dp
 private val HueSliderHeight = 28.dp
 private val HueSliderCornerRadius = 6.dp
 private const val HueDegrees = 360f
+
+private const val GITHUB_URL = "https://github.com/atomofiron/android-block-clock"
+private const val ShowPreviewFactory = false
 
 /**
  * Экран настроек виджета: живой предпросмотр, цвет и прозрачность
@@ -181,7 +176,16 @@ fun SettingsScreen(uiStarted: Boolean) {
             .background(animatedBackgroundColor(transparent = uiStarted))
             .windowInsetsPadding { displayCutout + statusBars + navigationBars.horizontal() },
     ) {
-        WidgetPreviewCard(previewSettings)
+        when {
+            ShowPreviewFactory -> WidgetPreviewFactory(previewSettings)
+            else -> WidgetPreview(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Padding.Common),
+                settings = previewSettings,
+            )
+        }
+
         val gridState = rememberLazyStaggeredGridState()
         val columns = gridState.layoutInfo.visibleItemsInfo
             .maxOfOrNull { it.lane }
@@ -195,7 +199,7 @@ fun SettingsScreen(uiStarted: Boolean) {
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(start = Padding.Common, top = Padding.Common, end = Padding.Common)
+                .padding(horizontal = Padding.Common)
                 .clip(clipShape),
         ) {
             LazyVerticalStaggeredGrid(
@@ -206,7 +210,7 @@ fun SettingsScreen(uiStarted: Boolean) {
                     .only(WindowInsetsSides.Bottom)
                     .add(WindowInsets(bottom = Padding.Common))
                     .asPaddingValues(),
-                horizontalArrangement = Arrangement.spacedBy(Padding.Common),
+                horizontalArrangement = Arrangement.spacedBy(Padding.Common, Alignment.CenterHorizontally),
                 verticalItemSpacing = Padding.Common,
             ) {
                 item {
@@ -325,7 +329,7 @@ fun SettingsScreen(uiStarted: Boolean) {
 }
 
 @Composable
-fun ProgressIndicator(
+private fun ProgressIndicator(
     modifier: Modifier,
     progress: Float? = null,
 ) {
@@ -369,31 +373,12 @@ private fun ClickablePoint(
     }
 }
 
-/** Живой предпросмотр виджета на «обоях» — окно прозрачное, обои видны сквозь него. */
-@Composable
-private fun WidgetPreviewCard(settings: WidgetSettings) {
-    val density = LocalDensity.current
-    val windowSize = LocalWindowInfo.current.containerSize
-    val minWindowSide = with(density) { min(windowSize.width, windowSize.height).toDp() }
-    val maxPreviewWidth = (minWindowSide - PreviewMaxWidthInset).coerceAtLeast(0.dp)
-    val previewSize = DpSize(
-        width = maxPreviewWidth,
-        height = maxPreviewWidth / PreviewAspectRatio + GapRange.endInclusive.dp,
-    )
-    GlanceWidgetPreview(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = Padding.Common)
-            .padding(horizontal = Padding.Common),
-        widget = ClockWidget(settings),
-        previewSize = previewSize,
-        refreshKey = settings,
-    )
-}
-
 /** Карточка-секция с необязательным заголовком. */
 @Composable
-private fun SectionCard(title: String? = null, content: @Composable ColumnScope.() -> Unit) {
+private fun SectionCard(
+    title: String? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(CardCornerRadius),

@@ -63,11 +63,6 @@ private const val DATE_TEXT_HEIGHT_FACTOR = 0.6f
  * времени и порядок даты берутся из [WidgetSettingsStore].
  */
 class ClockWidget(
-    /**
-     * Настройки для однократного рендера вместо [WidgetSettingsStore]
-     * (превью в настройках); null — обычный рендер из SharedPreferences.
-     */
-    @Volatile
     private var preview: WidgetSettings? = null,
 ) : GlanceAppWidget() {
 

@@ -25,12 +25,14 @@ import app.atomofiron.blockclock.MainActivity
  * на нижнем — в один ряд день недели и дата.
  * Клик по времени открывает системные часы, по дате — календарь.
  */
-class TwoLevelWidget : GlanceAppWidget() {
+class TwoLevelWidget(
+    private var preview: WidgetSettings? = null,
+) : GlanceAppWidget() {
 
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val settings = WidgetSettingsStore.load(context)
+        val settings = preview ?: WidgetSettingsStore.load(context)
         val openSettings = actionStartActivity(Intent(context, MainActivity::class.java))
         val openClockApp = clockAppAction(context)
         val openCalendarApp = calendarAppAction(context)

@@ -20,12 +20,14 @@ import androidx.glance.layout.wrapContentSize
  * Виджет «только дата»: 2 × 1 клеток рабочего стола —
  * день недели, день, месяц и год. Клик открывает системный календарь.
  */
-class DateOnlyWidget : GlanceAppWidget() {
+class DateOnlyWidget(
+    private var preview: WidgetSettings? = null,
+) : GlanceAppWidget() {
 
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val settings = WidgetSettingsStore.load(context)
+        val settings = preview ?: WidgetSettingsStore.load(context)
         val openCalendarApp = calendarAppAction(context)
         provideContent {
             DateOnlyWidgetContent(initialSettings = settings, openCalendarApp = openCalendarApp)
