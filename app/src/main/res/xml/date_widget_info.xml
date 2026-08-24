@@ -10,4 +10,5 @@
     android:targetCellHeight="1"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen"
+    android:previewImage="@drawable/preview_date_only"
     />
