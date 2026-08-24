@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +29,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -79,8 +81,10 @@ import app.atomofiron.blockclock.update.model.UpdateState
 import app.atomofiron.blockclock.update.UpdateStore
 import app.atomofiron.blockclock.update.model.UpdateType
 import app.atomofiron.blockclock.util.animatedBackgroundColor
-import app.atomofiron.blockclock.util.statusBarAndCutout
+import app.atomofiron.blockclock.util.horizontal
+import app.atomofiron.blockclock.util.plus
 import app.atomofiron.blockclock.util.steps
+import app.atomofiron.blockclock.util.windowInsetsPadding
 import app.atomofiron.blockclock.widget.ClockWidget
 import app.atomofiron.blockclock.widget.DateOnlyWidget
 import app.atomofiron.blockclock.widget.TimeOnlyWidget
@@ -175,7 +179,7 @@ fun SettingsScreen(uiStarted: Boolean) {
         modifier = Modifier
             .fillMaxSize()
             .background(animatedBackgroundColor(transparent = uiStarted))
-            .statusBarAndCutout(),
+            .windowInsetsPadding { displayCutout + statusBars + navigationBars.horizontal() },
     ) {
         WidgetPreviewCard(previewSettings)
         val gridState = rememberLazyStaggeredGridState()

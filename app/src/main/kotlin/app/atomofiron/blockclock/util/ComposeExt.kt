@@ -2,7 +2,10 @@ package app.atomofiron.blockclock.util
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -19,8 +22,14 @@ import androidx.compose.ui.unit.DpSize
 import androidx.glance.GlanceModifier
 import androidx.glance.layout.size
 
+operator fun WindowInsets.plus(other: WindowInsets) = union(other)
+
+fun WindowInsets.horizontal() = only(WindowInsetsSides.Horizontal)
+
 @Composable
-fun Modifier.statusBarAndCutout() = windowInsetsPadding(WindowInsets.run { statusBars.union(displayCutout) })
+fun Modifier.windowInsetsPadding(action: @Composable WindowInsets.Companion.() -> WindowInsets): Modifier {
+    return windowInsetsPadding(WindowInsets.action())
+}
 
 @Composable
 fun animatedBackgroundColor(transparent: Boolean): Color {
