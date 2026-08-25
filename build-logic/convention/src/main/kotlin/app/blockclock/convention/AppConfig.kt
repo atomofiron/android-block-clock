@@ -8,7 +8,7 @@ object AppConfig {
     const val libId = "app.blockclock"
     const val packageId = "app.atomofiron.blockclock"
 
-    const val minSdk = 24
+    const val minSdk = 23
     const val targetSdk = 37
     const val compileSdk = 37
     const val compileSdkMinor = 1
