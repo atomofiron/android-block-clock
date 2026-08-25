@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import app.atomofiron.blockclock.BuildConfig
 import app.blockclock.update.UpdateService
 import app.blockclock.update.UpdateStore
 import app.blockclock.update.model.UpdateState
