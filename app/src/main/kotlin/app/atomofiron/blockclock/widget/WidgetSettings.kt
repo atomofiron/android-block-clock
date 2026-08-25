@@ -17,7 +17,7 @@ data class WidgetSettings(
     /** Отступ между прямоугольниками в dp: 1..16. */
     val gapDp: Int = 6,
     /** Радиус скругления углов прямоугольников в dp: 1..32. */
-    val cornerRadiusDp: Int = 16,
+    val cornerRadiusDp: Int = 12,
 ) {
     /** Цвет прямоугольников с учётом прозрачности. */
     val effectiveRectColor: Color get() = background.copy(alpha = 1f - transparency)
