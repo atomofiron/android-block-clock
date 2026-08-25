@@ -5,7 +5,7 @@ package app.blockclock.convention
 @Suppress("ConstPropertyName")
 object AppConfig {
 
-    const val libId = "app.blockclock"
+    const val appId = "app.blockclock"
     const val packageId = "app.atomofiron.blockclock"
 
     const val minSdk = 23

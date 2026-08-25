@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="app.atomofiron.blockclock.MainActivity"
+            android:name="app.blockclock.MainActivity"
             android:exported="true"
             android:theme="@style/AppTheme"
             android:launchMode="singleInstance"
@@ -26,7 +26,7 @@
         </activity>
 
         <receiver
-            android:name="app.atomofiron.blockclock.widget.OneLevelWidgetReceiver"
+            android:name="app.blockclock.widget.OneLevelWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_date_and_time_name">
             <intent-filter>
@@ -39,7 +39,7 @@
         </receiver>
 
         <receiver
-            android:name="app.atomofiron.blockclock.widget.ThreeLevelWidgetReceiver"
+            android:name="app.blockclock.widget.ThreeLevelWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_date_and_time_name">
             <intent-filter>
@@ -52,7 +52,7 @@
         </receiver>
 
         <receiver
-            android:name="app.atomofiron.blockclock.widget.TwoLevelWidgetReceiver"
+            android:name="app.blockclock.widget.TwoLevelWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_date_and_time_name">
             <intent-filter>
@@ -65,7 +65,7 @@
         </receiver>
 
         <receiver
-            android:name="app.atomofiron.blockclock.widget.TimeOnlyWidgetReceiver"
+            android:name="app.blockclock.widget.TimeOnlyWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_time_name">
             <intent-filter>
@@ -78,7 +78,7 @@
         </receiver>
 
         <receiver
-            android:name="app.atomofiron.blockclock.widget.DateOnlyWidgetReceiver"
+            android:name="app.blockclock.widget.DateOnlyWidgetReceiver"
             android:exported="true"
             android:label="@string/widget_date_name">
             <intent-filter>

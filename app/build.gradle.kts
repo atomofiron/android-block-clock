@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = AppConfig.libId
+    namespace = AppConfig.appId
     buildFeatures {
         compose = true
     }

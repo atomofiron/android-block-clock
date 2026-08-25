@@ -5,9 +5,9 @@
     <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <application android:name="app.atomofiron.blockclock.App">
+    <application android:name="app.blockclock.App">
         <receiver
-            android:name=".UpdateInstallReceiver"
+            android:name="app.blockclock.UpdateInstallReceiver"
             android:exported="false"
             />
     </application>
