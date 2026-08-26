@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
@@ -30,7 +29,6 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
@@ -67,11 +65,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
+import app.blockclock.R
 import app.blockclock.licenses.LicensesDialog
 import app.blockclock.update.AppSource
 import app.blockclock.update.UpdateService
@@ -88,7 +88,6 @@ import app.blockclock.widget.DateOnlyWidget
 import app.blockclock.widget.TimeOnlyWidget
 import app.blockclock.widget.WidgetSettings
 import app.blockclock.widget.WidgetSettingsStore
-import app.blockclock.R
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -97,7 +96,6 @@ private val GridColumnMinWidth = 320.dp
 private val CardCornerRadius = 28.dp
 private val FieldCornerRadius = 12.dp
 private val FieldVerticalPadding = 10.dp
-private val FieldSpacing = 12.dp
 private val SwatchSize = 36.dp
 private val SwatchCornerRadius = 10.dp
 private val SwatchBorderWidth = 1.dp
@@ -107,7 +105,6 @@ private val TransparencyRange = 0f..1f
 private val RoundingRange = 0f..32f
 private val GapRange = 0f..16f
 private val IconSize = 24.dp
-private val DialogSpacing = 12.dp
 private val DialogSwatchSize = 32.dp
 private val DialogSwatchCornerRadius = 8.dp
 private val MarkerSize = 16.dp
@@ -268,15 +265,14 @@ fun SettingsScreen(uiStarted: Boolean) {
                     SectionCard(title = null) {
                         Row {
                             ClickablePoint(
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.padding(end = Padding.Half).weight(1f),
                                 R.drawable.ic_github,
                                 R.string.github,
                             ) {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, GITHUB_URL.toUri()))
                             }
-                            Spacer(Modifier.width(Padding.Common))
                             ClickablePoint(
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.padding(start = Padding.Half).weight(1f),
                                 R.drawable.ic_license,
                                 R.string.licenses,
                             ) {
@@ -365,7 +361,7 @@ private fun ClickablePoint(
         )
         Text(
             modifier = Modifier
-                .padding(start = FieldSpacing)
+                .padding(start = Padding.Semi)
                 .weight(1f),
             text = stringResource(label),
             style = MaterialTheme.typography.titleMedium,
@@ -445,8 +441,13 @@ private fun ColorField(
                     RoundedCornerShape(SwatchCornerRadius)
                 ),
         )
-        Spacer(Modifier.width(FieldSpacing))
-        Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        Text(
+            modifier = Modifier.padding(start = Padding.Semi),
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            overflow = TextOverflow.MiddleEllipsis,
+            maxLines = 1,
+        )
     }
 }
 
@@ -574,7 +575,7 @@ private fun ColorPickerDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(DialogSpacing)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Padding.Semi)) {
                 SaturationValueBox(
                     hue = hue,
                     sat = sat,
@@ -600,8 +601,8 @@ private fun ColorPickerDialog(
                                 RoundedCornerShape(DialogSwatchCornerRadius),
                             ),
                     )
-                    Spacer(Modifier.width(FieldSpacing))
                     Text(
+                        modifier = Modifier.padding(start = Padding.Semi),
                         text = "#%06X".format(color.toArgb() and 0xFFFFFF),
                         style = MaterialTheme.typography.bodyLarge,
                     )
