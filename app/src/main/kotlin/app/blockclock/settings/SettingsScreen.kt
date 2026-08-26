@@ -83,8 +83,9 @@ import app.blockclock.util.horizontal
 import app.blockclock.util.plus
 import app.blockclock.util.steps
 import app.blockclock.util.windowInsetsPadding
-import app.blockclock.widget.ClockWidget
 import app.blockclock.widget.DateOnlyWidget
+import app.blockclock.widget.OneLevelWidget
+import app.blockclock.widget.ThreeLevelWidget
 import app.blockclock.widget.TimeOnlyWidget
 import app.blockclock.widget.WidgetSettings
 import app.blockclock.widget.WidgetSettingsStore
@@ -141,7 +142,8 @@ fun SettingsScreen(uiStarted: Boolean) {
         previewSettings = newSettings
         scope.launch {
             WidgetSettingsStore.save(context, newSettings)
-            ClockWidget().updateAll(context)
+            OneLevelWidget().updateAll(context)
+            ThreeLevelWidget().updateAll(context)
             TimeOnlyWidget().updateAll(context)
             DateOnlyWidget().updateAll(context)
         }

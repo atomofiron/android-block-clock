@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import app.blockclock.widget.ClockWidget
+import app.blockclock.widget.OneLevelWidget
 import app.blockclock.widget.Structure
 import app.blockclock.widget.WidgetSettings
 import app.blockclock.widget.resolve
@@ -23,7 +23,7 @@ internal fun WidgetPreview(
     val (_, gridSize) = Structure.OneLevel.resolve(available, 0.dp) // fixed max possible height
     GlanceWidgetPreview(
         modifier = modifier,
-        widget = ClockWidget(settings),
+        widget = OneLevelWidget(settings),
         previewSize = gridSize,
     )
 }

@@ -52,17 +52,17 @@ import kotlin.math.roundToInt
 import android.os.Build.VERSION_CODES.P as AndroidP
 import android.os.Build.VERSION_CODES.S as AndroidS
 
-private const val LAYOUT_HORIZONTAL_MIN_ASPECT = 2.5f
 private const val TIME_TEXT_HEIGHT_FACTOR = 0.7f
 private const val DATE_TEXT_HEIGHT_FACTOR = 0.6f
 
 /**
- * Полный виджет «время + дата»: 4 × 1 клеток рабочего стола.
+ * Полный виджет «время + дата»: 4 × 1 клеток рабочего стола,
+ * один уровень — время слева, день недели и дата справа.
  *
  * Цвет/прозрачность прямоугольников, отступы, цвет текста, формат
  * времени и порядок даты берутся из [WidgetSettingsStore].
  */
-class ClockWidget(
+class OneLevelWidget(
     private var preview: WidgetSettings? = null,
 ) : GlanceAppWidget() {
 
@@ -74,7 +74,7 @@ class ClockWidget(
         val openClockApp = clockAppAction(context)
         val openCalendarApp = calendarAppAction(context)
         provideContent {
-            ClockWidgetContent(
+            OneLevelWidgetContent(
                 settings = settings,
                 openSettings = openSettings,
                 openClockApp = openClockApp,
@@ -85,7 +85,7 @@ class ClockWidget(
 }
 
 @Composable
-private fun ClockWidgetContent(
+private fun OneLevelWidgetContent(
     settings: WidgetSettings,
     openSettings: Action,
     openClockApp: Action,
@@ -93,10 +93,7 @@ private fun ClockWidgetContent(
 ) {
     val settings = rememberWidgetSettings(settings)
     val available = LocalSize.current
-    val structure = when {
-        available.width / available.height >= LAYOUT_HORIZONTAL_MIN_ASPECT -> Structure.OneLevel
-        else -> Structure.ThreeLevel
-    }
+    val structure = Structure.OneLevel
     val (cellSize, gridSize) = structure.resolve(available, settings.gapDp.dp)
 
     Box(
@@ -108,21 +105,11 @@ private fun ClockWidgetContent(
         if (settings.gapDp == 0) {
             CellBackground(settings.effectiveRectColor, settings.cornerRadiusDp, gridSize)
         }
-        if (structure == Structure.OneLevel) {
-            Row {
-                TimeSection(settings, structure, cellSize, onClick = openClockApp)
-                Column {
-                    WeekdaySection(settings, part = structure.weekday, cellSize = cellSize, onClick = openCalendarApp)
-                    DateSection(settings, structure, cellSize, onClick = openCalendarApp)
-                }
-            }
-        } else {
+        Row {
+            TimeSection(settings, structure, cellSize, onClick = openClockApp)
             Column {
-                TimeSection(settings, structure, cellSize, onClick = openClockApp)
-                Column {
-                    WeekdaySection(settings, part = structure.weekday, cellSize, onClick = openCalendarApp)
-                    DateSection(settings, structure, cellSize, onClick = openCalendarApp)
-                }
+                WeekdaySection(settings, part = structure.weekday, cellSize = cellSize, onClick = openCalendarApp)
+                DateSection(settings, structure, cellSize, onClick = openCalendarApp)
             }
         }
     }

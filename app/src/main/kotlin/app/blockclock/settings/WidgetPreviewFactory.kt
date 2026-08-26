@@ -20,9 +20,10 @@ import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import app.blockclock.widget.ClockWidget
 import app.blockclock.widget.DateOnlyWidget
+import app.blockclock.widget.OneLevelWidget
 import app.blockclock.widget.Structure
+import app.blockclock.widget.ThreeLevelWidget
 import app.blockclock.widget.TimeOnlyWidget
 import app.blockclock.widget.TwoLevelWidget
 import app.blockclock.widget.WidgetSettings
@@ -64,7 +65,7 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
                     }
                     drawLayer(graphicsLayers[0])
                 },
-            widget = ClockWidget(settings),
+            widget = OneLevelWidget(settings),
             previewSize = Structure.OneLevel.resolve(DpSize(previewWidth(), 100.dp), gap).second,
         )
         GlanceWidgetPreview(
@@ -88,7 +89,7 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
                     }
                     drawLayer(graphicsLayers[2])
                 },
-            widget = ClockWidget(settings),
+            widget = ThreeLevelWidget(settings),
             previewSize = Structure.ThreeLevel.resolve(DpSize(182.dp, 200.dp), gap).second,
         )
         GlanceWidgetPreview(
