@@ -5,7 +5,9 @@
     <string name="widget_two_level_name">2 уровня</string>
     <string name="widget_three_level_name">3 уровня</string>
     <string name="background">Фон</string>
+    <string name="background_color">Цвет фона</string>
     <string name="text">Текст</string>
+    <string name="text_color">Цвет текста</string>
     <string name="color">Цвет</string>
     <string name="shape">Форма</string>
     <string name="label_transparency">Прозрачность</string>

@@ -151,7 +151,10 @@ fun SettingsScreen(uiStarted: Boolean) {
 
     colorTarget?.let { target ->
         ColorPickerDialog(
-            title = stringResource(R.string.color),
+            title = when (target) {
+                ColorTarget.Rect -> stringResource(R.string.background_color)
+                ColorTarget.Text -> stringResource(R.string.text_color)
+            },
             initialColor = when (target) {
                 ColorTarget.Rect -> settings.background
                 else -> settings.text

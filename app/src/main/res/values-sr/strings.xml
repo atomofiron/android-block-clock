@@ -5,7 +5,9 @@
     <string name="widget_two_level_name">2 нивоа</string>
     <string name="widget_three_level_name">3 нивоа</string>
     <string name="background">Позадина</string>
+    <string name="background_color">Боја позадине</string>
     <string name="text">Текст</string>
+    <string name="text_color">Боја текста</string>
     <string name="color">Боја</string>
     <string name="shape">Облик</string>
     <string name="label_transparency">Провидно</string>
