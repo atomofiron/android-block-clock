@@ -33,13 +33,13 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -338,7 +338,7 @@ private fun ClickablePoint(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(Dimens.FieldCornerRadius))
+            .clip(ShapeDefaults.Medium)
             .clickable(enabled = clickable, onClick = onClick)
             .padding(vertical = Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
@@ -366,7 +366,7 @@ private fun SectionCard(
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(Dimens.CardCornerRadius),
+        shape = ShapeDefaults.ExtraLarge,
     ) {
         Column(
             modifier = Modifier
@@ -414,7 +414,7 @@ private fun ColorField(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(Dimens.FieldCornerRadius))
+            .clip(ShapeDefaults.Medium)
             .clickable(onClick = onClick)
             .padding(vertical = Dimens.FieldVerticalPadding),
         verticalAlignment = Alignment.CenterVertically,
@@ -422,12 +422,12 @@ private fun ColorField(
         Box(
             modifier = Modifier
                 .size(Dimens.SwatchSize)
-                .clip(RoundedCornerShape(Dimens.SwatchCornerRadius))
+                .clip(ShapeDefaults.Medium)
                 .background(color)
                 .border(
                     Dimens.SwatchBorderWidth,
                     SwatchBorderColor,
-                    RoundedCornerShape(Dimens.SwatchCornerRadius)
+                    ShapeDefaults.Medium,
                 ),
         )
         Text(
@@ -526,7 +526,7 @@ private fun SettingSwitch(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(Dimens.FieldCornerRadius))
+            .clip(ShapeDefaults.Medium)
             .clickable { onCheckedChange(!checked) }
             .padding(),
         verticalAlignment = Alignment.CenterVertically,
@@ -582,12 +582,12 @@ private fun ColorPickerDialog(
                     Box(
                         modifier = Modifier
                             .size(Dimens.DialogSwatchSize)
-                            .clip(RoundedCornerShape(Dimens.DialogSwatchCornerRadius))
+                            .clip(ShapeDefaults.Small)
                             .background(color)
                             .border(
                                 Dimens.SwatchBorderWidth,
                                 SwatchBorderColor,
-                                RoundedCornerShape(Dimens.DialogSwatchCornerRadius),
+                                ShapeDefaults.Small,
                             ),
                     )
                     Text(
@@ -623,7 +623,7 @@ private fun SaturationValueBox(
         modifier = Modifier
             .fillMaxWidth()
             .height(Dimens.SvBoxHeight)
-            .clip(RoundedCornerShape(Dimens.SvBoxCornerRadius))
+            .clip(ShapeDefaults.Medium)
             .background(
                 Brush.horizontalGradient(
                     listOf(
@@ -687,7 +687,7 @@ private fun HueSlider(hue: Float, onChange: (Float) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(Dimens.HueSliderHeight)
-            .clip(RoundedCornerShape(Dimens.HueSliderCornerRadius))
+            .clip(ShapeDefaults.Small)
             .background(Brush.horizontalGradient(rainbow))
             .pointerInput(Unit) {
                 detectTapGestures { position -> onChange(hueOf(size, position)) }
