@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             ) {
                 AppTheme {
                     SettingsScreen(store, isEnterAnimationCompleted.value)
-                    InsetsBackground(Modifier.alpha(0.5f), navigationBottom = false)
+                    InsetsBackground(Modifier.alpha(0.5f))
                 }
             }
         }

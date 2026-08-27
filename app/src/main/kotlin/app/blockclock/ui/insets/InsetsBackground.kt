@@ -62,8 +62,7 @@ fun InsetsBackground(
     val rightInset = resolve(common.right, navigationBar.right, tappable.right, transparent.right)
     val bottomInset = resolve(common.bottom, navigationBar.bottom, tappable.bottom, transparent.bottom)
 
-    if (drawStatusBar) Canvas(modifier.fillMaxSize()) {
-
+    Canvas(modifier.fillMaxSize()) {
         val leftInset = leftInset.toFloat()
         val rightInset = rightInset.toFloat()
         val bottomInset = bottomInset.toFloat()
@@ -71,7 +70,10 @@ fun InsetsBackground(
         val width = size.width
         val height = size.height
 
-        val navigationHorizontalTop = drawStatusBar(statusBar, cutout, navigationBar, screenCorners, color, size).toFloat()
+        val navigationHorizontalTop = when {
+            drawStatusBar -> drawStatusBar(statusBar, cutout, navigationBar, screenCorners, color, size).toFloat()
+            else -> 0f
+        }
         if (navigationLeft) {
             val offset = Offset(0f, navigationHorizontalTop)
             drawRect(color, offset, offset.calcSize(leftInset, height - bottomInset))
