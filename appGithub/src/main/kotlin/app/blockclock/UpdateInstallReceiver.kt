@@ -17,7 +17,7 @@ class UpdateInstallReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.getIntExtra(EXTRA_STATUS, STATUS_FAILURE)) {
-            STATUS_SUCCESS -> Unit
+            STATUS_SUCCESS -> return
             STATUS_FAILURE_ABORTED -> Unit
             STATUS_PENDING_USER_ACTION -> {
                 val activityIntent = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_INTENT, Intent::class.java)
@@ -26,5 +26,6 @@ class UpdateInstallReceiver : BroadcastReceiver() {
             else -> intent.getStringExtra(EXTRA_STATUS_MESSAGE)
                 ?.let { UpdateStore.self.showUpdateAlert(Alert(it)) }
         }
+        UpdateStore.self.fallback()
     }
 }
