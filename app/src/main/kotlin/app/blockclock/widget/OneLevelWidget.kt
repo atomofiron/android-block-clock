@@ -47,6 +47,10 @@ class OneLevelWidget(
             )
         }
     }
+
+    fun update(preview: WidgetSettings) {
+        this.preview = preview
+    }
 }
 
 @Composable

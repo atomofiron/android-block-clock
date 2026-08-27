@@ -1,6 +1,8 @@
 package app.blockclock.settings
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -18,14 +20,14 @@ internal fun WidgetPreview(
     modifier: Modifier = Modifier,
     settings: WidgetSettings,
 ) {
+    val widget = remember { OneLevelWidget(settings) }
+    LaunchedEffect(settings) {
+        widget.update(settings)
+    }
     val width = previewWidth()
     val available = DpSize(width, width)
     val (_, gridSize) = Structure.OneLevel.resolve(available, 0.dp) // fixed max possible height
-    GlanceWidgetPreview(
-        modifier = modifier,
-        widget = OneLevelWidget(settings),
-        previewSize = gridSize,
-    )
+    GlanceWidgetPreview(modifier, widget, gridSize, settings)
 }
 
 @Composable

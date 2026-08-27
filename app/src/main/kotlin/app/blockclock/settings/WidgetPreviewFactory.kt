@@ -66,7 +66,7 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
                     drawLayer(graphicsLayers[0])
                 },
             widget = OneLevelWidget(settings),
-            previewSize = Structure.OneLevel.resolve(DpSize(previewWidth(), 100.dp), gap).second,
+            size = Structure.OneLevel.resolve(DpSize(previewWidth(), 100.dp), gap).second,
         )
         GlanceWidgetPreview(
             modifier = Modifier
@@ -78,7 +78,7 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
                     drawLayer(graphicsLayers[1])
                 },
             widget = TwoLevelWidget(settings),
-            previewSize = Structure.TwoLevel.resolve(DpSize(182.dp, 120.dp), gap).second,
+            size = Structure.TwoLevel.resolve(DpSize(182.dp, 120.dp), gap).second,
         )
         GlanceWidgetPreview(
             modifier = Modifier
@@ -90,7 +90,7 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
                     drawLayer(graphicsLayers[2])
                 },
             widget = ThreeLevelWidget(settings),
-            previewSize = Structure.ThreeLevel.resolve(DpSize(182.dp, 200.dp), gap).second,
+            size = Structure.ThreeLevel.resolve(DpSize(182.dp, 200.dp), gap).second,
         )
         GlanceWidgetPreview(
             modifier = Modifier
@@ -102,7 +102,7 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
                     drawLayer(graphicsLayers[3])
                 },
             widget = TimeOnlyWidget(settings),
-            previewSize = Structure.TimeOnly.resolve(DpSize(182.dp, 91.dp), gap).second,
+            size = Structure.TimeOnly.resolve(DpSize(182.dp, 91.dp), gap).second,
         )
         GlanceWidgetPreview(
             modifier = Modifier
@@ -114,7 +114,7 @@ fun ColumnScope.WidgetPreviewFactory(settings: WidgetSettings) {
                     drawLayer(graphicsLayers[4])
                 },
             widget = DateOnlyWidget(settings),
-            previewSize = Structure.DateOnly.resolve(DpSize(182.dp, 91.dp), gap).second,
+            size = Structure.DateOnly.resolve(DpSize(182.dp, 91.dp), gap).second,
         )
     }
     val context = LocalContext.current

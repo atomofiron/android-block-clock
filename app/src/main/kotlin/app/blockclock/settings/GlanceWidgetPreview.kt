@@ -1,6 +1,5 @@
 package app.blockclock.settings
 
-import android.widget.FrameLayout
 import android.widget.RemoteViews
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -18,42 +17,35 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.compose
+import app.blockclock.widget.WidgetSettings
 
 /**
  * Рендерит Glance-виджет в Compose: запускает его композицию с размером
- * [previewSize] (этот размер видит LocalSize внутри виджета) и показывает
+ * [size] (этот размер видит LocalSize внутри виджета) и показывает
  * полученные RemoteViews.
  */
 @Composable
 fun GlanceWidgetPreview(
     modifier: Modifier = Modifier,
     widget: GlanceAppWidget,
-    previewSize: DpSize,
+    size: DpSize,
+    settings: WidgetSettings? = null,
 ) {
     val context = LocalContext.current
     var remoteViews by remember { mutableStateOf<RemoteViews?>(null) }
 
-    LaunchedEffect(widget) {
-        remoteViews = widget.compose(context, size = previewSize)
+    LaunchedEffect(widget, settings) {
+        remoteViews = widget.compose(context, size = size)
     }
 
     Box(
-        modifier = modifier.size(previewSize),
+        modifier = modifier.size(size),
         contentAlignment = Alignment.Center,
     ) {
         remoteViews?.run {
             AndroidView(
-                factory = { ctx ->
-                    val frameLayout = FrameLayout(ctx)
-                    val view = apply(ctx.applicationContext, frameLayout)
-                    frameLayout.addView(view)
-                    frameLayout
-                },
-                update = { frameLayout ->
-                    frameLayout.removeAllViews()
-                    val view = apply(frameLayout.context.applicationContext, frameLayout)
-                    frameLayout.addView(view)
-                }
+                factory = { context -> apply(context.applicationContext, null) },
+                update = { layout -> reapply(layout.context.applicationContext, layout) },
             )
         } ?: CircularProgressIndicator()
     }
