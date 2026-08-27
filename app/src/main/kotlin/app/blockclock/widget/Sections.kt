@@ -56,12 +56,12 @@ internal fun rememberWidgetSettings(initial: WidgetSettings): WidgetSettings {
     val context = LocalContext.current
     var settings by remember { mutableStateOf(initial) }
     DisposableEffect(context) {
-        val prefs = context.getSharedPreferences(WidgetSettingsStore.PREFS_NAME, Context.MODE_PRIVATE)
+        val store = WidgetSettingsStore(context)
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
-            settings = WidgetSettingsStore.load(context)
+            settings = store.read()
         }
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        onDispose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+        store.setListener(listener)
+        onDispose { store.removeListener(listener) }
     }
     return settings
 }
@@ -142,9 +142,9 @@ internal fun DateSection(
 /**
  * Одна ячейка с закруглёнными углами и отступами по флагам части [part].
  *
- * Размер — [part.calcSize]: клетка [cellSize], умноженная на вес, плюс
+ * Размер — [part]: клетка [cellSize], умноженная на вес, плюс
  * отступы (каждый флаг — [gap]/2, у широких частей — ещё [Part.gapInside]).
- * Шрифт — доля высоты ячейки за вычетом верхнего/нижнего отступов:
+ * Шрифт — доля высоты ячейки за вычетом верхнего или нижнего отступов:
  * 70% для времени ([Part.time]), 60% для даты.
  *
  * На Android 12+ фон рисует Glance, на Android 11 и ниже — Cell bitmap

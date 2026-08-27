@@ -57,7 +57,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.glance.appwidget.updateAll
 import app.blockclock.R
 import app.blockclock.licenses.LicensesDialog
 import app.blockclock.ui.values.Colors
@@ -73,12 +72,9 @@ import app.blockclock.util.horizontal
 import app.blockclock.util.plus
 import app.blockclock.util.steps
 import app.blockclock.util.windowInsetsPadding
-import app.blockclock.widget.DateOnlyWidget
-import app.blockclock.widget.OneLevelWidget
-import app.blockclock.widget.ThreeLevelWidget
-import app.blockclock.widget.TimeOnlyWidget
 import app.blockclock.widget.WidgetSettings
 import app.blockclock.widget.WidgetSettingsStore
+import app.blockclock.widget.updateWidgets
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -97,9 +93,9 @@ private const val ShowPreviewFactory = false
  * Любое изменение сразу сохраняется и перерисовывает виджет.
  */
 @Composable
-fun SettingsScreen(uiStarted: Boolean) {
+fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
     val context = LocalContext.current
-    var settings by remember { mutableStateOf(WidgetSettingsStore.load(context)) }
+    var settings by remember { mutableStateOf(store.read()) }
 
     var previewSettings by remember { mutableStateOf(settings) }
     var colorTarget by remember { mutableStateOf<ColorTarget?>(null) }
@@ -110,11 +106,8 @@ fun SettingsScreen(uiStarted: Boolean) {
         settings = newSettings
         previewSettings = newSettings
         scope.launch {
-            WidgetSettingsStore.save(context, newSettings)
-            OneLevelWidget().updateAll(context)
-            ThreeLevelWidget().updateAll(context)
-            TimeOnlyWidget().updateAll(context)
-            DateOnlyWidget().updateAll(context)
+            store.store(newSettings)
+            context.updateWidgets()
         }
     }
 

@@ -33,7 +33,7 @@ class ThreeLevelWidget(
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val settings = preview ?: WidgetSettingsStore.load(context)
+        val settings = preview ?: WidgetSettingsStore(context).read()
         val openSettings = actionStartActivity(Intent(context, MainActivity::class.java))
         val openClockApp = clockAppAction(context)
         val openCalendarApp = calendarAppAction(context)
