@@ -12,7 +12,6 @@ object Dimens {
     val SwatchSize = 36.dp
     val SwatchBorderWidth = 1.dp
     val IconSize = 24.dp
-    val DialogSwatchSize = 32.dp
     val MarkerSize = 16.dp
     val MarkerRadius = 8.dp
     val MarkerBorderWidth = 2.dp

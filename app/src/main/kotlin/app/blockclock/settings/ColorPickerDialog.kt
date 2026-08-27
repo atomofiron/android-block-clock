@@ -85,7 +85,7 @@ internal fun ColorPickerDialog(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(Dimens.DialogSwatchSize)
+                            .size(Dimens.SwatchSize)
                             .clip(ShapeDefaults.Medium)
                             .background(color)
                             .border(Dimens.SwatchBorderWidth, Colors.SwatchBorder, ShapeDefaults.Medium),
