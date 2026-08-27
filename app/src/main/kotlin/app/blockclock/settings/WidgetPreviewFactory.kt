@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import app.blockclock.ui.Padding
 import app.blockclock.widget.DateOnlyWidget
 import app.blockclock.widget.OneLevelWidget
 import app.blockclock.widget.Structure

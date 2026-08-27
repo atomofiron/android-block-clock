@@ -1,4 +1,4 @@
-package app.blockclock.settings
+package app.blockclock.ui
 
 import androidx.compose.ui.unit.dp
 
@@ -7,5 +7,4 @@ object Padding {
     val Semi = 12.dp
     val Half = 8.dp
     val Mini = 4.dp
-    val Micro = 2.dp
 }

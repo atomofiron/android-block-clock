@@ -73,6 +73,7 @@ import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
 import app.blockclock.R
 import app.blockclock.licenses.LicensesDialog
+import app.blockclock.ui.Padding
 import app.blockclock.update.AppSource
 import app.blockclock.update.UpdateService
 import app.blockclock.update.UpdateStore

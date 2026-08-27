@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import app.blockclock.ui.Padding
 import app.blockclock.widget.OneLevelWidget
 import app.blockclock.widget.Structure
 import app.blockclock.widget.WidgetSettings
