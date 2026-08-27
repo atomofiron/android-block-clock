@@ -80,21 +80,31 @@ class MainActivity : AppCompatActivity() {
         if (isFinishing) UpdateService.self.completeUpdate()
     }
 
+    /**
+     * Sets the widget colors from the wallpaper: the background takes the
+     * wallpaper secondary color; when the wallpaper is solid (no secondary
+     * color), the background is black or white depending on the contrast
+     * with the wallpaper; the text is black or white depending on the
+     * contrast with the chosen background.
+     */
     private fun WidgetSettingsStore.setDefaultWallpaperColor() {
         WallpaperManager.getInstance(this@MainActivity)
             .getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
-            ?.run { secondaryColor ?: primaryColor }
-            ?.toArgb()
-            ?.let {
-                val white = ColorUtils.calculateContrast(Color.WHITE, it)
-                val black = ColorUtils.calculateContrast(Color.BLACK, it)
-                val text = if (white > black) Color.WHITE else Color.BLACK
-                val settings = read().copy(background = ComposeColor(it), text = ComposeColor(text))
+            ?.run { secondaryColor?.toArgb() ?: primaryColor.toArgb().blackOrWhiteOverIt() }
+            ?.let { background ->
+                val text = background.blackOrWhiteOverIt()
+                val settings = read().copy(background = ComposeColor(background), text = ComposeColor(text))
                 lifecycleScope.launch {
                     store(settings)
                     updateWidgets()
                 }
             }
+    }
+
+    private fun Int.blackOrWhiteOverIt(): Int {
+        val white = ColorUtils.calculateContrast(Color.WHITE, this)
+        val black = ColorUtils.calculateContrast(Color.BLACK, this)
+        return if (white > black) Color.WHITE else Color.BLACK
     }
 
     private fun View.screenCorners(): ScreenCorners = when {
