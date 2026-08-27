@@ -20,11 +20,8 @@ import androidx.glance.layout.wrapContentSize
 import app.blockclock.MainActivity
 
 /**
- * Полный виджет «время + дата»: 2 × 2 клеток рабочего стола,
- * три уровня — время, день недели и дата друг под другом.
- *
- * Цвет/прозрачность прямоугольников, отступы, цвет текста, формат
- * времени и порядок даты берутся из [WidgetSettingsStore].
+ * The full "time and date" widget: 2 × 2 home screen cells, three levels —
+ * time, weekday and date stacked vertically.
  */
 class ThreeLevelWidget(
     private var preview: WidgetSettings? = null,
@@ -48,11 +45,6 @@ class ThreeLevelWidget(
     }
 }
 
-/**
- * Контент трёхуровневого виджета: пропорции из [Structure.ThreeLevel],
- * размер клетки и сетки из [Structure.resolve]; сверху вниз — время,
- * день недели и дата (размеры ячеек — клетка × веса частей).
- */
 @Composable
 private fun ThreeLevelWidgetContent(
     settings: WidgetSettings,

@@ -3,7 +3,6 @@ package app.blockclock.licenses
 import android.content.res.AssetManager
 import java.nio.charset.StandardCharsets.UTF_8
 
-/** Запись лицензии: имя библиотеки и её содержимое. */
 sealed interface License {
     val name: String
 
@@ -19,9 +18,9 @@ sealed interface License {
 }
 
 /**
- * Читает OSS-лицензии из assets/licenses — пару файлов
- * `third_party_license_metadata` и `third_party_licenses` (формат
- * плагина oss-licenses), которые генерирует задача updateBundledLicenses.
+ * Reads OSS licenses from assets/licenses — the `third_party_license_metadata`
+ * and `third_party_licenses` pair (the oss-licenses plugin format), generated
+ * by the updateBundledLicenses task.
  */
 object LicensesParser {
 

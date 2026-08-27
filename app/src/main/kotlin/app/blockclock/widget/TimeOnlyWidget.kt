@@ -17,8 +17,8 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.wrapContentSize
 
 /**
- * Виджет «только время»: 2 × 1 клеток рабочего стола, часы и минуты.
- * Клик открывает системное приложение часов.
+ * The "time only" widget: 2 × 1 home screen cells, hours and minutes.
+ * A tap opens the system clock app.
  */
 class TimeOnlyWidget(
     private var preview: WidgetSettings? = null,
@@ -35,10 +35,6 @@ class TimeOnlyWidget(
     }
 }
 
-/**
- * Контент виджета «только время»: часы и минуты из [Structure.TimeOnly] —
- * размер клетки и сетки из [Structure.resolve], ячейки по весам частей.
- */
 @Composable
 private fun TimeOnlyWidgetContent(
     initialSettings: WidgetSettings,

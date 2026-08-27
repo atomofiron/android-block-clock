@@ -7,10 +7,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.edit
 
-/**
- * Хранение настроек виджета в SharedPreferences.
- * Читается как из Glance-кода (provideGlance), так и из экрана настроек.
- */
 class WidgetSettingsStore(context: Context) {
     companion object {
         private const val FLAG_EMPTY = "empty"

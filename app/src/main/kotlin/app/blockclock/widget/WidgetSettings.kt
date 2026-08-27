@@ -4,20 +4,15 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.glance.appwidget.updateAll
 
-/**
- * Параметры оформления и поведения виджета.
- */
 data class WidgetSettings(
     val background: Color = Color.White,
     val transparency: Float = 0.3f,
     val text: Color = Color.Black,
     val dayFirst: Boolean = true,
-    /** Отступ между прямоугольниками в dp: 1..16. */
     val gapDp: Int = 6,
-    /** Радиус скругления углов прямоугольников в dp: 1..32. */
     val cornerRadiusDp: Int = 12,
 ) {
-    /** Цвет прямоугольников с учётом прозрачности. */
+    /** The rectangle color with the transparency applied. */
     val effectiveRectColor: Color get() = background.copy(alpha = 1f - transparency)
 }
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- высота 300dp необходима на случай если высота текста окажется
-     больше чем высота контейнера, а с явным указанием большой
-     высоты TextClock разместится в соответствии с layout_gravity="center" -->
+<!-- 300dp height is needed in case the text height exceeds the container;
+     with an explicit large height the TextClock is placed per layout_gravity="center" -->
 <TextClock
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/clock_text"

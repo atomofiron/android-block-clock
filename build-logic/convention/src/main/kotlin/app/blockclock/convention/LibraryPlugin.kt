@@ -46,5 +46,5 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 }
 
 fun VariantDimension.buildConfig(debug: Boolean) {
-    // на будущее
+    // for the future
 }

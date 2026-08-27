@@ -87,10 +87,9 @@ private const val GITHUB_URL = "https://github.com/atomofiron/android-block-cloc
 private const val ShowPreviewFactory = false
 
 /**
- * Экран настроек виджета: живой предпросмотр, цвет и прозрачность
- * прямоугольников, отступы между ними, цвет текста, формат времени
- * 12/24 и порядок даты.
- * Любое изменение сразу сохраняется и перерисовывает виджет.
+ * The widget settings screen: live preview, rectangle color and
+ * transparency, spacing, text color, 12/24 time format and date order.
+ * Every change is saved and redraws the widget immediately.
  */
 @Composable
 fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
@@ -336,7 +335,6 @@ private fun ClickablePoint(
     }
 }
 
-/** Карточка-секция с необязательным заголовком. */
 @Composable
 private fun SectionCard(
     title: String? = null,
@@ -382,7 +380,6 @@ private fun SubTitle(title: String, value: String) {
     }
 }
 
-/** Плитка текущего цвета — по тапу открывает диалог с градиентным полем. */
 @Composable
 private fun ColorField(
     modifier: Modifier,
@@ -414,7 +411,7 @@ private fun ColorField(
     }
 }
 
-/** Слайдер прозрачности: чем больше значение, тем прозрачнее прямоугольники. */
+/** The transparency slider: the higher the value, the more transparent the rectangles. */
 @Composable
 private fun TransparencySlider(
     transparency: Float,
@@ -439,9 +436,6 @@ private fun TransparencySlider(
     }
 }
 
-/**
- * Дискретный слайдер отступов между ячейками: значения от 1 до 8 с шагом 1.
- */
 @Composable
 private fun GapSlider(gap: Int, onChange: (Int) -> Unit, onChangeFinished: (Int) -> Unit) {
     var value by remember { mutableFloatStateOf(gap.toFloat().coerceIn(GapRange)) }
@@ -463,7 +457,6 @@ private fun GapSlider(gap: Int, onChange: (Int) -> Unit, onChangeFinished: (Int)
     }
 }
 
-/** Слайдер целого значения в dp: значение показывается справа от подписи. */
 @Composable
 private fun RoundingSlider(
     label: String,
@@ -490,7 +483,7 @@ private fun RoundingSlider(
     }
 }
 
-/** Строка настройки со Switch: весь ряд кликабелен. */
+/** A settings row with a Switch: the whole row is clickable. */
 @Composable
 private fun SettingSwitch(
     label: String,

@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlin.math.min
 
-/** Отступы ячейки: флаг определяет, с какой стороны он рендерится. */
 data class Gap(
     val left: Boolean = false,
     val top: Boolean = false,
@@ -14,8 +13,8 @@ data class Gap(
 )
 
 /**
- * Часть виджета: вес (множители клетки), отступы по флагам [gap],
- * дополнительные внутренние зазоры [gapInside] и признак времени [time].
+ * A widget part: the [weight] (cell multipliers), the [gap] flags,
+ * extra inner gaps [gapInside] and the time flag.
  */
 data class Part(
     val weight: Weight,
@@ -24,13 +23,12 @@ data class Part(
     val time: Boolean = false,
 )
 
-/** Соотношение и отступы структуры по одному измерению. */
+/** The structure proportions and the number of gap slots along one axis. */
 data class Dimension(
     val weight: Int,
     val gaps: Int,
 )
 
-/** Вес части: множители клетки по горизонтали и вертикали. */
 data class Weight(
     val horizontal: Int,
     val vertical: Int,
@@ -114,12 +112,12 @@ sealed interface Structure {
 }
 
 /**
- * Размеры структуры в доступном пространстве: отступы [Dimension.gaps] ×
- * [gap] вычитаются из доступного размера, остаток делится на вес
- * [Dimension.weight] (горизонталь к вертикали) — получается клетка;
- * отступы прибавляются обратно к сетке.
+ * Resolves the structure sizes in the available space: [Dimension.gaps] ×
+ * [gap] are subtracted from the available size, the remainder is divided
+ * by the [Dimension.weight] (horizontal to vertical) — the cell; the gaps
+ * are added back to the grid.
  *
- * @return пару: размер клетки (единица веса) и размер сетки (контейнера).
+ * @return a pair: the cell size (one weight unit) and the grid size (container).
  */
 fun Structure.resolve(available: DpSize, gap: Dp): Pair<DpSize, DpSize> {
     val gapWidth = gap * horizontal.gaps
@@ -136,9 +134,9 @@ fun Structure.resolve(available: DpSize, gap: Dp): Pair<DpSize, DpSize> {
 }
 
 /**
- * Размер части: клетка [cellSize], умноженная на [Weight], плюс отступы —
- * по [gap]/2 с каждой флаговой стороны, а для частей шире одной клетки —
- * ещё [gapInside] × [gap].
+ * The part size: the [cellSize] cell times the [Weight] plus the gaps —
+ * [gap]/2 on each flagged side, and parts wider than one cell get
+ * [gapInside] × [gap] more.
  */
 fun Part.calcSize(cellSize: DpSize, gap: Dp): DpSize {
     var hGap = (if (this.gap.left) gap / 2 else 0.dp) + (if (this.gap.right) gap / 2 else 0.dp)

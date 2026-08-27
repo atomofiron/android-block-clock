@@ -47,8 +47,8 @@ private const val TIME_TEXT_HEIGHT_FACTOR = 0.7f
 private const val DATE_TEXT_HEIGHT_FACTOR = 0.6f
 
 /**
- * Реактивная загрузка настроек: пока composition виджета жива, она следит
- * за изменениями в SharedPreferences и перерисовывается без перезапуска
+ * Reactively loads the settings: while the widget composition is alive it
+ * listens to SharedPreferences changes and redraws without restarting
  * provideGlance.
  */
 @Composable
@@ -66,12 +66,6 @@ internal fun rememberWidgetSettings(initial: WidgetSettings): WidgetSettings {
     return settings
 }
 
-/**
- * Часы и минуты: две ячейки рядом с нативными TextClock.
- *
- * Размер каждой ячейки — [cellSize] (клетка структуры), умноженный
- * на вес части; шрифт времени — 70% высоты ячейки.
- */
 @Composable
 internal fun TimeSection(
     settings: WidgetSettings,
@@ -91,9 +85,6 @@ internal fun TimeSection(
     }
 }
 
-/**
- * День недели: одна ячейка части [part] на всю ширину.
- */
 @Composable
 internal fun WeekdaySection(
     settings: WidgetSettings,
@@ -112,10 +103,6 @@ internal fun WeekdaySection(
     }
 }
 
-/**
- * Дата: день, месяц и год в один ряд (порядок день/месяц зависит
- * от настройки), размеры ячеек — [cellSize] × веса частей [structure].
- */
 @Composable
 internal fun DateSection(
     settings: WidgetSettings,
@@ -140,17 +127,17 @@ internal fun DateSection(
 }
 
 /**
- * Одна ячейка с закруглёнными углами и отступами по флагам части [part].
+ * A single cell with rounded corners and padding per the [part] gap flags.
  *
- * Размер — [part]: клетка [cellSize], умноженная на вес, плюс
- * отступы (каждый флаг — [gap]/2, у широких частей — ещё [Part.gapInside]).
- * Шрифт — доля высоты ячейки за вычетом верхнего или нижнего отступов:
- * 70% для времени ([Part.time]), 60% для даты.
+ * The size is [part.calcSize]: the [cellSize] cell times the weight plus
+ * the gaps (each flag adds [gap]/2, wide parts add [Part.gapInside] more).
+ * The font is a fraction of the cell height minus the top/bottom gaps:
+ * 70% for time parts ([Part.time]), 60% for date parts.
  *
- * На Android 12+ фон рисует Glance, на Android 11 и ниже — Cell bitmap
- * с запечёнными цветом (включая прозрачность) и углами; при [gap] = 0
- * ячейки прозрачны (общий фон рисует [CellBackground]).
- * Текст — нативный [android.widget.TextClock], обновляется сам.
+ * The background is drawn by Glance on Android 12+ and by a cell bitmap
+ * (color with transparency and corners baked in) on Android 11 and below;
+ * at [gap] = 0 cells are transparent (the shared [CellBackground] draws).
+ * The text is a native [android.widget.TextClock] that updates itself.
  */
 @Composable
 internal fun Cell(
@@ -217,8 +204,8 @@ private fun CellRemoteViews(remoteViews: RemoteViews) {
 }
 
 /**
- * Общий фон сетки виджета: один скруглённый прямоугольник вместо фонов
- * отдельных ячеек (используется при нулевом зазоре).
+ * The widget grid background: a single rounded rectangle instead of
+ * per-cell backgrounds (used when the gap is zero).
  */
 @Composable
 internal fun CellBackground(
@@ -249,7 +236,6 @@ internal fun CellBackground(
     }
 }
 
-/** RemoteViews текста ячейки: цвет, размер и вертикальная компенсация. */
 @Composable
 private fun textRemoteViews(
     context: Context,
@@ -268,7 +254,6 @@ private fun textRemoteViews(
     return views
 }
 
-/** Растровый фон ячейки: цвет с прозрачностью и скруглённые углы. */
 private fun cellBitmap(
     size: DpSize,
     color: Color,
@@ -287,6 +272,11 @@ private fun cellBitmap(
     return bitmap
 }
 
+/**
+ * Compensates the TextView vertical centering: glyphs sit visually low in a
+ * centered view, so an asymmetric bottom padding lifts the text by the
+ * measured offset.
+ */
 @Composable
 private fun RemoteViews.setPadding(
     viewId: Int,

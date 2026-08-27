@@ -26,8 +26,8 @@ import app.blockclock.R
 import app.blockclock.ui.values.Padding
 
 /**
- * Диалог OSS-лицензий: список библиотек. Тап по лицензии с текстом
- * показывает её содержимое, тап по ссылке открывает браузер.
+ * The OSS licenses dialog: a library list. Tapping a text license shows
+ * its content, tapping a link opens the browser.
  */
 @Composable
 fun LicensesDialog(onDismiss: () -> Unit) {

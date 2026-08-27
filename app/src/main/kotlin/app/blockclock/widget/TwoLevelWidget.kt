@@ -21,9 +21,9 @@ import androidx.glance.layout.wrapContentSize
 import app.blockclock.MainActivity
 
 /**
- * Двухуровневый виджет 2 × 2: на верхнем этаже время (часы и минуты),
- * на нижнем — в один ряд день недели и дата.
- * Клик по времени открывает системные часы, по дате — календарь.
+ * The two-level 2 × 2 widget: time on the top floor (hours and minutes),
+ * weekday and date in one row below.
+ * Tapping time opens the system clock app, tapping the date opens the calendar.
  */
 class TwoLevelWidget(
     private var preview: WidgetSettings? = null,
@@ -47,14 +47,6 @@ class TwoLevelWidget(
     }
 }
 
-/**
- * Контент двухуровневого виджета.
- *
- * Пропорции и отступы заданы в [Structure.TwoLevel]: размер клетки и
- * сетки вычисляются [Structure.resolve] из доступной области; сверху —
- * время, снизу в один ряд день недели и дата (размеры ячеек — клетка
- * × веса частей).
- */
 @Composable
 private fun TwoLevelWidgetContent(
     initialSettings: WidgetSettings,

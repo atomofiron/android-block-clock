@@ -4,9 +4,9 @@ import androidx.annotation.LayoutRes
 import app.blockclock.R
 
 /**
- * Часть времени/даты, отображаемая нативным [android.widget.TextClock]
- * через AndroidRemoteViews. TextClock сам обновляет текст каждую минуту,
- * без запуска кода нашего приложения.
+ * A time/date part rendered by a native [android.widget.TextClock] through
+ * AndroidRemoteViews. TextClock updates the text every minute by itself,
+ * without running any app code.
  */
 enum class ClockTextPart(@LayoutRes val layoutRes: Int) {
     HOURS(R.layout.text_clock_hours),

@@ -17,8 +17,8 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.wrapContentSize
 
 /**
- * Виджет «только дата»: 2 × 1 клеток рабочего стола —
- * день недели, день, месяц и год. Клик открывает системный календарь.
+ * The "date only" widget: 2 × 1 home screen cells — weekday, day, month
+ * and year. A tap opens the system calendar.
  */
 class DateOnlyWidget(
     private var preview: WidgetSettings? = null,
@@ -35,10 +35,6 @@ class DateOnlyWidget(
     }
 }
 
-/**
- * Контент виджета «только дата»: день недели и дата из [Structure.DateOnly] —
- * размер клетки и сетки из [Structure.resolve], ячейки по весам частей.
- */
 @Composable
 private fun DateOnlyWidgetContent(
     initialSettings: WidgetSettings,

@@ -9,13 +9,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 
 /**
- * Клип скроллящегося блока настроек: верхняя кромка сегментирована —
- * по одному скруглённому «горбу» на каждую колонку грида, между сегментами
- * и по контуру — отступ; низ и бока прямые.
+ * The clip of the scrolling settings block: the top edge is segmented —
+ * one rounded "bump" per grid column, with padding between the segments
+ * and along the outline; the bottom and the sides are straight.
  *
- * @property columns текущее количество колонок LazyVerticalStaggeredGrid.
- * @property padding ширина выреза между сегментами и отступ контура от края.
- * @property cornerRadius радиус скругления углов сегментов.
+ * @property columns the current LazyVerticalStaggeredGrid column count.
+ * @property padding the cutout width between segments and the outline offset.
+ * @property cornerRadius the segment corner radius.
  */
 class StaggeredGridClipShape(
     val columns: Int,

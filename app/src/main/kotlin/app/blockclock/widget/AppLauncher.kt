@@ -7,8 +7,9 @@ import androidx.glance.appwidget.action.actionStartActivity
 import app.blockclock.MainActivity
 
 /**
- * Кандидаты «пакет → активити» системных часов для разных вендоров.
- * Перебор, как в лаунчерах: у каждого производителя свои имена.
+ * Candidate "package → activity" pairs of the system clock app for
+ * different vendors. Enumerated like launchers do: each manufacturer
+ * has its own names.
  */
 private val CLOCK_APP_ACTIVITIES = listOf(
     "com.android.alarmclock" to "com.android.alarmclock.AlarmClock",
@@ -29,7 +30,7 @@ private val CLOCK_APP_ACTIVITIES = listOf(
     "com.sonyericsson.organizer" to "com.sonyericsson.organizer.Organizer",
 )
 
-/** Кандидаты «пакет → активити» системного календаря для разных вендоров. */
+/** Candidate "package → activity" pairs of the system calendar for different vendors. */
 private val CALENDAR_APP_ACTIVITIES = listOf(
     "com.android.calendar" to "com.android.calendar.LaunchActivity",
     "com.android.calendar" to "com.android.calendar.homepage.AllInOneActivity",
@@ -44,8 +45,8 @@ private val CALENDAR_APP_ACTIVITIES = listOf(
 )
 
 /**
- * Первый явный intent (пакет + активити), для которого нашёлся обработчик;
- * иначе — фолбэк на экран настроек.
+ * The first explicit intent (package + activity) that has a handler;
+ * otherwise — a fallback to the settings screen.
  */
 private fun explicitAppAction(context: Context, candidates: List<Pair<String, String>>): Action {
     val packageManager = context.packageManager
@@ -58,8 +59,8 @@ private fun explicitAppAction(context: Context, candidates: List<Pair<String, St
     return actionStartActivity(Intent(context, MainActivity::class.java))
 }
 
-/** Открывает системное приложение часов; фолбэк — экран настроек. */
+/** Opens the system clock app; falls back to the settings screen. */
 internal fun clockAppAction(context: Context): Action = explicitAppAction(context, CLOCK_APP_ACTIVITIES)
 
-/** Открывает системный календарь; фолбэк — экран настроек. */
+/** Opens the system calendar; falls back to the settings screen. */
 internal fun calendarAppAction(context: Context): Action = explicitAppAction(context, CALENDAR_APP_ACTIVITIES)

@@ -20,9 +20,9 @@ import androidx.glance.appwidget.compose
 import app.blockclock.widget.WidgetSettings
 
 /**
- * Рендерит Glance-виджет в Compose: запускает его композицию с размером
- * [size] (этот размер видит LocalSize внутри виджета) и показывает
- * полученные RemoteViews.
+ * Renders a Glance widget in Compose: runs its composition with the [size]
+ * (this is what LocalSize sees inside the widget) and shows the produced
+ * RemoteViews.
  */
 @Composable
 fun GlanceWidgetPreview(

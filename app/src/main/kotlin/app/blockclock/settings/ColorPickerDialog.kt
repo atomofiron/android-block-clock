@@ -45,8 +45,8 @@ import kotlin.math.roundToInt
 private const val HueDegrees = 360f
 
 /**
- * Диалог выбора цвета: градиентное поле насыщенность × яркость (SV)
- * при выбранном оттенке (H) + слайдер оттенка + текущий цвет и HEX.
+ * The color picker dialog: a saturation × value (SV) gradient field at the
+ * selected hue (H) + a hue slider + the current color and its HEX.
  */
 @Composable
 internal fun ColorPickerDialog(
@@ -86,13 +86,9 @@ internal fun ColorPickerDialog(
                     Box(
                         modifier = Modifier
                             .size(Dimens.DialogSwatchSize)
-                            .clip(ShapeDefaults.Small)
+                            .clip(ShapeDefaults.Medium)
                             .background(color)
-                            .border(
-                                Dimens.SwatchBorderWidth,
-                                Colors.SwatchBorder,
-                                ShapeDefaults.Small,
-                            ),
+                            .border(Dimens.SwatchBorderWidth, Colors.SwatchBorder, ShapeDefaults.Medium),
                     )
                     Text(
                         modifier = Modifier.padding(start = Padding.Semi),
@@ -115,7 +111,7 @@ internal fun ColorPickerDialog(
     )
 }
 
-/** Квадрат насыщенность (по горизонтали) × яркость (по вертикали). */
+/** The saturation (horizontal) × value (vertical) square. */
 @Composable
 private fun SaturationValueBox(
     hue: Float,
@@ -171,17 +167,14 @@ private fun SaturationValueBox(
     }
 }
 
-/** Позиция в SV-квадрате → пара (насыщенность, яркость). */
 private fun satValueOf(size: IntSize, position: Offset): Pair<Float, Float> = Pair(
     (position.x / size.width).coerceIn(0f, 1f),
     1f - (position.y / size.height).coerceIn(0f, 1f),
 )
 
-/** Позиция на радуге → оттенок в градусах (0..360). */
 private fun hueOf(size: IntSize, position: Offset): Float =
     (position.x / size.width * HueDegrees).coerceIn(0f, HueDegrees)
 
-/** Слайдер оттенка: градиентная радуга. */
 @Composable
 private fun HueSlider(hue: Float, onChange: (Float) -> Unit) {
     val rainbow = Color.run { listOf(Red, Yellow, Green, Cyan, Blue, Magenta, Red) }
@@ -189,7 +182,7 @@ private fun HueSlider(hue: Float, onChange: (Float) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(Dimens.HueSliderHeight)
-            .clip(ShapeDefaults.Small)
+            .clip(ShapeDefaults.Medium)
             .background(Brush.horizontalGradient(rainbow))
             .pointerInput(Unit) {
                 detectTapGestures { position -> onChange(hueOf(size, position)) }

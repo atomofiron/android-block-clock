@@ -21,11 +21,8 @@ import androidx.glance.layout.wrapContentSize
 import app.blockclock.MainActivity
 
 /**
- * Полный виджет «время + дата»: 4 × 1 клеток рабочего стола,
- * один уровень — время слева, день недели и дата справа.
- *
- * Цвет/прозрачность прямоугольников, отступы, цвет текста, формат
- * времени и порядок даты берутся из [WidgetSettingsStore].
+ * The full "time and date" widget: 4 × 1 home screen cells, one level —
+ * time on the left, weekday and date on the right.
  */
 class OneLevelWidget(
     private var preview: WidgetSettings? = null,
