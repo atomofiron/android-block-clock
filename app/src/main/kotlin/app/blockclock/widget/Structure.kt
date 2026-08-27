@@ -5,21 +5,13 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlin.math.min
 
-/** Отступы ячейки: флаг определяет, с какой стороны рендерится [gap]. */
-data class GapImpl(
-    override val left: Boolean = false,
-    override val top: Boolean = false,
-    override val right: Boolean = false,
-    override val bottom: Boolean = false,
-) : Gap
-
-/** Флаги отступов части; по умолчанию — без отступов. */
-interface Gap {
-    val left: Boolean get() = false
-    val top: Boolean get() = false
-    val right: Boolean get() = false
-    val bottom: Boolean get() = false
-}
+/** Отступы ячейки: флаг определяет, с какой стороны он рендерится. */
+data class Gap(
+    val left: Boolean = false,
+    val top: Boolean = false,
+    val right: Boolean = false,
+    val bottom: Boolean = false,
+)
 
 /**
  * Часть виджета: вес (множители клетки), отступы по флагам [gap],
@@ -30,7 +22,7 @@ data class Part(
     val gap: Gap,
     val gapInside: Int = 0,
     val time: Boolean = false,
-) : Gap by gap
+)
 
 /** Соотношение и отступы структуры по одному измерению. */
 data class Dimension(
@@ -67,54 +59,54 @@ sealed interface Structure {
     sealed interface TimeAndDate : Time, Weekday, Date
 
     data object OneLevel : TimeAndDate, Structure {
-        override val hours: Part = Part(Weight(2, 2), GapImpl(right = true), gapInside = 1, time = true)
-        override val minutes: Part = Part(Weight(2, 2), GapImpl(left = true, right = true), gapInside = 1, time = true)
-        override val weekday: Part = Part(Weight(4, 1), GapImpl(left = true, bottom = true), gapInside = 3)
-        override val first: Part = Part(Weight(1, 1), GapImpl(left = true, top = true, right = true))
-        override val second: Part = Part(Weight(1, 1), GapImpl(left = true, top = true, right = true))
-        override val year: Part = Part(Weight(2, 1), GapImpl(left = true, top = true), gapInside = 1)
+        override val hours: Part = Part(Weight(2, 2), Gap(right = true), gapInside = 1, time = true)
+        override val minutes: Part = Part(Weight(2, 2), Gap(left = true, right = true), gapInside = 1, time = true)
+        override val weekday: Part = Part(Weight(4, 1), Gap(left = true, bottom = true), gapInside = 3)
+        override val first: Part = Part(Weight(1, 1), Gap(left = true, top = true, right = true))
+        override val second: Part = Part(Weight(1, 1), Gap(left = true, top = true, right = true))
+        override val year: Part = Part(Weight(2, 1), Gap(left = true, top = true), gapInside = 1)
 
         override val horizontal = Dimension(8, 7)
         override val vertical = Dimension(2, 1)
     }
 
     data object TwoLevel : TimeAndDate, Structure {
-        override val hours: Part = Part(Weight(4, 4), GapImpl(right = true, bottom = true), gapInside = 1, time = true)
-        override val minutes: Part = Part(Weight(4, 4), GapImpl(left = true, bottom = true), gapInside = 1, time = true)
-        override val weekday: Part = Part(Weight(4, 1), GapImpl(top = true, right = true), gapInside = 1)
-        override val first: Part = Part(Weight(1, 1), GapImpl(left = true, top = true, right = true))
-        override val second: Part = Part(Weight(1, 1), GapImpl(left = true, top = true, right = true))
-        override val year: Part = Part(Weight(2, 1), GapImpl(left = true, top = true), gapInside = -1)
+        override val hours: Part = Part(Weight(4, 4), Gap(right = true, bottom = true), gapInside = 1, time = true)
+        override val minutes: Part = Part(Weight(4, 4), Gap(left = true, bottom = true), gapInside = 1, time = true)
+        override val weekday: Part = Part(Weight(4, 1), Gap(top = true, right = true), gapInside = 1)
+        override val first: Part = Part(Weight(1, 1), Gap(left = true, top = true, right = true))
+        override val second: Part = Part(Weight(1, 1), Gap(left = true, top = true, right = true))
+        override val year: Part = Part(Weight(2, 1), Gap(left = true, top = true), gapInside = -1)
 
         override val horizontal = Dimension(8, 3)
         override val vertical = Dimension(5, 2)
     }
 
     data object ThreeLevel : TimeAndDate, Structure {
-        override val hours: Part = Part(Weight(2, 2), GapImpl(right = true, bottom = true), gapInside = 1, time = true)
-        override val minutes: Part = Part(Weight(2, 2), GapImpl(left = true, bottom = true), gapInside = 1, time = true)
-        override val weekday: Part = Part(Weight(4, 1), GapImpl(top = true, bottom = true), gapInside = 3)
-        override val first: Part = Part(Weight(1, 1), GapImpl(top = true, right = true))
-        override val second: Part = Part(Weight(1, 1), GapImpl(left = true, top = true, right = true))
-        override val year: Part = Part(Weight(2, 1), GapImpl(left = true, top = true), gapInside = 1)
+        override val hours: Part = Part(Weight(2, 2), Gap(right = true, bottom = true), gapInside = 1, time = true)
+        override val minutes: Part = Part(Weight(2, 2), Gap(left = true, bottom = true), gapInside = 1, time = true)
+        override val weekday: Part = Part(Weight(4, 1), Gap(top = true, bottom = true), gapInside = 3)
+        override val first: Part = Part(Weight(1, 1), Gap(top = true, right = true))
+        override val second: Part = Part(Weight(1, 1), Gap(left = true, top = true, right = true))
+        override val year: Part = Part(Weight(2, 1), Gap(left = true, top = true), gapInside = 1)
 
         override val horizontal = Dimension(4, 3)
         override val vertical = Dimension(4, 3)
     }
 
     data object TimeOnly : Time, Structure {
-        override val hours: Part = Part(Weight(1, 1), GapImpl(right = true), time = true)
-        override val minutes: Part = Part(Weight(1, 1), GapImpl(left = true), time = true)
+        override val hours: Part = Part(Weight(1, 1), Gap(right = true), time = true)
+        override val minutes: Part = Part(Weight(1, 1), Gap(left = true), time = true)
 
         override val horizontal = Dimension(2, 1)
         override val vertical = Dimension(1, 0)
     }
 
     data object DateOnly : Date, Weekday, Structure {
-        override val weekday: Part = Part(Weight(4, 1), GapImpl(bottom = true), gapInside = 3)
-        override val first: Part = Part(Weight(1, 1), GapImpl(top = true, right = true))
-        override val second: Part = Part(Weight(1, 1), GapImpl(left = true, top = true, right = true))
-        override val year: Part = Part(Weight(2, 1), GapImpl(left = true, top = true), gapInside = 1)
+        override val weekday: Part = Part(Weight(4, 1), Gap(bottom = true), gapInside = 3)
+        override val first: Part = Part(Weight(1, 1), Gap(top = true, right = true))
+        override val second: Part = Part(Weight(1, 1), Gap(left = true, top = true, right = true))
+        override val year: Part = Part(Weight(2, 1), Gap(left = true, top = true), gapInside = 1)
 
         override val horizontal = Dimension(4, 3)
         override val vertical = Dimension(2, 1)
