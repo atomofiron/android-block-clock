@@ -1,4 +1,4 @@
-package app.blockclock.ui
+package app.blockclock.ui.values
 
 import androidx.compose.ui.unit.dp
 

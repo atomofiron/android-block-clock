@@ -37,9 +37,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import app.blockclock.R
-import app.blockclock.ui.Colors
-import app.blockclock.ui.Dimens
-import app.blockclock.ui.Padding
+import app.blockclock.ui.values.Colors
+import app.blockclock.ui.values.Dimens
+import app.blockclock.ui.values.Padding
 import kotlin.math.roundToInt
 
 private const val HueDegrees = 360f

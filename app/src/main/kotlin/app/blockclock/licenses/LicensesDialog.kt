@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.blockclock.R
-import app.blockclock.ui.Padding
+import app.blockclock.ui.values.Padding
 
 /**
  * Диалог OSS-лицензий: список библиотек. Тап по лицензии с текстом

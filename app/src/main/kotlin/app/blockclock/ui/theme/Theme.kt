@@ -10,7 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import app.blockclock.ui.Colors
+import app.blockclock.ui.values.Colors
 
 private val DarkColorScheme = darkColorScheme(
     primary = Colors.Purple80,
