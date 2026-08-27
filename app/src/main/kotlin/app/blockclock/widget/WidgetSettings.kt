@@ -16,10 +16,10 @@ data class WidgetSettings(
     val effectiveRectColor: Color get() = background.copy(alpha = 1f - transparency)
 }
 
-suspend fun Context.updateWidgets() {
-    OneLevelWidget().updateAll(this)
-    TwoLevelWidget().updateAll(this)
-    ThreeLevelWidget().updateAll(this)
-    TimeOnlyWidget().updateAll(this)
-    DateOnlyWidget().updateAll(this)
-}
+suspend fun Context.updateWidgets() = listOf(
+    OneLevelWidget(),
+    TwoLevelWidget(),
+    ThreeLevelWidget(),
+    TimeOnlyWidget(),
+    DateOnlyWidget(),
+).forEach { it.updateAll(this) }
