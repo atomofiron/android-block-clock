@@ -11,6 +11,6 @@ object Colors {
     val PurpleGrey40 = Color(0xFF625b71)
     val Pink40 = Color(0xFF7D5260)
 
-    val SwatchBorder = Color(0x33000000)
+    val SwatchBorder = Color(0x50808080)
     val MarkerBorder = Color(0xff808080)
 }
