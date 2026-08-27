@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import app.blockclock.ui.LocalScreenCorners
 import app.blockclock.ui.values.Dimens
 import app.blockclock.util.Empty
 import app.blockclock.util.calcSize

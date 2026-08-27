@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import app.blockclock.settings.SettingsScreen
 import app.blockclock.ui.insets.InsetsBackground
-import app.blockclock.ui.insets.LocalScreenCorners
+import app.blockclock.ui.LocalScreenCorners
 import app.blockclock.ui.insets.ScreenCorners
 import app.blockclock.ui.theme.AppTheme
 import app.blockclock.update.UpdateService
