@@ -73,6 +73,7 @@ import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
 import app.blockclock.R
 import app.blockclock.licenses.LicensesDialog
+import app.blockclock.ui.Dimens
 import app.blockclock.ui.Padding
 import app.blockclock.update.AppSource
 import app.blockclock.update.UpdateService
@@ -93,31 +94,13 @@ import app.blockclock.widget.WidgetSettingsStore
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-private val ClipCornerRadius = 28.dp
-private val GridColumnMinWidth = 320.dp
-private val CardCornerRadius = 28.dp
-private val FieldCornerRadius = 12.dp
-private val FieldVerticalPadding = 10.dp
-private val SwatchSize = 36.dp
-private val SwatchCornerRadius = 10.dp
-private val SwatchBorderWidth = 1.dp
 private val SwatchBorderColor = Color(0x33000000)
+private val MarkerBorderColor = Color(0x66000000)
 private const val PercentFactor = 100f
+private const val HueDegrees = 360f
 private val TransparencyRange = 0f..1f
 private val RoundingRange = 0f..32f
 private val GapRange = 0f..16f
-private val IconSize = 24.dp
-private val DialogSwatchSize = 32.dp
-private val DialogSwatchCornerRadius = 8.dp
-private val MarkerSize = 16.dp
-private val MarkerRadius = 8.dp
-private val MarkerBorderWidth = 2.dp
-private val MarkerBorderColor = Color(0x66000000)
-private val SvBoxHeight = 160.dp
-private val SvBoxCornerRadius = 12.dp
-private val HueSliderHeight = 28.dp
-private val HueSliderCornerRadius = 6.dp
-private const val HueDegrees = 360f
 
 private const val GITHUB_URL = "https://github.com/atomofiron/android-block-clock"
 private const val ShowPreviewFactory = false
@@ -194,7 +177,7 @@ fun SettingsScreen(uiStarted: Boolean) {
         val clipShape = StaggeredGridClipShape(
             columns = columns,
             padding = Padding.Common,
-            cornerRadius = ClipCornerRadius,
+            cornerRadius = Dimens.ClipCornerRadius,
         )
         Box(
             modifier = Modifier
@@ -205,7 +188,7 @@ fun SettingsScreen(uiStarted: Boolean) {
         ) {
             LazyVerticalStaggeredGrid(
                 state = gridState,
-                columns = StaggeredGridCells.Adaptive(GridColumnMinWidth),
+                columns = StaggeredGridCells.Adaptive(Dimens.GridColumnMinWidth),
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = WindowInsets.navigationBars
                     .only(WindowInsetsSides.Bottom)
@@ -355,13 +338,13 @@ private fun ClickablePoint(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(FieldCornerRadius))
+            .clip(RoundedCornerShape(Dimens.FieldCornerRadius))
             .clickable(enabled = clickable, onClick = onClick)
             .padding(vertical = Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            modifier = Modifier.size(IconSize),
+            modifier = Modifier.size(Dimens.IconSize),
             painter = painterResource(icon),
             contentDescription = null,
         )
@@ -383,7 +366,7 @@ private fun SectionCard(
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(CardCornerRadius),
+        shape = RoundedCornerShape(Dimens.CardCornerRadius),
     ) {
         Column(
             modifier = Modifier
@@ -431,20 +414,20 @@ private fun ColorField(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(FieldCornerRadius))
+            .clip(RoundedCornerShape(Dimens.FieldCornerRadius))
             .clickable(onClick = onClick)
-            .padding(vertical = FieldVerticalPadding),
+            .padding(vertical = Dimens.FieldVerticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(SwatchSize)
-                .clip(RoundedCornerShape(SwatchCornerRadius))
+                .size(Dimens.SwatchSize)
+                .clip(RoundedCornerShape(Dimens.SwatchCornerRadius))
                 .background(color)
                 .border(
-                    SwatchBorderWidth,
+                    Dimens.SwatchBorderWidth,
                     SwatchBorderColor,
-                    RoundedCornerShape(SwatchCornerRadius)
+                    RoundedCornerShape(Dimens.SwatchCornerRadius)
                 ),
         )
         Text(
@@ -543,7 +526,7 @@ private fun SettingSwitch(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(FieldCornerRadius))
+            .clip(RoundedCornerShape(Dimens.FieldCornerRadius))
             .clickable { onCheckedChange(!checked) }
             .padding(),
         verticalAlignment = Alignment.CenterVertically,
@@ -598,13 +581,13 @@ private fun ColorPickerDialog(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(DialogSwatchSize)
-                            .clip(RoundedCornerShape(DialogSwatchCornerRadius))
+                            .size(Dimens.DialogSwatchSize)
+                            .clip(RoundedCornerShape(Dimens.DialogSwatchCornerRadius))
                             .background(color)
                             .border(
-                                SwatchBorderWidth,
+                                Dimens.SwatchBorderWidth,
                                 SwatchBorderColor,
-                                RoundedCornerShape(DialogSwatchCornerRadius),
+                                RoundedCornerShape(Dimens.DialogSwatchCornerRadius),
                             ),
                     )
                     Text(
@@ -639,8 +622,8 @@ private fun SaturationValueBox(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
-            .height(SvBoxHeight)
-            .clip(RoundedCornerShape(SvBoxCornerRadius))
+            .height(Dimens.SvBoxHeight)
+            .clip(RoundedCornerShape(Dimens.SvBoxCornerRadius))
             .background(
                 Brush.horizontalGradient(
                     listOf(
@@ -674,14 +657,14 @@ private fun SaturationValueBox(
             modifier = Modifier
                 .offset {
                     IntOffset(
-                        x = (sat * maxWidth.value * density - MarkerRadius.value * density).roundToInt(),
-                        y = ((1f - value) * maxHeight.value * density - MarkerRadius.value * density).roundToInt(),
+                        x = (sat * maxWidth.value * density - Dimens.MarkerRadius.value * density).roundToInt(),
+                        y = ((1f - value) * maxHeight.value * density - Dimens.MarkerRadius.value * density).roundToInt(),
                     )
                 }
-                .size(MarkerSize)
+                .size(Dimens.MarkerSize)
                 .clip(CircleShape)
                 .background(Color.White)
-                .border(MarkerBorderWidth, MarkerBorderColor, CircleShape),
+                .border(Dimens.MarkerBorderWidth, MarkerBorderColor, CircleShape),
         )
     }
 }
@@ -703,8 +686,8 @@ private fun HueSlider(hue: Float, onChange: (Float) -> Unit) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
-            .height(HueSliderHeight)
-            .clip(RoundedCornerShape(HueSliderCornerRadius))
+            .height(Dimens.HueSliderHeight)
+            .clip(RoundedCornerShape(Dimens.HueSliderCornerRadius))
             .background(Brush.horizontalGradient(rainbow))
             .pointerInput(Unit) {
                 detectTapGestures { position -> onChange(hueOf(size, position)) }
@@ -723,13 +706,13 @@ private fun HueSlider(hue: Float, onChange: (Float) -> Unit) {
             modifier = Modifier
                 .offset {
                     IntOffset(
-                        x = (hue / HueDegrees * maxWidth.value * density - MarkerRadius.value * density).roundToInt(),
-                        y = (maxHeight.value * density / 2 - MarkerRadius.value * density).roundToInt(),
+                        x = (hue / HueDegrees * maxWidth.value * density - Dimens.MarkerRadius.value * density).roundToInt(),
+                        y = (maxHeight.value * density / 2 - Dimens.MarkerRadius.value * density).roundToInt(),
                     )
                 }
-                .size(MarkerSize)
+                .size(Dimens.MarkerSize)
                 .clip(CircleShape)
-                .border(MarkerBorderWidth, Color.White, CircleShape),
+                .border(Dimens.MarkerBorderWidth, Color.White, CircleShape),
         )
     }
 }
