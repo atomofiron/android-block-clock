@@ -1,4 +1,4 @@
-package app.blockclock.update.model
+package app.blockclock.model
 
 sealed interface Loading {
     data class Progress(val done: Long, val length: Long) : Loading {

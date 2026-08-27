@@ -1,4 +1,4 @@
-package app.blockclock.update.model
+package app.blockclock.model
 
 data class ApkInfo(
     val appName: String,

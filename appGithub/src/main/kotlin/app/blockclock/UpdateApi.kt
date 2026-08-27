@@ -7,7 +7,7 @@ import app.blockclock.util.forHumans
 import app.blockclock.util.toErr
 import app.blockclock.util.toOk
 import app.blockclock.util.toRslt
-import app.blockclock.update.model.Loading
+import app.blockclock.model.Loading
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO

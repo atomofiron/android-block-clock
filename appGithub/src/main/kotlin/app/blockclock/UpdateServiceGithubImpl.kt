@@ -4,13 +4,16 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.pm.PackageInfoCompat
 import app.atomofiron.blockclock.BuildConfig
+import app.blockclock.model.ApkInfo
 import app.blockclock.model.GithubAsset
 import app.blockclock.model.GithubRelease
+import app.blockclock.model.Loading
 import app.blockclock.update.UpdateService
 import app.blockclock.update.UpdateStore
-import app.blockclock.update.model.Loading
 import app.blockclock.update.model.UpdateState
 import app.blockclock.update.model.UpdateType
 import app.blockclock.util.Alert
@@ -18,7 +21,6 @@ import app.blockclock.util.AlertErr
 import app.blockclock.util.Android
 import app.blockclock.util.AppScope
 import app.blockclock.util.Rslt
-import app.blockclock.util.apkInfo
 import app.blockclock.util.debugFailUnreachable
 import app.blockclock.util.toRslt
 import kotlinx.coroutines.launch
@@ -138,7 +140,7 @@ class UpdateServiceGithubImpl(
         !exists() -> false
         length() != asset.size -> false
         BuildConfig.DEBUG -> true
-        else -> context.packageManager.apkInfo(path, icon = false)
+        else -> context.packageManager.apkInfo(path)
             ?.let { it.versionCode > BuildConfig.VERSION_CODE }== true
     }.let { verified ->
         if (!verified) delete()
@@ -176,4 +178,17 @@ class UpdateServiceGithubImpl(
     } catch (e: Exception) {
         e.toRslt()
     }
+}
+
+fun PackageManager.apkInfo(path: String): ApkInfo? {
+    val packageInfo = getPackageArchiveInfo(path, 0)
+    val info = packageInfo?.applicationInfo
+    info ?: return null
+    info.sourceDir = path
+    info.publicSourceDir = path
+    return ApkInfo(
+        appName = info.loadLabel(this).toString(),
+        versionName = packageInfo.versionName.toString(),
+        versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),
+    )
 }
