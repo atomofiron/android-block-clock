@@ -40,12 +40,7 @@ class UpdateServiceGithubImpl(
             context: Context,
             scope: AppScope,
             updateStore: UpdateStore,
-        ): UpdateService = UpdateServiceGithubImpl(
-            context,
-            scope,
-            UpdateApi(),
-            updateStore,
-        )
+        ): UpdateService = UpdateServiceGithubImpl(context, scope, UpdateApi(), updateStore)
     }
 
     private var asset: GithubAsset? = null
@@ -89,15 +84,13 @@ class UpdateServiceGithubImpl(
     override fun completeUpdate() {
         when (val file = file) {
             null -> store.set(asset?.checkFile() ?: UpdateState.Unknown)
-            else -> {
+            else -> scope.launch {
                 val state = store.state.value
                 store.set(UpdateState.Installing)
-                scope.launch {
-                    val rslt = installApk(file.path, UpdateService.ACTION_INSTALL_UPDATE, silently = true)
-                    if (rslt is Rslt.Err) {
-                        store.set(state)
-                        store.showUpdateAlert(AlertErr(rslt.message))
-                    }
+                val rslt = installApk(file.path, UpdateService.ACTION_INSTALL_UPDATE, silently = true)
+                if (rslt is Rslt.Err) {
+                    store.set(state)
+                    store.showUpdateAlert(AlertErr(rslt.message))
                 }
             }
         }
