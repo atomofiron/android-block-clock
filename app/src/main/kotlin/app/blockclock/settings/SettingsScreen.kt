@@ -1,7 +1,6 @@
 package app.blockclock.settings
 
 import android.content.Intent
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,6 +50,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,6 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import app.blockclock.R
 import app.blockclock.licenses.LicensesDialog
+import app.blockclock.model.AppPickerTarget
+import app.blockclock.model.ColorTarget
 import app.blockclock.ui.values.Colors
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
@@ -70,10 +72,13 @@ import app.blockclock.update.model.UpdateType
 import app.blockclock.util.animatedBackgroundColor
 import app.blockclock.util.horizontal
 import app.blockclock.util.plus
+import app.blockclock.util.rememberAppIconPainter
 import app.blockclock.util.steps
 import app.blockclock.util.windowInsetsPadding
 import app.blockclock.widget.WidgetSettings
 import app.blockclock.widget.WidgetSettingsStore
+import app.blockclock.widget.defaultCalendarApp
+import app.blockclock.widget.defaultClockApp
 import app.blockclock.widget.updateWidgets
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -99,6 +104,7 @@ fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
     var previewSettings by remember { mutableStateOf(settings) }
     var colorTarget by remember { mutableStateOf<ColorTarget?>(null) }
     var showLicenses by remember { mutableStateOf(false) }
+    var appPicker by remember { mutableStateOf<AppPickerTarget?>(null) }
     val scope = rememberCoroutineScope()
 
     fun apply(newSettings: WidgetSettings) {
@@ -218,6 +224,28 @@ fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
                 }
                 item {
                     SectionCard(title = null) {
+                        val clockApp = remember(settings.clockApp) { settings.clockApp ?: defaultClockApp(context) }
+                        val calendarApp = remember(settings.calendarApp) { settings.calendarApp ?: defaultCalendarApp(context) }
+                        Row {
+                            ClickablePoint(
+                                modifier = Modifier.padding(end = Padding.Half).weight(1f),
+                                icon = rememberAppIconPainter(clockApp?.packageName),
+                                label = R.string.clock_app,
+                                tintedIcon = false,
+                                largeIcon = true,
+                            ) {
+                                appPicker = AppPickerTarget.Clock
+                            }
+                            ClickablePoint(
+                                modifier = Modifier.padding(start = Padding.Half).weight(1f),
+                                icon = rememberAppIconPainter(calendarApp?.packageName),
+                                label = R.string.calendar_app,
+                                tintedIcon = false,
+                                largeIcon = true,
+                            ) {
+                                appPicker = AppPickerTarget.Calendar
+                            }
+                        }
                         SettingSwitch(
                             label = stringResource(R.string.option_month_first),
                             checked = !settings.dayFirst,
@@ -232,14 +260,14 @@ fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
                         Row {
                             ClickablePoint(
                                 modifier = Modifier.padding(end = Padding.Half).weight(1f),
-                                R.drawable.ic_github,
+                                icon = painterResource(R.drawable.ic_github),
                                 R.string.github,
                             ) {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, GITHUB_URL.toUri()))
                             }
                             ClickablePoint(
                                 modifier = Modifier.padding(start = Padding.Half).weight(1f),
-                                R.drawable.ic_license,
+                                painterResource(R.drawable.ic_license),
                                 R.string.licenses,
                             ) {
                                 showLicenses = true
@@ -248,7 +276,7 @@ fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
                         val updateState by UpdateStore.self.state.collectAsState()
                         ClickablePoint(
                             modifier = Modifier.fillMaxWidth(),
-                            icon = updateState.icon(),
+                            icon = painterResource(updateState.icon()),
                             label = updateState.label(),
                             clickable = updateState.interactable,
                             onClick = updateState::action,
@@ -286,6 +314,22 @@ fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
     if (showLicenses) {
         LicensesDialog(onDismiss = { showLicenses = false })
     }
+    appPicker?.let { picker ->
+        AppPickerScreen(
+            title = when (picker) {
+                AppPickerTarget.Clock -> R.string.clock_app
+                AppPickerTarget.Calendar -> R.string.calendar_app
+            }.let { stringResource(it) },
+            onPick = { target ->
+                appPicker = null
+                when (picker) {
+                    AppPickerTarget.Clock -> apply(settings.copy(clockApp = target))
+                    AppPickerTarget.Calendar -> apply(settings.copy(calendarApp = target))
+                }
+            },
+            onClose = { appPicker = null },
+        )
+    }
 }
 
 @Composable
@@ -308,9 +352,11 @@ private fun ProgressIndicator(
 @Composable
 private fun ClickablePoint(
     modifier: Modifier = Modifier,
-    @DrawableRes icon: Int,
+    icon: Painter,
     @StringRes label: Int,
     clickable: Boolean = true,
+    tintedIcon: Boolean = true,
+    largeIcon: Boolean = false,
     onClick: () -> Unit,
 ) {
     Row(
@@ -320,11 +366,19 @@ private fun ClickablePoint(
             .padding(vertical = Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            modifier = Modifier.size(Dimens.IconSize),
-            painter = painterResource(icon),
-            contentDescription = null,
-        )
+        val iconSize = if (largeIcon) Dimens.LargeIconSize else Dimens.IconSize
+        when {
+            tintedIcon -> Icon(
+                modifier = Modifier.size(iconSize),
+                painter = icon,
+                contentDescription = null,
+            )
+            else -> Image(
+                modifier = Modifier.size(iconSize),
+                painter = icon,
+                contentDescription = null,
+            )
+        }
         Text(
             modifier = Modifier
                 .padding(start = Padding.Semi)

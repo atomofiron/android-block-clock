@@ -21,8 +21,13 @@
     <string name="button_done">Done</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_close">Close</string>
+    <string name="back">Back</string>
+    <string name="search">Search</string>
+    <string name="clear_search">Clear search</string>
     <string name="button_ok">Ok</string>
     <string name="licenses">Licenses</string>
+    <string name="clock_app">Clock app</string>
+    <string name="calendar_app">Calendar app</string>
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="is_up_to_date">App is up to date</string>
     <string name="check_updates">Check for updates</string>

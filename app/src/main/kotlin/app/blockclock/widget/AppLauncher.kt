@@ -1,10 +1,15 @@
 package app.blockclock.widget
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import androidx.glance.action.Action
 import androidx.glance.appwidget.action.actionStartActivity
 import app.blockclock.MainActivity
+import app.blockclock.model.TargetApp
+import app.blockclock.util.Android
 
 /**
  * Candidate "package → activity" pairs of the system clock app for
@@ -44,23 +49,47 @@ private val CALENDAR_APP_ACTIVITIES = listOf(
     "com.sonymobile.calendar" to "com.sonymobile.calendar.LaunchActivity",
 )
 
-/**
- * The first explicit intent (package + activity) that has a handler;
- * otherwise — a fallback to the settings screen.
- */
-private fun explicitAppAction(context: Context, candidates: List<Pair<String, String>>): Action {
-    val packageManager = context.packageManager
+private fun TargetApp.toIntent(): Intent = Intent()
+    .setComponent(ComponentName(packageName, activityName))
+    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+private fun TargetApp.isResolvable(context: Context): Boolean =
+    context.packageManager.queryIntentActivities(toIntent(), 0).isNotEmpty()
+
+
+/** The first candidate "package → activity" pair that has a handler. */
+private fun firstResolved(context: Context, candidates: List<Pair<String, String>>): TargetApp? {
     for ((pkg, activity) in candidates) {
-        val intent = Intent().setClassName(pkg, activity).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (packageManager.queryIntentActivities(intent, 0).isNotEmpty()) {
-            return actionStartActivity(intent)
+        val intent = Intent().setClassName(pkg, activity)
+        if (context.packageManager.queryIntentActivities(intent, 0).isNotEmpty()) {
+            return TargetApp(pkg, activity)
         }
     }
-    return actionStartActivity(Intent(context, MainActivity::class.java))
+    return null
 }
 
-/** Opens the system clock app; falls back to the settings screen. */
-internal fun clockAppAction(context: Context): Action = explicitAppAction(context, CLOCK_APP_ACTIVITIES)
+/** The default clock app: the first resolvable vendor candidate. */
+fun defaultClockApp(context: Context): TargetApp? = firstResolved(context, CLOCK_APP_ACTIVITIES)
 
-/** Opens the system calendar; falls back to the settings screen. */
-internal fun calendarAppAction(context: Context): Action = explicitAppAction(context, CALENDAR_APP_ACTIVITIES)
+/** The default calendar app: the first resolvable vendor candidate. */
+fun defaultCalendarApp(context: Context): TargetApp? = firstResolved(context, CALENDAR_APP_ACTIVITIES)
+
+/**
+ * The action for a widget tap: the saved [TargetApp] when it resolves,
+ * otherwise the default app of the same kind, otherwise the settings screen.
+ */
+internal fun TargetApp?.launchAction(context: Context, fallback: TargetApp?): Action {
+    val target = this?.takeIf { it.isResolvable(context) } ?: fallback
+    return target?.let { actionStartActivity(it.toIntent()) }
+        ?: actionStartActivity(Intent(context, MainActivity::class.java))
+}
+
+/** All launcher apps visible to this package. */
+fun getInstalledApps(context: Context): List<ResolveInfo> {
+    val mainIntent = Intent(Intent.ACTION_MAIN, null)
+    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+    return when {
+        Android.T -> context.packageManager.queryIntentActivities(mainIntent, PackageManager.ResolveInfoFlags.of(0L))
+        else -> context.packageManager.queryIntentActivities(mainIntent, 0)
+    }
+}

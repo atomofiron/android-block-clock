@@ -17,8 +17,13 @@
     <string name="button_done">Готово</string>
     <string name="button_cancel">Отмена</string>
     <string name="button_close">Закрыть</string>
+    <string name="back">Назад</string>
+    <string name="search">Поиск</string>
+    <string name="clear_search">Очистить поиск</string>
     <string name="button_ok">ОК</string>
     <string name="licenses">Лицензии</string>
+    <string name="clock_app">Часы</string>
+    <string name="calendar_app">Календарь</string>
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="is_up_to_date">У вас последняя версия приложения</string>
     <string name="check_updates">Проверить обновления</string>

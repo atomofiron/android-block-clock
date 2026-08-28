@@ -8,10 +8,12 @@ object Dimens {
 
     val ClipCornerRadius = 28.dp
     val GridColumnMinWidth = 320.dp
+    val PickerColumnMinWidth = 169.dp
     val FieldVerticalPadding = 10.dp
     val SwatchSize = 36.dp
     val SwatchBorderWidth = 1.dp
     val IconSize = 24.dp
+    val LargeIconSize = 36.dp
     val MarkerSize = 16.dp
     val MarkerRadius = 8.dp
     val MarkerBorderWidth = 2.dp

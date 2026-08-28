@@ -6,6 +6,7 @@ import android.text.format.DateFormat
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.edit
+import app.blockclock.model.TargetApp
 
 class WidgetSettingsStore(context: Context) {
     companion object {
@@ -16,6 +17,8 @@ class WidgetSettingsStore(context: Context) {
         private const val KEY_DAY_FIRST = "day_first"
         private const val KEY_GAP_DP = "gap_dp"
         private const val KEY_CORNER_RADIUS_DP = "corner_radius_dp"
+        private const val KEY_CLOCK_APP = "clock_app"
+        private const val KEY_CALENDAR_APP = "calendar_app"
 
         val Defaults = WidgetSettings()
     }
@@ -32,6 +35,8 @@ class WidgetSettingsStore(context: Context) {
         gapDp = sp.getInt(KEY_GAP_DP, Defaults.gapDp),
         cornerRadiusDp = sp.getInt(KEY_CORNER_RADIUS_DP, Defaults.cornerRadiusDp),
         dayFirst = sp.getBoolean(KEY_DAY_FIRST, systemDayFirst),
+        clockApp = sp.getString(KEY_CLOCK_APP, null).toAppTarget(),
+        calendarApp = sp.getString(KEY_CALENDAR_APP, null).toAppTarget(),
     )
 
     fun store(settings: WidgetSettings) {
@@ -47,6 +52,14 @@ class WidgetSettingsStore(context: Context) {
                 systemDayFirst -> remove(KEY_DAY_FIRST)
                 else -> putBoolean(KEY_DAY_FIRST, settings.dayFirst)
             }
+            when (val target = settings.clockApp) {
+                null -> remove(KEY_CLOCK_APP)
+                else -> putString(KEY_CLOCK_APP, target.encode())
+            }
+            when (val target = settings.calendarApp) {
+                null -> remove(KEY_CALENDAR_APP)
+                else -> putString(KEY_CALENDAR_APP, target.encode())
+            }
         }
     }
 
@@ -60,3 +73,10 @@ class WidgetSettingsStore(context: Context) {
         sp.unregisterOnSharedPreferenceChangeListener(listener)
     }
 }
+
+private fun TargetApp.encode(): String = "$packageName/$activityName"
+
+fun String?.toAppTarget(): TargetApp? = this
+    ?.split('/', limit = 2)
+    ?.takeIf { it.size == 2 }
+    ?.let { (pkg, activity) -> TargetApp(pkg, activity) }

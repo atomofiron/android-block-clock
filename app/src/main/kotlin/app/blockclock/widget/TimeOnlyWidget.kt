@@ -28,7 +28,7 @@ class TimeOnlyWidget(
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val settings = preview ?: WidgetSettingsStore(context).read()
-        val openClockApp = clockAppAction(context)
+        val openClockApp = settings.clockApp.launchAction(context, defaultClockApp(context))
         provideContent {
             TimeOnlyWidgetContent(initialSettings = settings, openClockApp = openClockApp)
         }

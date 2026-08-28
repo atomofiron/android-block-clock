@@ -1,4 +1,4 @@
-package app.blockclock.settings
+package app.blockclock.model
 
 enum class ColorTarget {
     Rect,

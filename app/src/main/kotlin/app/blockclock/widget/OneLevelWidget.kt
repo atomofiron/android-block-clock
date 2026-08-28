@@ -33,8 +33,8 @@ class OneLevelWidget(
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val settings = preview ?: WidgetSettingsStore(context).read()
         val openSettings = actionStartActivity(Intent(context, MainActivity::class.java))
-        val openClockApp = clockAppAction(context)
-        val openCalendarApp = calendarAppAction(context)
+        val openClockApp = settings.clockApp.launchAction(context, defaultClockApp(context))
+        val openCalendarApp = settings.calendarApp.launchAction(context, defaultCalendarApp(context))
         provideContent {
             OneLevelWidgetContent(
                 settings = settings,

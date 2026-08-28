@@ -17,8 +17,13 @@
     <string name="button_done">Готово</string>
     <string name="button_cancel">Откажи</string>
     <string name="button_close">Затвори</string>
+    <string name="back">Назад</string>
+    <string name="search">Претрага</string>
+    <string name="clear_search">Очисти претрагу</string>
     <string name="button_ok">ОК</string>
     <string name="licenses">Лиценце</string>
+    <string name="clock_app">Ап. за сат</string>
+    <string name="calendar_app">Ап. за календар</string>
     <string name="unknown_error">Непозната грешка</string>
     <string name="is_up_to_date">Апликација је ажурна</string>
     <string name="check_updates">Провери ажурирања</string>

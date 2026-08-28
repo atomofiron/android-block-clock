@@ -92,6 +92,10 @@
     </application>
 
     <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
         <package android:name="com.android.alarmclock" />
         <package android:name="com.android.calendar" />
         <package android:name="com.android.deskclock" />

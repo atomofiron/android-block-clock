@@ -1,5 +1,7 @@
 package app.blockclock.util
 
+import android.content.Context
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -17,6 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.DpSize
 import androidx.glance.GlanceModifier
 import androidx.glance.layout.size
@@ -49,4 +56,35 @@ fun GlanceModifier.size(size: DpSize) = size(width = size.width, height = size.h
 
 fun Offset.calcSize(right: Float, bottom: Float): Size {
     return Size(right - x, bottom - y)
+}
+
+@Composable
+fun rememberAppIconPainter(packageName: String?): Painter {
+    val context = LocalContext.current
+    return remember(packageName) {
+        context.appIcon(packageName)
+            ?.toPainter()
+            ?: ColorPainter(Color.Transparent)
+    }
+}
+
+fun Context.appIcon(packageName: String?): Drawable? {
+    packageName ?: return null
+    return packageManager.getApplicationIcon(packageName)
+}
+
+fun Drawable?.toPainter(): Painter {
+    this ?: return ColorPainter(Color.Transparent)
+    return object : Painter() {
+        override val intrinsicSize: Size
+            get() = Size(
+                intrinsicWidth.toFloat().takeIf { it > 0 } ?: Size.Unspecified.width,
+                intrinsicHeight.toFloat().takeIf { it > 0 } ?: Size.Unspecified.height,
+            )
+
+        override fun DrawScope.onDraw() {
+            setBounds(0, 0, size.width.toInt(), size.height.toInt())
+            draw(drawContext.canvas.nativeCanvas)
+        }
+    }
 }

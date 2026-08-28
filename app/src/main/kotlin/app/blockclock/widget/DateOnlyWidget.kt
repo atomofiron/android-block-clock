@@ -28,7 +28,7 @@ class DateOnlyWidget(
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val settings = preview ?: WidgetSettingsStore(context).read()
-        val openCalendarApp = calendarAppAction(context)
+        val openCalendarApp = settings.calendarApp.launchAction(context, defaultCalendarApp(context))
         provideContent {
             DateOnlyWidgetContent(initialSettings = settings, openCalendarApp = openCalendarApp)
         }
