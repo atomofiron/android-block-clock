@@ -58,7 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import app.blockclock.R
-import app.blockclock.licenses.LicensesDialog
+import app.blockclock.licenses.LicensesScreen
 import app.blockclock.model.AppPickerTarget
 import app.blockclock.model.ColorTarget
 import app.blockclock.ui.values.Colors
@@ -312,7 +312,7 @@ fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
         }
     }
     if (showLicenses) {
-        LicensesDialog(onDismiss = { showLicenses = false })
+        LicensesScreen(onClose = { showLicenses = false })
     }
     appPicker?.let { picker ->
         AppPickerScreen(

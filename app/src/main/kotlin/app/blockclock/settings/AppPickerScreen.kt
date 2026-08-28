@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,6 +53,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import app.blockclock.R
 import app.blockclock.model.TargetApp
 import app.blockclock.model.UserApp
+import app.blockclock.ui.BackButton
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
 import app.blockclock.util.appIcon
@@ -114,12 +114,7 @@ fun AppPickerScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
                 navigationIcon = {
-                    IconButton(onClick = onClose) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                        )
-                    }
+                    BackButton(onClose)
                 },
                 title = {
                     when {
