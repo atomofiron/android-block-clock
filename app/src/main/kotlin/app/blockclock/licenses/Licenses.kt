@@ -1,21 +1,8 @@
 package app.blockclock.licenses
 
 import android.content.res.AssetManager
+import app.blockclock.model.License
 import java.nio.charset.StandardCharsets.UTF_8
-
-sealed interface License {
-    val name: String
-
-    data class Text(
-        override val name: String,
-        val text: String,
-    ) : License
-
-    data class Url(
-        override val name: String,
-        val url: String,
-    ) : License
-}
 
 /**
  * Reads OSS licenses from assets/licenses — the `third_party_license_metadata`
