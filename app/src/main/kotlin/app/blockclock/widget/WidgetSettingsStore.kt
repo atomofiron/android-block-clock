@@ -16,6 +16,8 @@ class WidgetSettingsStore(context: Context) {
         private const val KEY_DAY_FIRST = "day_first"
         private const val KEY_GAP_DP = "gap_dp"
         private const val KEY_CORNER_RADIUS_DP = "corner_radius_dp"
+
+        val Defaults = WidgetSettings()
     }
 
     private val sp = context.getSharedPreferences("widget_settings", Context.MODE_PRIVATE)
@@ -23,20 +25,14 @@ class WidgetSettingsStore(context: Context) {
         DateFormat.getDateFormatOrder(context).run { indexOf('d') < indexOf('M') }
     }
 
-    fun read(): WidgetSettings {
-        val defaults = WidgetSettings()
-        return WidgetSettings(
-            background = Color(sp.getInt(KEY_RECT_COLOR, defaults.background.toArgb())),
-            transparency = sp.getFloat(KEY_RECT_TRANSPARENCY, defaults.transparency),
-            text = Color(sp.getInt(KEY_TEXT_COLOR, defaults.text.toArgb())),
-            gapDp = sp.getInt(KEY_GAP_DP, defaults.gapDp),
-            cornerRadiusDp = sp.getInt(KEY_CORNER_RADIUS_DP, defaults.cornerRadiusDp),
-            dayFirst = when (sp.contains(KEY_DAY_FIRST)) {
-                true -> sp.getBoolean(KEY_DAY_FIRST, defaults.dayFirst)
-                false -> systemDayFirst
-            },
-        )
-    }
+    fun read() = WidgetSettings(
+        background = Color(sp.getInt(KEY_RECT_COLOR, Defaults.background.toArgb())),
+        transparency = sp.getFloat(KEY_RECT_TRANSPARENCY, Defaults.transparency),
+        text = Color(sp.getInt(KEY_TEXT_COLOR, Defaults.text.toArgb())),
+        gapDp = sp.getInt(KEY_GAP_DP, Defaults.gapDp),
+        cornerRadiusDp = sp.getInt(KEY_CORNER_RADIUS_DP, Defaults.cornerRadiusDp),
+        dayFirst = sp.getBoolean(KEY_DAY_FIRST, systemDayFirst),
+    )
 
     fun store(settings: WidgetSettings) {
         sp.edit {
