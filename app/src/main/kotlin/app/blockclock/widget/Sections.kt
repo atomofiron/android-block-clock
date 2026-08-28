@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Typeface
 import android.os.Build.VERSION.SDK_INT
 import android.util.TypedValue
 import android.widget.RemoteViews
@@ -36,11 +35,9 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.layout.wrapContentSize
-import androidx.glance.text.FontWeight
-import app.blockclock.util.size
 import app.blockclock.R
+import app.blockclock.util.size
 import kotlin.math.roundToInt
-import android.os.Build.VERSION_CODES.P as AndroidP
 import android.os.Build.VERSION_CODES.S as AndroidS
 
 private const val TIME_TEXT_HEIGHT_FACTOR = 0.7f
@@ -245,7 +242,6 @@ private fun textRemoteViews(
 ): RemoteViews {
     val views = RemoteViews(context.packageName, part.layoutRes)
     views.setTextColor(R.id.clock_text, textColor.toArgb())
-    views.setPadding(R.id.clock_text, fontSize, FontWeight.Bold)
     views.setTextViewTextSize(
         R.id.clock_text,
         TypedValue.COMPLEX_UNIT_PX,
@@ -270,35 +266,4 @@ private fun cellBitmap(
     }
     canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), radius, radius, paint)
     return bitmap
-}
-
-/**
- * Compensates the TextView vertical centering: glyphs sit visually low in a
- * centered view, so an asymmetric bottom padding lifts the text by the
- * measured offset.
- */
-@Composable
-private fun RemoteViews.setPadding(
-    viewId: Int,
-    fontSize: TextUnit,
-    fontWeight: FontWeight,
-) {
-    val density = LocalContext.current.resources.displayMetrics.density
-    val paint = remember {
-        Paint().apply {
-            textSize = fontSize.value * density
-            if (SDK_INT >= AndroidP) {
-                typeface = Typeface.create(Typeface.DEFAULT, fontWeight.value, false)
-            }
-        }
-    }
-    val metrics = paint.fontMetrics
-    val topSpace = metrics.ascent - metrics.top
-    val bottomSpace = metrics.bottom
-    val offset = ((bottomSpace - topSpace) / 2).roundToInt()
-
-    when {
-        offset < 0 -> setViewPadding(viewId, 0, offset, 0, 0)
-        offset > 0 -> setViewPadding(viewId, 0, 0, 0, offset)
-    }
 }

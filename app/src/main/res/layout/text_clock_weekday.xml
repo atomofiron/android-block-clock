@@ -6,7 +6,8 @@
     android:format12Hour="EEEE"
     android:format24Hour="EEEE"
     android:gravity="center"
+    android:textStyle="bold"
+    android:includeFontPadding="false"
+    android:elegantTextHeight="false"
     android:singleLine="true"
-    android:textColor="#FFFFFF"
-    android:textSize="14sp"
-    android:textStyle="bold" />
+    />
