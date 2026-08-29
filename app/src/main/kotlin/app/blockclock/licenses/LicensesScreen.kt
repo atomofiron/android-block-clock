@@ -34,6 +34,7 @@ import app.blockclock.R
 import app.blockclock.model.License
 import app.blockclock.ui.BackButton
 import app.blockclock.ui.values.Padding
+import androidx.core.net.toUri
 
 /**
  * A full-screen OSS licenses list: a tap on a text license opens its
@@ -74,7 +75,7 @@ fun LicensesScreen(onClose: () -> Unit) {
                             .clickable {
                                 when (license) {
                                     is License.Text -> selected = license
-                                    is License.Url -> context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(license.url)))
+                                    is License.Url -> context.startActivity(Intent(Intent.ACTION_VIEW, license.url.toUri()))
                                 }
                             }
                             .padding(vertical = Padding.Half),

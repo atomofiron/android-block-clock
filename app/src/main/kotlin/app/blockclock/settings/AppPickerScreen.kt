@@ -74,12 +74,11 @@ fun AppPickerScreen(
     onClose: () -> Unit,
 ) {
     val context = LocalContext.current
-    val packageManager = context.packageManager
     var apps by remember { mutableStateOf<List<UserApp>?>(null) }
     LaunchedEffect(Unit) {
         apps = withContext(Dispatchers.Default) {
             getInstalledApps(context)
-                .map { UserApp(it.loadLabel(packageManager).toString(), it, context.appIcon(it.activityInfo.packageName)) }
+                .map { UserApp(it.loadLabel(context.packageManager).toString(), it, context.appIcon(it.activityInfo.packageName)) }
                 .sortedBy { it.label.lowercase() }
         }
     }
