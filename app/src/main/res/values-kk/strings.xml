@@ -1,0 +1,36 @@
+<resources>
+    <string name="widget_time_name">Тек уақыт</string>
+    <string name="widget_date_name">Тек күн</string>
+    <string name="widget_date_and_time_name">Уақыт және күн</string>
+    <string name="widget_two_level_name">2 деңгей</string>
+    <string name="widget_three_level_name">3 деңгей</string>
+    <string name="background">Фон</string>
+    <string name="background_color">Фон түсі</string>
+    <string name="text">Мәтін</string>
+    <string name="text_color">Мәтін түсі</string>
+    <string name="color">Түс</string>
+    <string name="shape">Пішін</string>
+    <string name="label_transparency">Мөлдірлік</string>
+    <string name="label_corner_radius">Дөңгелектеу</string>
+    <string name="label_gap">Аралықтар</string>
+    <string name="option_month_first">Алдымен ай</string>
+    <string name="button_done">Дайын</string>
+    <string name="button_cancel">Болдырмау</string>
+    <string name="button_close">Жабу</string>
+    <string name="back">Артқа</string>
+    <string name="search">Іздеу</string>
+    <string name="clear_search">Іздеуді тазалау</string>
+    <string name="button_ok">ОК</string>
+    <string name="licenses">Лицензиялар</string>
+    <string name="clock_app">Сағат</string>
+    <string name="calendar_app">Күнтізбе</string>
+    <string name="unknown_error">Белгісіз қате</string>
+    <string name="is_up_to_date">Қолданба жаңартылған</string>
+    <string name="check_updates">Жаңартуларды тексеру</string>
+    <string name="download_update">Жаңартуды жүктеп алу</string>
+    <string name="update_downloading">Жүктелуде…</string>
+    <string name="install_update">Жаңартуды орнату</string>
+    <string name="update_installing">Орнатылуда…</string>
+    <string name="retry">Қайталау</string>
+    <string name="checking">Тексерілуде…</string>
+</resources>

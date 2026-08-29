@@ -1,0 +1,36 @@
+<resources>
+    <string name="widget_time_name">Тільки час</string>
+    <string name="widget_date_name">Тільки дата</string>
+    <string name="widget_date_and_time_name">Час і дата</string>
+    <string name="widget_two_level_name">2 рівні</string>
+    <string name="widget_three_level_name">3 рівні</string>
+    <string name="background">Фон</string>
+    <string name="background_color">Колір фону</string>
+    <string name="text">Текст</string>
+    <string name="text_color">Колір тексту</string>
+    <string name="color">Колір</string>
+    <string name="shape">Форма</string>
+    <string name="label_transparency">Прозорість</string>
+    <string name="label_corner_radius">Заокруглення</string>
+    <string name="label_gap">Відступи</string>
+    <string name="option_month_first">Спочатку місяць</string>
+    <string name="button_done">Готово</string>
+    <string name="button_cancel">Скасувати</string>
+    <string name="button_close">Закрити</string>
+    <string name="back">Назад</string>
+    <string name="search">Пошук</string>
+    <string name="clear_search">Очистити пошук</string>
+    <string name="button_ok">ОК</string>
+    <string name="licenses">Ліцензії</string>
+    <string name="clock_app">Годинник</string>
+    <string name="calendar_app">Календар</string>
+    <string name="unknown_error">Невідома помилка</string>
+    <string name="is_up_to_date">Застосунок оновлено</string>
+    <string name="check_updates">Перевірити оновлення</string>
+    <string name="download_update">Завантажити оновлення</string>
+    <string name="update_downloading">Завантаження…</string>
+    <string name="install_update">Встановити оновлення</string>
+    <string name="update_installing">Встановлення…</string>
+    <string name="retry">Повторити</string>
+    <string name="checking">Перевірка…</string>
+</resources>

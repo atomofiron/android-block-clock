@@ -1,0 +1,36 @@
+<resources>
+    <string name="widget_time_name">მხოლოდ დრო</string>
+    <string name="widget_date_name">მხოლოდ თარიღი</string>
+    <string name="widget_date_and_time_name">დრო და თარიღი</string>
+    <string name="widget_two_level_name">2 დონე</string>
+    <string name="widget_three_level_name">3 დონე</string>
+    <string name="background">ფონი</string>
+    <string name="background_color">ფონის ფერი</string>
+    <string name="text">ტექსტი</string>
+    <string name="text_color">ტექსტის ფერი</string>
+    <string name="color">ფერი</string>
+    <string name="shape">ფორმა</string>
+    <string name="label_transparency">გამჭვირვალობა</string>
+    <string name="label_corner_radius">დამრგვალება</string>
+    <string name="label_gap">ინტერვალები</string>
+    <string name="option_month_first">ჯერ თვე</string>
+    <string name="button_done">მზადაა</string>
+    <string name="button_cancel">გაუქმება</string>
+    <string name="button_close">დახურვა</string>
+    <string name="back">უკან</string>
+    <string name="search">ძებნა</string>
+    <string name="clear_search">ძებნის გასუფთავება</string>
+    <string name="button_ok">კარგი</string>
+    <string name="licenses">ლიცენზიები</string>
+    <string name="clock_app">საათი</string>
+    <string name="calendar_app">კალენდარი</string>
+    <string name="unknown_error">უცნობი შეცდომა</string>
+    <string name="is_up_to_date">აპლიკაცია განახლებულია</string>
+    <string name="check_updates">განახლებების შემოწმება</string>
+    <string name="download_update">განახლების ჩამოტვირთვა</string>
+    <string name="update_downloading">იტვირთება…</string>
+    <string name="install_update">განახლების დაყენება</string>
+    <string name="update_installing">დაყენება…</string>
+    <string name="retry">თავიდან ცდა</string>
+    <string name="checking">მოწმდება…</string>
+</resources>
