@@ -16,7 +16,7 @@ import app.blockclock.R
 import app.blockclock.model.License
 import app.blockclock.ui.values.Padding
 
-/** A dialog with the full text of one [app.blockclock.model.License.Text]. */
+/** A dialog with the full text of one [License.Text]. */
 @Composable
 fun LicenseDialog(license: License.Text, onDismiss: () -> Unit) {
     AlertDialog(
