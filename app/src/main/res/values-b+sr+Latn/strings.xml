@@ -20,7 +20,7 @@
     <string name="back">Nazad</string>
     <string name="search">Pretraga</string>
     <string name="clear_search">Očisti pretragu</string>
-    <string name="button_ok">Ok</string>
+    <string name="button_ok">@android:string/ok</string>
     <string name="licenses">Licence</string>
     <string name="clock_app">Ap. za sat</string>
     <string name="calendar_app">Ap. za kalendar</string>

@@ -24,7 +24,7 @@
     <string name="back">Back</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear search</string>
-    <string name="button_ok">Ok</string>
+    <string name="button_ok">@android:string/ok</string>
     <string name="licenses">Licenses</string>
     <string name="clock_app">Clock app</string>
     <string name="calendar_app">Calendar app</string>

@@ -20,7 +20,7 @@
     <string name="back">Артқа</string>
     <string name="search">Іздеу</string>
     <string name="clear_search">Іздеуді тазалау</string>
-    <string name="button_ok">ОК</string>
+    <string name="button_ok">@android:string/ok</string>
     <string name="licenses">Лицензиялар</string>
     <string name="clock_app">Сағат</string>
     <string name="calendar_app">Күнтізбе</string>
