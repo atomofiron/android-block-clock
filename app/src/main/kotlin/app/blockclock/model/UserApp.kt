@@ -3,6 +3,7 @@ package app.blockclock.model
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 
+@ConsistentCopyVisibility
 data class UserApp private constructor(
     val label: String,
     val packageName: String,

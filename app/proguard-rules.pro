@@ -1,5 +1,7 @@
 # ProGuard/R8 rules for release builds.
 
+#noinspection ShrinkerUnresolvedReference
+
 # WorkManager creates the WorkDatabase via Room reflection
 # (Class.forName("...WorkDatabase_Impl")), so the generated class must not be
 # obfuscated or removed — otherwise the app crashes on startup with
