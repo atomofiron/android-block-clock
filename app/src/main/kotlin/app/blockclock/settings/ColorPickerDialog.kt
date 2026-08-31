@@ -1,5 +1,7 @@
 package app.blockclock.settings
 
+import android.graphics.Color.HSVToColor
+import android.graphics.Color.colorToHSV
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -37,6 +39,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import app.blockclock.R
+import app.blockclock.model.WallpaperColors
+import app.blockclock.ui.ColorBox
 import app.blockclock.ui.values.Colors
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
@@ -52,23 +56,47 @@ private const val HueDegrees = 360f
 internal fun ColorPickerDialog(
     title: String,
     initialColor: Color,
+    wallpaper: WallpaperColors?,
     onDismiss: () -> Unit,
     onConfirm: (Color) -> Unit,
 ) {
-    val initialHsv = remember(initialColor) {
-        FloatArray(3).also { android.graphics.Color.colorToHSV(initialColor.toArgb(), it) }
+    val hsv = remember {
+        FloatArray(3).also { colorToHSV(initialColor.toArgb(), it) }
     }
-    var hue by remember { mutableFloatStateOf(initialHsv[0]) }
-    var sat by remember { mutableFloatStateOf(initialHsv[1]) }
-    var value by remember { mutableFloatStateOf(initialHsv[2]) }
+    var hue by remember { mutableFloatStateOf(hsv[0]) }
+    var sat by remember { mutableFloatStateOf(hsv[1]) }
+    var value by remember { mutableFloatStateOf(hsv[2]) }
     val color = remember(hue, sat, value) {
-        Color(android.graphics.Color.HSVToColor(floatArrayOf(hue, sat, value)))
+        Color(HSVToColor(floatArrayOf(hue, sat, value)))
+    }
+    fun set(color: Color) {
+        colorToHSV(color.toArgb(), hsv)
+        hue = hsv[0]
+        sat = hsv[1]
+        value = hsv[2]
     }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(Padding.Semi)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Padding.Common)) {
+                if (wallpaper != null) Row(horizontalArrangement = Arrangement.spacedBy(Padding.Common)) {
+                    wallpaper.primary.let { color ->
+                        ColorBox(Modifier.weight(1f), color) {
+                            set(color)
+                        }
+                    }
+                    wallpaper.secondary?.let { color ->
+                        ColorBox(Modifier.weight(1f), color) {
+                            set(color)
+                        }
+                    }
+                    wallpaper.tertiary?.let { color ->
+                        ColorBox(Modifier.weight(1f), color) {
+                            set(color)
+                        }
+                    }
+                }
                 SaturationValueBox(
                     hue = hue,
                     sat = sat,
@@ -83,15 +111,9 @@ internal fun ColorPickerDialog(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(Dimens.SwatchSize)
-                            .clip(ShapeDefaults.Medium)
-                            .background(color)
-                            .border(Dimens.SwatchBorderWidth, Colors.SwatchBorder, ShapeDefaults.Medium),
-                    )
+                    ColorBox(Modifier.size(Dimens.SwatchSize), color)
                     Text(
-                        modifier = Modifier.padding(start = Padding.Semi),
+                        modifier = Modifier.padding(start = Padding.Common),
                         text = "#%06X".format(color.toArgb() and 0xFFFFFF),
                         style = MaterialTheme.typography.bodyLarge,
                     )
@@ -128,7 +150,7 @@ private fun SaturationValueBox(
                 Brush.horizontalGradient(
                     listOf(
                         Color.White,
-                        Color(android.graphics.Color.HSVToColor(floatArrayOf(hue, 1f, 1f)))
+                        Color(HSVToColor(floatArrayOf(hue, 1f, 1f)))
                     )
                 )
             )

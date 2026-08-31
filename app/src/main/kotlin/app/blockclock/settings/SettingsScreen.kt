@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,7 +60,8 @@ import app.blockclock.R
 import app.blockclock.licenses.LicensesScreen
 import app.blockclock.model.AppPickerTarget
 import app.blockclock.model.ColorTarget
-import app.blockclock.ui.values.Colors
+import app.blockclock.model.WallpaperColors
+import app.blockclock.ui.ColorBox
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
 import app.blockclock.update.AppSource
@@ -97,7 +97,11 @@ private const val ShowPreviewFactory = false
  * Every change is saved and redraws the widget immediately.
  */
 @Composable
-fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
+fun SettingsScreen(
+    store: WidgetSettingsStore,
+    wallpaperColors: WallpaperColors?,
+    uiStarted: Boolean,
+) {
     val context = LocalContext.current
     var settings by remember { mutableStateOf(store.read()) }
 
@@ -126,6 +130,7 @@ fun SettingsScreen(store: WidgetSettingsStore, uiStarted: Boolean) {
                 ColorTarget.Rect -> settings.background
                 else -> settings.text
             },
+            wallpaperColors,
             onDismiss = { colorTarget = null },
             onConfirm = { color ->
                 colorTarget = null
@@ -448,13 +453,7 @@ private fun ColorField(
             .padding(vertical = Dimens.FieldVerticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(Dimens.SwatchSize)
-                .clip(ShapeDefaults.Medium)
-                .background(color)
-                .border(Dimens.SwatchBorderWidth, Colors.SwatchBorder, ShapeDefaults.Medium),
-        )
+        ColorBox(Modifier.size(Dimens.SwatchSize), color)
         Text(
             modifier = Modifier.padding(start = Padding.Semi),
             text = label,
