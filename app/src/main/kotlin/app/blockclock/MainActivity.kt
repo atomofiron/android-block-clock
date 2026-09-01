@@ -2,7 +2,6 @@ package app.blockclock
 
 import android.app.WallpaperManager
 import android.app.WallpaperManager.FLAG_SYSTEM
-import android.graphics.Color
 import android.os.Build.VERSION_CODES.O_MR1
 import android.os.Bundle
 import android.os.Handler
@@ -19,12 +18,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import app.blockclock.model.ColorSource
+import app.blockclock.model.ColorTarget
 import app.blockclock.model.WallpaperColors
 import app.blockclock.settings.SettingsScreen
 import app.blockclock.ui.LocalScreenCorners
@@ -40,7 +42,7 @@ import app.blockclock.util.get
 import app.blockclock.widget.WidgetSettingsStore
 import app.blockclock.widget.updateWidgets
 import kotlinx.coroutines.launch
-import androidx.compose.ui.graphics.Color as ComposeColor
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val navigationBar = ContextCompat.getColor(this, R.color.navigation_bar)
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            statusBarStyle = SystemBarStyle.auto(Color.Transparent.toArgb(), Color.Transparent.toArgb()),
             navigationBarStyle = SystemBarStyle.auto(navigationBar, navigationBar),
         )
 
@@ -61,10 +63,14 @@ class MainActivity : AppCompatActivity() {
         }
         val store = WidgetSettingsStore(this)
         if (Android.O1) {
-            handleWallpaperColors()
-            wallpaperColors.value
-                ?.takeIf { store.isEmpty() }
-                ?.let { store.setColors(it) }
+            handleWallpaperColors { colors ->
+                wallpaperColors.value = colors
+                when {
+                    colors == null -> Unit
+                    store.isEmpty() -> store.setColors(colors)
+                    else -> store.updateColors(colors)
+                }
+            }
         }
         setContent {
             CompositionLocalProvider(
@@ -94,11 +100,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(O_MR1)
-    private fun handleWallpaperColors() {
+    private fun handleWallpaperColors(consumer: (WallpaperColors?) -> Unit) {
         val manager = WallpaperManager.getInstance(this)
         val listener = WallpaperManager.OnColorsChangedListener { colors, which ->
             if (which contains FLAG_SYSTEM) {
-                wallpaperColors.value = colors?.let(::WallpaperColors)
+                consumer(colors?.let(::WallpaperColors))
             }
         }
         manager.addOnColorsChangedListener(listener, Handler(Looper.getMainLooper()))
@@ -120,22 +126,66 @@ class MainActivity : AppCompatActivity() {
      * contrast with the chosen background.
      */
     private fun WidgetSettingsStore.setColors(colors: WallpaperColors) {
-        colors
-            .run { secondary?.toArgb() ?: primary.toArgb().blackOrWhiteOverIt() }
-            .let { background ->
+        colors.run {
+            secondary?.let { it.toArgb() to ColorSource.Secondary }
+                ?: (primary.toArgb() to ColorSource.Primary)
+        }.let { (color, source) -> Color(color) to source }
+            .let { (background, source) ->
                 val text = background.blackOrWhiteOverIt()
-                val settings = read().copy(background = ComposeColor(background), text = ComposeColor(text))
+                val settings = read().copy(background = background, text = text)
+                store(settings, ColorTarget.Rect, source)
                 lifecycleScope.launch {
-                    store(settings)
                     updateWidgets()
                 }
             }
     }
 
-    private fun Int.blackOrWhiteOverIt(): Int {
-        val white = ColorUtils.calculateContrast(Color.WHITE, this)
-        val black = ColorUtils.calculateContrast(Color.BLACK, this)
-        return if (white > black) Color.WHITE else Color.BLACK
+    private fun WidgetSettingsStore.updateColors(colors: WallpaperColors) {
+        val sources = readSources()
+        if (sources.rect.manual() && sources.text.manual()) {
+            return
+        }
+        val contrast = readContrast()
+        val settings = read()
+        val textColors = when (sources.text) {
+            ColorSource.Manual -> listOfNotNull(
+                settings.text,
+                Color.White.takeIf { settings.text == Color.Black },
+                Color.Black.takeIf { settings.text == Color.White },
+            )
+            ColorSource.Primary -> listOfNotNull(colors.primary, colors.secondary, colors.tertiary)
+            ColorSource.Secondary -> listOfNotNull(colors.secondary, colors.primary, colors.tertiary)
+            ColorSource.Tertiary -> listOfNotNull(colors.tertiary, colors.primary, colors.secondary)
+        }
+        val rectColors = when (sources.rect) {
+            ColorSource.Manual -> listOfNotNull(
+                settings.background,
+                Color.White.takeIf { settings.background == Color.Black },
+                Color.Black.takeIf { settings.background == Color.White },
+            )
+            ColorSource.Primary -> listOfNotNull(colors.primary, colors.secondary, colors.tertiary)
+            ColorSource.Secondary -> listOfNotNull(colors.secondary, colors.primary, colors.tertiary)
+            ColorSource.Tertiary -> listOfNotNull(colors.tertiary, colors.primary, colors.secondary)
+        }
+        val candidates = buildList {
+            for (rect in rectColors) for (text in textColors) {
+                val c = ColorUtils.calculateContrast(text.toArgb(), rect.toArgb())
+                add(Triple(rect, text, abs(c.toFloat() - contrast)))
+            }
+        }
+        val (rect, text) = candidates.minBy { it.third }
+        if (settings.background != rect || settings.text != text) {
+            store(settings.copy(background = rect, text = text))
+            lifecycleScope.launch {
+                updateWidgets()
+            }
+        }
+    }
+
+    private fun Color.blackOrWhiteOverIt(): Color {
+        val white = ColorUtils.calculateContrast(Color.White.toArgb(), toArgb())
+        val black = ColorUtils.calculateContrast(Color.Black.toArgb(), toArgb())
+        return if (white > black) Color.White else Color.Black
     }
 
     private fun View.screenCorners(): ScreenCorners = when {

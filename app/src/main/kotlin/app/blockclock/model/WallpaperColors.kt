@@ -3,9 +3,11 @@ package app.blockclock.model
 import android.app.WallpaperColors
 import android.os.Build.VERSION_CODES.O_MR1
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import app.blockclock.util.toComposeColor
 
+@Immutable
 data class WallpaperColors(
     val primary: Color,
     val secondary: Color?,

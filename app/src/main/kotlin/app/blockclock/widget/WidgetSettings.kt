@@ -1,10 +1,12 @@
 package app.blockclock.widget
 
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.glance.appwidget.updateAll
 import app.blockclock.model.TargetApp
 
+@Immutable
 data class WidgetSettings(
     val background: Color = Color.White,
     val transparency: Float = 0.3f,

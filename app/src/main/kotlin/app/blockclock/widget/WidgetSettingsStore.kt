@@ -6,6 +6,10 @@ import android.text.format.DateFormat
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.edit
+import androidx.core.graphics.ColorUtils
+import app.blockclock.model.ColorSource
+import app.blockclock.model.ColorSources
+import app.blockclock.model.ColorTarget
 import app.blockclock.model.TargetApp
 
 class WidgetSettingsStore(context: Context) {
@@ -19,6 +23,9 @@ class WidgetSettingsStore(context: Context) {
         private const val KEY_CORNER_RADIUS_DP = "corner_radius_dp"
         private const val KEY_CLOCK_APP = "clock_app"
         private const val KEY_CALENDAR_APP = "calendar_app"
+        private const val KEY_RECT_SOURCE = "rect_source"
+        private const val KEY_TEXT_SOURCE = "text_source"
+        private const val KEY_CONTRAST = "contrast"
 
         val Defaults = WidgetSettings()
     }
@@ -39,7 +46,12 @@ class WidgetSettingsStore(context: Context) {
         calendarApp = sp.getString(KEY_CALENDAR_APP, null).toAppTarget(),
     )
 
-    fun store(settings: WidgetSettings) {
+    fun store(
+        settings: WidgetSettings,
+        target: ColorTarget? = null,
+        source: ColorSource? = null,
+        saveContrast: Boolean = false,
+    ) {
         sp.edit {
             putBoolean(FLAG_EMPTY, false)
             putInt(KEY_RECT_COLOR, settings.background.toArgb())
@@ -60,8 +72,24 @@ class WidgetSettingsStore(context: Context) {
                 null -> remove(KEY_CALENDAR_APP)
                 else -> putString(KEY_CALENDAR_APP, target.encode())
             }
+            if (source != null) when (target) {
+                null -> null
+                ColorTarget.Rect -> KEY_RECT_SOURCE
+                ColorTarget.Text -> KEY_TEXT_SOURCE
+            }?.let { putString(it, source.name) }
+            if (saveContrast) {
+                val contrast = ColorUtils.calculateContrast(settings.text.toArgb(), settings.background.toArgb())
+                putFloat(KEY_CONTRAST, contrast.toFloat())
+            }
         }
     }
+
+    fun readContrast() = sp.getFloat(KEY_CONTRAST, 1f)
+
+    fun readSources() = ColorSources(
+        rect = ColorSource.from(sp.getString(KEY_RECT_SOURCE, null)),
+        text = ColorSource.from(sp.getString(KEY_TEXT_SOURCE, null)),
+    )
 
     fun isEmpty(): Boolean = sp.getBoolean(FLAG_EMPTY, true)
 

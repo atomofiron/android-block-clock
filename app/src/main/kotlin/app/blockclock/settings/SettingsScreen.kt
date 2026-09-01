@@ -59,6 +59,7 @@ import androidx.core.net.toUri
 import app.blockclock.R
 import app.blockclock.licenses.LicensesScreen
 import app.blockclock.model.AppPickerTarget
+import app.blockclock.model.ColorSource
 import app.blockclock.model.ColorTarget
 import app.blockclock.model.WallpaperColors
 import app.blockclock.ui.ColorBox
@@ -103,19 +104,23 @@ fun SettingsScreen(
     uiStarted: Boolean,
 ) {
     val context = LocalContext.current
-    var settings by remember { mutableStateOf(store.read()) }
+    var settings by remember(wallpaperColors) { mutableStateOf(store.read()) }
 
-    var previewSettings by remember { mutableStateOf(settings) }
+    var previewSettings by remember(settings) { mutableStateOf(settings) }
     var colorTarget by remember { mutableStateOf<ColorTarget?>(null) }
     var showLicenses by remember { mutableStateOf(false) }
     var appPicker by remember { mutableStateOf<AppPickerTarget?>(null) }
     val scope = rememberCoroutineScope()
 
-    fun apply(newSettings: WidgetSettings) {
+    fun apply(
+        newSettings: WidgetSettings,
+        target: ColorTarget? = null,
+        source: ColorSource? = null,
+    ) {
         settings = newSettings
         previewSettings = newSettings
         scope.launch {
-            store.store(newSettings)
+            store.store(newSettings, target, source, saveContrast = true)
             context.updateWidgets()
         }
     }
@@ -128,15 +133,17 @@ fun SettingsScreen(
             },
             initialColor = when (target) {
                 ColorTarget.Rect -> settings.background
-                else -> settings.text
+                ColorTarget.Text -> settings.text
             },
             wallpaperColors,
             onDismiss = { colorTarget = null },
-            onConfirm = { color ->
+            onConfirm = { color, source ->
                 colorTarget = null
                 when (target) {
-                    ColorTarget.Rect -> apply(settings.copy(background = color))
-                    else -> apply(settings.copy(text = color))
+                    ColorTarget.Rect -> settings.copy(background = color)
+                    ColorTarget.Text -> settings.copy(text = color)
+                }.let {
+                    apply(it, target, source)
                 }
             },
         )

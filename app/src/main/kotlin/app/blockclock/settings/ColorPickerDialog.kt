@@ -25,6 +25,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import app.blockclock.R
+import app.blockclock.model.ColorSource
 import app.blockclock.model.WallpaperColors
 import app.blockclock.ui.ColorBox
 import app.blockclock.ui.values.Colors
@@ -58,8 +60,9 @@ internal fun ColorPickerDialog(
     initialColor: Color,
     wallpaper: WallpaperColors?,
     onDismiss: () -> Unit,
-    onConfirm: (Color) -> Unit,
+    onConfirm: (Color, ColorSource?) -> Unit,
 ) {
+    var source: ColorSource? by remember { mutableStateOf(null) }
     val hsv = remember {
         FloatArray(3).also { colorToHSV(initialColor.toArgb(), it) }
     }
@@ -83,16 +86,19 @@ internal fun ColorPickerDialog(
                 if (wallpaper != null) Row(horizontalArrangement = Arrangement.spacedBy(Padding.Common)) {
                     wallpaper.primary.let { color ->
                         ColorBox(Modifier.weight(1f), color) {
+                            source = ColorSource.Primary
                             set(color)
                         }
                     }
                     wallpaper.secondary?.let { color ->
                         ColorBox(Modifier.weight(1f), color) {
+                            source = ColorSource.Secondary
                             set(color)
                         }
                     }
                     wallpaper.tertiary?.let { color ->
                         ColorBox(Modifier.weight(1f), color) {
+                            source = ColorSource.Tertiary
                             set(color)
                         }
                     }
@@ -102,11 +108,15 @@ internal fun ColorPickerDialog(
                     sat = sat,
                     value = value,
                     onChange = { s, v ->
+                        source = ColorSource.Manual
                         sat = s
                         value = v
                     },
                 )
-                HueSlider(hue = hue, onChange = { hue = it })
+                HueSlider(hue = hue) {
+                    source = ColorSource.Manual
+                    hue = it
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -121,7 +131,7 @@ internal fun ColorPickerDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(color) }) {
+            TextButton(onClick = { onConfirm(color, source) }) {
                 Text(stringResource(R.string.button_done))
             }
         },
