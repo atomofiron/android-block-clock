@@ -1,9 +1,12 @@
 package app.blockclock
 
 import android.app.WallpaperManager
+import android.app.WallpaperManager.FLAG_SYSTEM
 import android.graphics.Color
 import android.os.Build.VERSION_CODES.O_MR1
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.RoundedCorner
 import android.view.View
 import android.widget.Toast
@@ -19,6 +22,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import app.blockclock.model.WallpaperColors
 import app.blockclock.settings.SettingsScreen
@@ -30,8 +35,8 @@ import app.blockclock.update.UpdateService
 import app.blockclock.update.UpdateStore
 import app.blockclock.util.Android
 import app.blockclock.util.collect
+import app.blockclock.util.contains
 import app.blockclock.util.get
-import app.blockclock.util.toComposeColor
 import app.blockclock.widget.WidgetSettingsStore
 import app.blockclock.widget.updateWidgets
 import kotlinx.coroutines.launch
@@ -39,7 +44,8 @@ import androidx.compose.ui.graphics.Color as ComposeColor
 
 class MainActivity : AppCompatActivity() {
 
-    private var isEnterAnimationCompleted = mutableStateOf(false)
+    private val isEnterAnimationCompleted = mutableStateOf(false)
+    private val wallpaperColors = mutableStateOf<WallpaperColors?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,20 +60,18 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, resources[it.text], Toast.LENGTH_LONG).show()
         }
         val store = WidgetSettingsStore(this)
-        val wallpaperColors = when {
-            Android.O1 -> wallpaperColors()
-            else -> null
+        if (Android.O1) {
+            handleWallpaperColors()
+            wallpaperColors.value
+                ?.takeIf { store.isEmpty() }
+                ?.let { store.setColors(it) }
         }
-        if (wallpaperColors != null && store.isEmpty()) {
-            store.setDefaultColor(wallpaperColors)
-        }
-
         setContent {
             CompositionLocalProvider(
                 LocalScreenCorners provides window.decorView.screenCorners(),
             ) {
                 AppTheme {
-                    SettingsScreen(store, wallpaperColors, isEnterAnimationCompleted.value)
+                    SettingsScreen(store, wallpaperColors.value, isEnterAnimationCompleted.value)
                     InsetsBackground(Modifier.alpha(0.5f))
                 }
             }
@@ -90,15 +94,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(O_MR1)
-    private fun wallpaperColors(): WallpaperColors? {
-        val colors = WallpaperManager.getInstance(this@MainActivity)
-            .getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
-            ?:  return null
-        return WallpaperColors(
-            colors.primaryColor.toComposeColor(),
-            colors.secondaryColor?.toComposeColor(),
-            colors.tertiaryColor?.toComposeColor(),
-        )
+    private fun handleWallpaperColors() {
+        val manager = WallpaperManager.getInstance(this)
+        val listener = WallpaperManager.OnColorsChangedListener { colors, which ->
+            if (which contains FLAG_SYSTEM) {
+                wallpaperColors.value = colors?.let(::WallpaperColors)
+            }
+        }
+        manager.addOnColorsChangedListener(listener, Handler(Looper.getMainLooper()))
+        object : DefaultLifecycleObserver {
+            override fun onDestroy(owner: LifecycleOwner) {
+                manager.removeOnColorsChangedListener(listener)
+                owner.lifecycle.removeObserver(this)
+            }
+        }.let { lifecycle.addObserver(it) }
+        val colors = manager.getWallpaperColors(FLAG_SYSTEM)
+        listener.onColorsChanged(colors, FLAG_SYSTEM)
     }
 
     /**
@@ -108,7 +119,7 @@ class MainActivity : AppCompatActivity() {
      * with the wallpaper; the text is black or white depending on the
      * contrast with the chosen background.
      */
-    private fun WidgetSettingsStore.setDefaultColor(colors: WallpaperColors) {
+    private fun WidgetSettingsStore.setColors(colors: WallpaperColors) {
         colors
             .run { secondary?.toArgb() ?: primary.toArgb().blackOrWhiteOverIt() }
             .let { background ->

@@ -23,3 +23,5 @@ fun <T, V : Any> T.ifNotNull(value: V?, action: T.(V) -> T): T = when (value) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun AndroidColor.toComposeColor() = Color(toArgb())
+
+inline infix fun Int.contains(flags: Int): Boolean = (this and flags) == flags
