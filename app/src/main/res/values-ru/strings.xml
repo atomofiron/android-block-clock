@@ -21,6 +21,7 @@
     <string name="search">Поиск</string>
     <string name="clear_search">Очистить поиск</string>
     <string name="button_ok">@android:string/ok</string>
+    <string name="github_repository">GitHub репозиторий</string>
     <string name="licenses">Лицензии</string>
     <string name="clock_app">Часы</string>
     <string name="calendar_app">Календарь</string>

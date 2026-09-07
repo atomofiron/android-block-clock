@@ -273,7 +273,7 @@ fun SettingsScreen(
                             ClickablePoint(
                                 modifier = Modifier.padding(end = Padding.Half).weight(1f),
                                 icon = painterResource(R.drawable.ic_github),
-                                R.string.github,
+                                R.string.github_repository,
                             ) {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, GITHUB_URL.toUri()))
                             }

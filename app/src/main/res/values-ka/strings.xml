@@ -21,6 +21,7 @@
     <string name="search">ძებნა</string>
     <string name="clear_search">ძებნის გასუფთავება</string>
     <string name="button_ok">კარგი</string>
+    <string name="github_repository">GitHub რეპოზიტორია</string>
     <string name="licenses">ლიცენზიები</string>
     <string name="clock_app">საათი</string>
     <string name="calendar_app">კალენდარი</string>

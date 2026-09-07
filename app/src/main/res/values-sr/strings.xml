@@ -21,6 +21,7 @@
     <string name="search">Претрага</string>
     <string name="clear_search">Очисти претрагу</string>
     <string name="button_ok">@android:string/ok</string>
+    <string name="github_repository">GitHub репозиторијум</string>
     <string name="licenses">Лиценце</string>
     <string name="clock_app">Ап. за сат</string>
     <string name="calendar_app">Ап. за календар</string>
