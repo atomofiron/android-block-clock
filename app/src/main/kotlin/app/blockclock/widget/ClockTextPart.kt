@@ -8,11 +8,14 @@ import app.blockclock.R
  * AndroidRemoteViews. TextClock updates the text every minute by itself,
  * without running any app code.
  */
-enum class ClockTextPart(@LayoutRes val layoutRes: Int) {
-    HOURS(R.layout.text_clock_hours),
-    MINUTES(R.layout.text_clock_minutes),
-    WEEKDAY(R.layout.text_clock_weekday),
-    DAY(R.layout.text_clock_day),
-    MONTH(R.layout.text_clock_month),
-    YEAR(R.layout.text_clock_year),
+enum class ClockTextPart(
+    val format24: String,
+    val format12: String = format24,
+) {
+    HOURS("HH", "hh"),
+    MINUTES("mm"),
+    WEEKDAY("EEEE"),
+    DAY("d"),
+    MONTH("M"),
+    YEAR("yyyy"),
 }

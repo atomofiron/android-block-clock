@@ -3,11 +3,7 @@
     android:id="@+id/clock_text"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:format12Hour="EEEE"
-    android:format24Hour="EEEE"
     android:gravity="center"
-    android:textStyle="bold"
     android:includeFontPadding="false"
     android:elegantTextHeight="false"
-    android:singleLine="true"
     />

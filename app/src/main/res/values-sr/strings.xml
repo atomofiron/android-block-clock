@@ -10,6 +10,11 @@
     <string name="text_color">Боја текста</string>
     <string name="color">Боја</string>
     <string name="shape">Облик</string>
+    <string name="font">Фонт</string>
+    <string name="font_default">Подразумевано</string>
+    <string name="style_normal">Обично</string>
+    <string name="style_bold">Подебљано</string>
+    <string name="style_italic">Курзив</string>
     <string name="label_transparency">Провидно</string>
     <string name="label_corner_radius">Заобљавање</string>
     <string name="label_gap">Размаци</string>

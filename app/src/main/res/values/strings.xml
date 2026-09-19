@@ -13,6 +13,11 @@
     <string name="text_color">Text color</string>
     <string name="color">Color</string>
     <string name="shape">Shape</string>
+    <string name="font">Font</string>
+    <string name="font_default">Default</string>
+    <string name="style_normal">Normal</string>
+    <string name="style_bold">Bold</string>
+    <string name="style_italic">Italic</string>
     <string name="label_transparency">Transparency</string>
     <string name="label_corner_radius">Rounding</string>
     <string name="label_gap">Spacing</string>

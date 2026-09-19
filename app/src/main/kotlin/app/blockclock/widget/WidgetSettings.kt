@@ -5,6 +5,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.glance.appwidget.updateAll
 import app.blockclock.model.TargetApp
+import app.blockclock.model.TextStyle
+import app.blockclock.model.WidgetFont
 
 @Immutable
 data class WidgetSettings(
@@ -18,6 +20,10 @@ data class WidgetSettings(
     val clockApp: TargetApp? = null,
     /** The app opened by the date tap; null = the default calendar app. */
     val calendarApp: TargetApp? = null,
+    /** The text font; null = the system default font. */
+    val font: WidgetFont? = null,
+    /** The style of the text of the default font; a picked font brings its own style. */
+    val textStyle: TextStyle = TextStyle.Normal,
 ) {
     /** The rectangle color with the transparency applied. */
     val effectiveRectColor: Color get() = background.copy(alpha = 1f - transparency)

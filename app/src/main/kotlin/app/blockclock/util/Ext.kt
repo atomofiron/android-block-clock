@@ -1,8 +1,12 @@
 package app.blockclock.util
 
+import android.graphics.fonts.SystemFonts
+import android.os.Build.VERSION_CODES.Q
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import app.blockclock.AbstractApp
 import app.blockclock.BuildConfig
+import app.blockclock.model.WidgetFont
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -35,3 +39,14 @@ val Any?.simpleName: String get() = when {
     this == null -> null
     else -> this::class.java.simpleName
 }.toString()
+
+@RequiresApi(Q)
+fun getSystemFonts(): List<WidgetFont> = when {
+    Android.Q -> SystemFonts.getAvailableFonts()
+        .asSequence()
+        .mapNotNull { it.toWidgetFont() }
+        .distinctBy { it.name }
+        .sortedBy { it.name }
+        .toList()
+    else -> emptyList()
+}

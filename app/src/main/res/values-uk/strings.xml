@@ -10,6 +10,11 @@
     <string name="text_color">Колір тексту</string>
     <string name="color">Колір</string>
     <string name="shape">Форма</string>
+    <string name="font">Шрифт</string>
+    <string name="font_default">За замовчуванням</string>
+    <string name="style_normal">Звичайний</string>
+    <string name="style_bold">Напівжирний</string>
+    <string name="style_italic">Курсив</string>
     <string name="label_transparency">Прозорість</string>
     <string name="label_corner_radius">Заокруглення</string>
     <string name="label_gap">Відступи</string>

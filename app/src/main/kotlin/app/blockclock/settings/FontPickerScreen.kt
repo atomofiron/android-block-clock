@@ -1,14 +1,14 @@
 package app.blockclock.settings
 
+import android.os.Build.VERSION_CODES.Q
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -40,49 +39,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import app.blockclock.model.TargetApp
-import app.blockclock.model.UserApp
+import app.blockclock.R
+import app.blockclock.model.WidgetFont
 import app.blockclock.ui.BackButton
 import app.blockclock.ui.SearchButton
 import app.blockclock.ui.SearchField
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
-import app.blockclock.util.appIcon
-import app.blockclock.util.toPainter
-import app.blockclock.widget.getInstalledApps
+import app.blockclock.util.getSystemFonts
+import app.blockclock.util.toFontFamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * A full-screen picker of all launcher apps: each row shows the app icon
- * and label; a tap passes the picked [TargetApp] up.
+ * A full-screen picker of the system fonts: each row shows the font file
+ * name rendered in that font; a tap passes the picked [WidgetFont] up,
+ * null means the system default font.
  */
 @OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Q)
 @Composable
-fun AppPickerScreen(
+fun FontPickerScreen(
     title: String,
-    onPick: (TargetApp) -> Unit,
+    onPick: (WidgetFont?) -> Unit,
     onClose: () -> Unit,
 ) {
-    val context = LocalContext.current
-    var apps by remember { mutableStateOf<List<UserApp>?>(null) }
+    var fonts by remember { mutableStateOf<List<WidgetFont>?>(null) }
     LaunchedEffect(Unit) {
-        apps = withContext(Dispatchers.Default) {
-            getInstalledApps(context)
-                .map { UserApp(it.loadLabel(context.packageManager).toString(), it, context.appIcon(it.activityInfo.packageName)) }
-                .sortedBy { it.label }
+        fonts = withContext(Dispatchers.Default) {
+            getSystemFonts().sortedBy { it.name }
         }
     }
     var searching by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
-    val visibleApps = remember(apps, searchQuery) {
-        val list = apps.orEmpty()
+    val visibleFonts = remember(fonts, searchQuery) {
+        val list = fonts.orEmpty()
         when {
             searchQuery.isEmpty() -> list
-            else -> list.filter { it.label.contains(searchQuery, ignoreCase = true) }
+            else -> list.filter { it.name.contains(searchQuery, ignoreCase = true) }
         }
     }
     LaunchedEffect(searching) {
@@ -128,7 +125,7 @@ fun AppPickerScreen(
                     )
                 },
             )
-            if (apps == null) {
+            if (fonts == null) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
@@ -137,22 +134,23 @@ fun AppPickerScreen(
                 }
             }
             AnimatedVisibility(
-                visible = apps != null,
+                visible = fonts != null,
                 enter = fadeIn(),
             ) {
-                AppList(visibleApps, onPick)
+                FontList(visibleFonts, onPick)
             }
         }
     }
 }
 
+@RequiresApi(Q)
 @Composable
-private fun AppList(
-    apps: List<UserApp>,
-    onPick: (TargetApp) -> Unit,
+private fun FontList(
+    fonts: List<WidgetFont>,
+    onPick: (WidgetFont?) -> Unit,
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(Dimens.PickerColumnMinWidth),
+        columns = GridCells.Adaptive(Dimens.WidePickerColumnMinWidth),
         modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.spacedBy(Padding.Common),
         contentPadding = WindowInsets.navigationBars
@@ -160,30 +158,30 @@ private fun AppList(
             .add(WindowInsets(left = Padding.Common, right = Padding.Common, bottom = Padding.Common))
             .asPaddingValues(),
     ) {
-        items(apps, key = UserApp::key) { app ->
-            Row(
+        item {
+            Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(ShapeDefaults.Medium)
-                    .clickable { onPick(app.toTarget()) }
-                    .padding(vertical = Padding.Half),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Image(
-                    modifier = Modifier.size(Dimens.LargeIconSize),
-                    painter = remember(app.packageName) { app.drawable.toPainter() },
-                    contentDescription = null,
-                )
-                Text(
-                    modifier = Modifier
-                        .padding(start = Padding.Semi)
-                        .fillMaxWidth(),
-                    text = app.label,
-                    style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+                    .clickable { onPick(null) }
+                    .padding(vertical = Padding.Common),
+                text = stringResource(R.string.font_default),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+        items(fonts, key = { it.path }) { font ->
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(ShapeDefaults.Medium)
+                    .clickable { onPick(font) }
+                    .padding(vertical = Padding.Common),
+                text = font.name,
+                fontFamily = font.toFontFamily(),
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

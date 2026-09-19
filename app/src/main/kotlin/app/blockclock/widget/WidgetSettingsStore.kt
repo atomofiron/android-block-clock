@@ -11,6 +11,9 @@ import app.blockclock.model.ColorSource
 import app.blockclock.model.ColorSources
 import app.blockclock.model.ColorTarget
 import app.blockclock.model.TargetApp
+import app.blockclock.model.TextStyle
+import app.blockclock.util.Android
+import app.blockclock.util.widgetFont
 
 class WidgetSettingsStore(context: Context) {
     companion object {
@@ -26,6 +29,10 @@ class WidgetSettingsStore(context: Context) {
         private const val KEY_RECT_SOURCE = "rect_source"
         private const val KEY_TEXT_SOURCE = "text_source"
         private const val KEY_CONTRAST = "contrast"
+        private const val KEY_FONT_PATH = "font_path"
+        private const val KEY_FONT_TTC_INDEX = "font_ttc_index"
+        private const val KEY_FONT_VARIATIONS = "font_variations"
+        private const val KEY_TEXT_STYLE = "text_style"
 
         val Defaults = WidgetSettings()
     }
@@ -44,6 +51,17 @@ class WidgetSettingsStore(context: Context) {
         dayFirst = sp.getBoolean(KEY_DAY_FIRST, systemDayFirst),
         clockApp = sp.getString(KEY_CLOCK_APP, null).toAppTarget(),
         calendarApp = sp.getString(KEY_CALENDAR_APP, null).toAppTarget(),
+        font = when {
+            Android.Q -> sp.getString(KEY_FONT_PATH, null)?.let { path ->
+                widgetFont(
+                    path = path,
+                    ttcIndex = sp.getInt(KEY_FONT_TTC_INDEX, 0),
+                    variations = sp.getString(KEY_FONT_VARIATIONS, null).toVariations(),
+                )
+            }
+            else -> null
+        },
+        textStyle = TextStyle.from(sp.getString(KEY_TEXT_STYLE, null)),
     )
 
     fun store(
@@ -71,6 +89,25 @@ class WidgetSettingsStore(context: Context) {
             when (val target = settings.calendarApp) {
                 null -> remove(KEY_CALENDAR_APP)
                 else -> putString(KEY_CALENDAR_APP, target.encode())
+            }
+            when (val font = settings.font) {
+                null -> {
+                    remove(KEY_FONT_PATH)
+                    remove(KEY_FONT_TTC_INDEX)
+                    remove(KEY_FONT_VARIATIONS)
+                }
+                else -> {
+                    putString(KEY_FONT_PATH, font.path)
+                    putInt(KEY_FONT_TTC_INDEX, font.ttcIndex)
+                    when (font.variations.isEmpty()) {
+                        true -> remove(KEY_FONT_VARIATIONS)
+                        false -> putString(KEY_FONT_VARIATIONS, font.variations.encode())
+                    }
+                }
+            }
+            when (settings.textStyle) {
+                TextStyle.Normal -> remove(KEY_TEXT_STYLE)
+                else -> putString(KEY_TEXT_STYLE, settings.textStyle.name)
             }
             if (source != null) when (target) {
                 null -> null
@@ -103,6 +140,21 @@ class WidgetSettingsStore(context: Context) {
 }
 
 private fun TargetApp.encode(): String = "$packageName/$activityName"
+
+private fun Map<String, Float>.encode(): String = entries.joinToString(VARIATION_SEPARATOR) { "${it.key}$VARIATION_VALUE_SEPARATOR${it.value}" }
+
+private fun String?.toVariations(): Map<String, Float> = this
+    ?.split(VARIATION_SEPARATOR)
+    ?.mapNotNull { variation ->
+        variation.split(VARIATION_VALUE_SEPARATOR, limit = 2)
+            .takeIf { it.size == 2 }
+            ?.let { (tag, value) -> tag to value.toFloat() }
+    }
+    ?.toMap()
+    .orEmpty()
+
+private const val VARIATION_SEPARATOR = ","
+private const val VARIATION_VALUE_SEPARATOR = "="
 
 fun String?.toAppTarget(): TargetApp? = this
     ?.split('/', limit = 2)

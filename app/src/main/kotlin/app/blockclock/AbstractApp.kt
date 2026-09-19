@@ -12,6 +12,9 @@ abstract class AbstractApp : Application() {
         @SuppressLint("StaticFieldLeak")
         lateinit var self: AbstractApp // this is the Application instance
             private set
+
+        /** The scope of the application: the work that outlives the screens. */
+        val scope = AppScope()
     }
 
     protected abstract val appSource: AppSource
@@ -22,7 +25,6 @@ abstract class AbstractApp : Application() {
 
         self = this
 
-        val scope = AppScope()
         UpdateStore.init(this, appSource, scope)
         UpdateService.init(this, scope, UpdateStore.self, updateServiceFactory)
 

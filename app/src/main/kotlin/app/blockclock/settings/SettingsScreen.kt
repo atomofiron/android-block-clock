@@ -1,12 +1,16 @@
 package app.blockclock.settings
 
 import android.content.Intent
+import android.os.Build.VERSION_CODES.Q
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -23,25 +27,31 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,12 +66,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import app.blockclock.AbstractApp
 import app.blockclock.R
 import app.blockclock.licenses.LicensesScreen
 import app.blockclock.model.AppPickerTarget
 import app.blockclock.model.ColorSource
 import app.blockclock.model.ColorTarget
+import app.blockclock.model.FontAxis
+import app.blockclock.model.TextStyle
 import app.blockclock.model.WallpaperColors
+import app.blockclock.model.WidgetFont
 import app.blockclock.ui.ColorBox
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
@@ -70,18 +84,24 @@ import app.blockclock.update.UpdateService
 import app.blockclock.update.UpdateStore
 import app.blockclock.update.model.UpdateState
 import app.blockclock.update.model.UpdateType
+import app.blockclock.util.Android
 import app.blockclock.util.animatedBackgroundColor
+import app.blockclock.util.familyStyles
+import app.blockclock.util.getSystemFonts
 import app.blockclock.util.horizontal
 import app.blockclock.util.plus
 import app.blockclock.util.rememberAppIconPainter
 import app.blockclock.util.steps
+import app.blockclock.util.toFontFamily
 import app.blockclock.util.windowInsetsPadding
 import app.blockclock.widget.WidgetSettings
 import app.blockclock.widget.WidgetSettingsStore
 import app.blockclock.widget.defaultCalendarApp
 import app.blockclock.widget.defaultClockApp
 import app.blockclock.widget.updateWidgets
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 private const val PercentFactor = 100f
@@ -110,7 +130,14 @@ fun SettingsScreen(
     var colorTarget by remember { mutableStateOf<ColorTarget?>(null) }
     var showLicenses by remember { mutableStateOf(false) }
     var appPicker by remember { mutableStateOf<AppPickerTarget?>(null) }
-    val scope = rememberCoroutineScope()
+    var showFontPicker by remember { mutableStateOf(false) }
+    var systemFonts by remember { mutableStateOf<List<WidgetFont>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        if (Android.Q) {
+            systemFonts = withContext(Dispatchers.Default) { getSystemFonts() }
+        }
+    }
 
     fun apply(
         newSettings: WidgetSettings,
@@ -119,9 +146,10 @@ fun SettingsScreen(
     ) {
         settings = newSettings
         previewSettings = newSettings
-        scope.launch {
-            store.store(newSettings, target, source, saveContrast = true)
-            context.updateWidgets()
+        store.store(newSettings, target, source, saveContrast = true)
+        // The refresh outlives this screen: a scope of the composition would drop it on the way out.
+        AbstractApp.scope.launch(Dispatchers.Main) {
+            context.applicationContext.updateWidgets()
         }
     }
 
@@ -235,6 +263,31 @@ fun SettingsScreen(
                     }
                 }
                 item {
+                    SectionCard(stringResource(R.string.font)) {
+                        when {
+                            Android.Q -> {
+                                FontField(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    font = settings.font,
+                                    onClick = { showFontPicker = true },
+                                )
+                                FontVariations(
+                                    font = settings.font,
+                                    textStyle = settings.textStyle,
+                                    systemFonts = systemFonts,
+                                    onFont = { apply(settings.copy(font = it)) },
+                                    onStyle = { apply(settings.copy(textStyle = it)) },
+                                )
+                            }
+                            // The system fonts need Android 10, the styles of the default font do not.
+                            else -> TextStyleGroup(
+                                selected = settings.textStyle,
+                                onStyle = { apply(settings.copy(textStyle = it)) },
+                            )
+                        }
+                    }
+                }
+                item {
                     SectionCard(title = null) {
                         val clockApp = remember(settings.clockApp) { settings.clockApp ?: defaultClockApp(context) }
                         val calendarApp = remember(settings.calendarApp) { settings.calendarApp ?: defaultCalendarApp(context) }
@@ -325,6 +378,16 @@ fun SettingsScreen(
     }
     if (showLicenses) {
         LicensesScreen(onClose = { showLicenses = false })
+    }
+    if (showFontPicker && Android.Q) {
+        FontPickerScreen(
+            title = stringResource(R.string.font),
+            onPick = { font ->
+                showFontPicker = false
+                apply(settings.copy(font = font))
+            },
+            onClose = { showFontPicker = false },
+        )
     }
     appPicker?.let { picker ->
         AppPickerScreen(
@@ -457,7 +520,7 @@ private fun ColorField(
         modifier = modifier
             .clip(ShapeDefaults.Medium)
             .clickable(onClick = onClick)
-            .padding(vertical = Dimens.FieldVerticalPadding),
+            .padding(vertical = Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         ColorBox(Modifier.size(Dimens.SwatchSize), color)
@@ -468,6 +531,156 @@ private fun ColorField(
             overflow = TextOverflow.MiddleEllipsis,
             maxLines = 1,
         )
+    }
+}
+
+/** The font row: the font file name rendered in that very font. */
+@RequiresApi(Q)
+@Composable
+private fun FontField(
+    modifier: Modifier,
+    font: WidgetFont?,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .clip(ShapeDefaults.Medium)
+            .clickable(onClick = onClick)
+            .padding(vertical = Padding.Common),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = font?.name ?: stringResource(R.string.font_default),
+            fontFamily = font?.toFontFamily(),
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/**
+ * The font variations: the style of the default font as a group of buttons,
+ * the axes of a variable font as sliders, or the styles of the same font
+ * family as a group of buttons — the group of a family with a single style
+ * is not shown: there is nothing to choose.
+ */
+@RequiresApi(Q)
+@Composable
+private fun ColumnScope.FontVariations(
+    font: WidgetFont?,
+    textStyle: TextStyle,
+    systemFonts: List<WidgetFont>,
+    onFont: (WidgetFont?) -> Unit,
+    onStyle: (TextStyle) -> Unit,
+) {
+    when {
+        font == null -> TextStyleGroup(
+            selected = textStyle,
+            onStyle = onStyle,
+        )
+        font.vf -> font.axes.forEach { axis ->
+            VariationSlider(
+                axis = axis,
+                value = font.variation(axis.tag, axis.default),
+                onChange = { onFont(font.copy(variations = font.variations + (axis.tag to it))) },
+            )
+        }
+        else -> remember(font, systemFonts) { systemFonts.familyStyles(font) }
+            .takeIf { it.size > 1 }
+            ?.let { StyleGroup(styles = it, selected = font, onFont = onFont) }
+    }
+}
+
+/** The slider of one variable font axis, e.g. `wght`. */
+@Composable
+private fun VariationSlider(
+    axis: FontAxis,
+    value: Float,
+    onChange: (Float) -> Unit,
+) {
+    var current by remember(axis, value) { mutableFloatStateOf(value) }
+    Column {
+        SubTitle(
+            title = axis.tag,
+            value = current.roundToInt().toString(),
+        )
+        Slider(
+            value = current,
+            onValueChange = { current = it },
+            onValueChangeFinished = { onChange(current) },
+            valueRange = axis.range,
+        )
+    }
+}
+
+/** The group button with the text styles of the default font. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TextStyleGroup(
+    selected: TextStyle,
+    onStyle: (TextStyle) -> Unit,
+) {
+    val styles = TextStyle.entries
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .widthIn(min = maxWidth),
+        ) {
+            styles.forEachIndexed { index, style ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = styles.size),
+                    onClick = { onStyle(style) },
+                    selected = style == selected,
+                ) {
+                    Text(
+                        text = stringResource(style.label()),
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** The label of the text style. */
+@StringRes
+private fun TextStyle.label(): Int = when (this) {
+    TextStyle.Normal -> R.string.style_normal
+    TextStyle.Bold -> R.string.style_bold
+    TextStyle.Italic -> R.string.style_italic
+}
+
+/** The group button with the styles of the font family. */
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Q)
+@Composable
+private fun StyleGroup(
+    styles: List<WidgetFont>,
+    selected: WidgetFont,
+    onFont: (WidgetFont?) -> Unit,
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .widthIn(min = maxWidth),
+        ) {
+            styles.forEachIndexed { index, style ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = styles.size),
+                    onClick = { onFont(style) },
+                    selected = style.path == selected.path && style.ttcIndex == selected.ttcIndex,
+                ) {
+                    Text(
+                        text = style.style.ifEmpty { style.family },
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
     }
 }
 

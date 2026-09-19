@@ -10,6 +10,11 @@
     <string name="text_color">Цвет текста</string>
     <string name="color">Цвет</string>
     <string name="shape">Форма</string>
+    <string name="font">Шрифт</string>
+    <string name="font_default">По умолчанию</string>
+    <string name="style_normal">Обычный</string>
+    <string name="style_bold">Полужирный</string>
+    <string name="style_italic">Курсив</string>
     <string name="label_transparency">Прозрачность</string>
     <string name="label_corner_radius">Закругление</string>
     <string name="label_gap">Отступы</string>

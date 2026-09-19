@@ -10,6 +10,11 @@
     <string name="text_color">ტექსტის ფერი</string>
     <string name="color">ფერი</string>
     <string name="shape">ფორმა</string>
+    <string name="font">ფონტი</string>
+    <string name="font_default">ნაგულისხმევი</string>
+    <string name="style_normal">ჩვეულებრივი</string>
+    <string name="style_bold">მსხვილი</string>
+    <string name="style_italic">დახრილი</string>
     <string name="label_transparency">გამჭვირვალობა</string>
     <string name="label_corner_radius">დამრგვალება</string>
     <string name="label_gap">ინტერვალები</string>
