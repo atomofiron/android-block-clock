@@ -22,15 +22,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,14 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import app.blockclock.R
 import app.blockclock.model.TargetApp
 import app.blockclock.model.UserApp
 import app.blockclock.ui.BackButton
+import app.blockclock.ui.SearchButton
+import app.blockclock.ui.SearchField
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
 import app.blockclock.util.appIcon
@@ -127,19 +120,12 @@ fun AppPickerScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        when {
-                            searchQuery.isEmpty() -> searching = !searching
-                            else -> searchQuery = ""
-                        }
-                    }) {
-                        Icon(
-                            imageVector = if (searching) Icons.Filled.Close else Icons.Filled.Search,
-                            contentDescription = stringResource(
-                                if (searching) R.string.clear_search else R.string.search,
-                            ),
-                        )
-                    }
+                    SearchButton(
+                        searching,
+                        searchQuery,
+                        onToggle = { searching = !searching },
+                        onReset = { searchQuery = "" },
+                    )
                 },
             )
             if (apps == null) {
@@ -200,21 +186,4 @@ private fun AppList(
             }
         }
     }
-}
-
-@Composable
-private fun SearchField(
-    modifier: Modifier,
-    searchQuery: String,
-    focusRequester: FocusRequester,
-    onInput: (String) -> Unit,
-) {
-    OutlinedTextField(
-        modifier = modifier.focusRequester(focusRequester),
-        value = searchQuery,
-        onValueChange = onInput,
-        placeholder = { Text(stringResource(R.string.search)) },
-        singleLine = true,
-        shape = ShapeDefaults.Medium,
-    )
 }
