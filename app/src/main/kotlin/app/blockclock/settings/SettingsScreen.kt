@@ -4,13 +4,15 @@ import android.content.Intent
 import android.os.Build.VERSION_CODES.Q
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -27,11 +29,11 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -41,7 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.ShapeDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SingleChoiceSegmentedButtonRowScope
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -59,11 +61,15 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import app.blockclock.AbstractApp
@@ -77,6 +83,8 @@ import app.blockclock.model.TextStyle
 import app.blockclock.model.WallpaperColors
 import app.blockclock.model.WidgetFont
 import app.blockclock.ui.ColorBox
+import app.blockclock.ui.GroupItem
+import app.blockclock.ui.SegmentedButton
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
 import app.blockclock.update.AppSource
@@ -623,23 +631,18 @@ private fun TextStyleGroup(
     onStyle: (TextStyle) -> Unit,
 ) {
     val styles = TextStyle.entries
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        SingleChoiceSegmentedButtonRow(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .widthIn(min = maxWidth),
-        ) {
-            styles.forEachIndexed { index, style ->
-                SegmentedButton(
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = styles.size),
-                    onClick = { onStyle(style) },
-                    selected = style == selected,
-                ) {
-                    Text(
-                        text = stringResource(style.label()),
-                        maxLines = 1,
-                    )
-                }
+    SegmentedButton(Modifier.fillMaxWidth()) {
+        styles.forEachIndexed { index, style ->
+            GroupItem(
+                index = index,
+                count = styles.size,
+                selected = style == selected,
+                onClick = { onStyle(style) },
+            ) {
+                Text(
+                    text = stringResource(style.label()),
+                    maxLines = 1,
+                )
             }
         }
     }
@@ -662,23 +665,18 @@ private fun StyleGroup(
     selected: WidgetFont,
     onFont: (WidgetFont?) -> Unit,
 ) {
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        SingleChoiceSegmentedButtonRow(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .widthIn(min = maxWidth),
-        ) {
-            styles.forEachIndexed { index, style ->
-                SegmentedButton(
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = styles.size),
-                    onClick = { onFont(style) },
-                    selected = style.path == selected.path && style.ttcIndex == selected.ttcIndex,
-                ) {
-                    Text(
-                        text = style.style.ifEmpty { style.family },
-                        maxLines = 1,
-                    )
-                }
+    SegmentedButton(Modifier.fillMaxWidth()) {
+        styles.forEachIndexed { index, style ->
+            GroupItem(
+                index = index,
+                count = styles.size,
+                selected = style.path == selected.path && style.ttcIndex == selected.ttcIndex,
+                onClick = { onFont(style) },
+            ) {
+                Text(
+                    text = style.style.ifEmpty { style.family },
+                    maxLines = 1,
+                )
             }
         }
     }
