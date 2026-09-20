@@ -40,11 +40,21 @@ val Any?.simpleName: String get() = when {
     else -> this::class.java.simpleName
 }.toString()
 
+/**
+ * The fonts of the system the picker offers: only the ones the home screen can draw.
+ *
+ * A picked font reaches the widget as a family name the host resolves itself ([toCellFont]):
+ * a typeface would not survive the process boundary, and the host silently draws its own
+ * default for a name it does not know. Nearly every file of the system belongs to a family
+ * the configuration does not name: [toCellFont] answers null for those, the host draws the
+ * default for them, and the widget would ignore the pick. They are left out of the list.
+ */
 @RequiresApi(Q)
 fun getSystemFonts(): List<WidgetFont> = when {
     Android.Q -> SystemFonts.getAvailableFonts()
         .asSequence()
         .mapNotNull { it.toWidgetFont() }
+        .filter { it.toCellFont() != null }
         .distinctBy { it.name }
         .sortedBy { it.name }
         .toList()

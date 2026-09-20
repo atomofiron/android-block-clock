@@ -166,6 +166,7 @@ internal fun Cell(
         false -> DATE_TEXT_HEIGHT_FACTOR
     }
     val fontSize = (height.value * factor).sp
+    val cellHeightPx = height.value * context.resources.displayMetrics.density
     val font = remember(settings.font) {
         when {
             settings.font == null || !Android.Q -> null
@@ -175,7 +176,7 @@ internal fun Cell(
     val textStyle = settings.textStyle.bits
     Box(modifier = modifier) {
         if (gap <= 0.dp) {
-            CellRemoteViews(textRemoteViews(context, layoutPart, textColor, fontSize, font, textStyle))
+            CellRemoteViews(textRemoteViews(context, layoutPart, textColor, fontSize, cellHeightPx, font, textStyle))
         } else if (SDK_INT >= AndroidS) {
             Box(
                 modifier = GlanceModifier
@@ -184,13 +185,13 @@ internal fun Cell(
                     .cornerRadius(cornerRadiusDp.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                CellRemoteViews(textRemoteViews(context, layoutPart, textColor, fontSize, font, textStyle))
+                CellRemoteViews(textRemoteViews(context, layoutPart, textColor, fontSize, cellHeightPx, font, textStyle))
             }
         } else {
             val density = context.resources.displayMetrics.density
             val cell = RemoteViews(context.packageName, R.layout.cell_bg)
             cell.setImageViewBitmap(R.id.cell_bg, cellBitmap(size, rectColor, cornerRadiusDp, density))
-            cell.addView(R.id.cell_root, textRemoteViews(context, layoutPart, textColor, fontSize, font, textStyle))
+            cell.addView(R.id.cell_root, textRemoteViews(context, layoutPart, textColor, fontSize, cellHeightPx, font, textStyle))
             CellRemoteViews(cell)
         }
     }
@@ -243,6 +244,7 @@ private fun textRemoteViews(
     part: ClockTextPart,
     textColor: Color,
     fontSize: TextUnit,
+    cellHeightPx: Float,
     font: CellFont?,
     textStyle: Int,
 ): RemoteViews {
@@ -251,13 +253,14 @@ private fun textRemoteViews(
     val sizePx = fontSize.value * density
     views.setTextColor(R.id.clock_text, textColor.toArgb())
     views.setTextViewTextSize(R.id.clock_text, TypedValue.COMPLEX_UNIT_PX, sizePx)
-    val shift = remember(font, fontSize, part) {
-        font.textShift(sizePx, part.sample())
+    val shift = remember(font, fontSize, cellHeightPx, part) {
+        font.textShift(sizePx, cellHeightPx, part.sample())
     }
     when {
-        // Padding moves the centred line by its half, so the shift is doubled.
-        shift > 0 -> views.setViewPadding(R.id.clock_text, 0, shift * 2, 0, 0)
-        shift < 0 -> views.setViewPadding(R.id.clock_text, 0, 0, 0, -shift * 2)
+        // The shift is the padding itself: the host moves the text by its half while the line
+        // fits the cell, and by the whole of it when it does not, see [textShift].
+        shift > 0 -> views.setViewPadding(R.id.clock_text, 0, shift, 0, 0)
+        shift < 0 -> views.setViewPadding(R.id.clock_text, 0, 0, 0, -shift)
     }
     font?.variationSettings?.let { views.setString(R.id.clock_text, "setFontVariationSettings", it) }
     views.setCharSequence(R.id.clock_text, "setFormat24Hour", styledClockFormat(part.format24, font, textStyle))
@@ -266,19 +269,36 @@ private fun textRemoteViews(
 }
 
 /**
- * The vertical shift in pixels that puts the text on the optical centre of the cell
- * (`shift > 0` moves the text down).
+ * The vertical padding in pixels that puts the ink of the [sample] on the optical centre of a
+ * [cellHeightPx] tall cell: `> 0` is the top padding and moves the text down, `< 0` is the
+ * bottom one.
  *
  * The host centres the line box of the font — its ascent and descent — and not the ink of
  * the text: the digits sit off that centre by a per-font amount, e.g. 1.4 px up for Roboto
  * and 3.2 px down for Noto Serif per 100 px of the font size. `includeFontPadding="false"`
  * does not help: it only drops the accent space on top of the very same ascent and descent.
+ *
+ * A line box that does not fit the cell is the second case, and another formula. The host then
+ * centres nothing: `TextView.getVerticalOffset` shifts the text only `if (textht < boxht)`,
+ * where the box is the cell minus the paddings, and otherwise leaves `voffset` at zero — the
+ * text sits at the padding itself. ComingSoon is that case: its line box is 1.51 em against the
+ * 0.7 em the cell height gives the time parts, and a half-shift padding dropped its digits 10%
+ * of the cell height below the centre on the device. The opposite direction is limited by the
+ * cell: a padding larger than the cell minus the line box stops the host centring anything, so an
+ * upward shift the cell has no room for is cut down to the slack it has, and a line taller than
+ * the cell leaves no slack at all and no shift.
  */
-private fun CellFont?.textShift(sizePx: Float, sample: String): Int {
+private fun CellFont?.textShift(
+    sizePx: Float,
+    cellHeightPx: Float,
+    sample: String,
+): Int {
     val face = when {
         this == null -> Typeface.DEFAULT
-        family != null -> Typeface.create(family, style)
-        else -> typeface ?: Typeface.DEFAULT
+        // The host draws the text with the family it is handed, so the metrics of the shift
+        // come from that family and not from the file of the picked font: the file may have
+        // other metrics entirely, and it does not even reach the host ([CellFont]).
+        else -> Typeface.create(family, style)
     }
     val paint = Paint().apply {
         typeface = face
@@ -287,20 +307,27 @@ private fun CellFont?.textShift(sizePx: Float, sample: String): Int {
     val bounds = Rect()
     paint.getTextBounds(sample, 0, sample.length, bounds)
     val metrics = paint.fontMetrics
-    return ((metrics.ascent + metrics.descent - bounds.top - bounds.bottom) / 2f).roundToInt()
+    val inkTop = bounds.top.toFloat()
+    val inkBottom = bounds.bottom.toFloat()
+    // The padding the centred case asks for: it moves the line by its half, so twice the shift.
+    val padding = (metrics.ascent + metrics.descent - inkTop - inkBottom).roundToInt()
+    // The padding the host stops centring at: the cell minus the line box.
+    val slack = cellHeightPx - metrics.descent + metrics.ascent
+    return when {
+        // The padding the cell has no room for is cut down to what fits: the padding shrinks
+        // the box the host centres the line in, and a line that fills the cell leaves no room.
+        padding <= 0 -> -minOf(-padding, slack.toInt().coerceAtLeast(0))
+        padding < slack -> padding
+        // Pinned to the padding: the offset of the ink from the top of the cell.
+        else -> (cellHeightPx / 2f + metrics.ascent - (inkTop + inkBottom) / 2f).roundToInt().coerceAtLeast(0)
+    }
 }
 
 /** The sample of the cell text: the digits of a font share one ink box. */
 private fun ClockTextPart.sample(): String = when (this) {
-    ClockTextPart.HOURS, ClockTextPart.MINUTES, ClockTextPart.DAY, ClockTextPart.YEAR -> DIGITS
-    ClockTextPart.WEEKDAY, ClockTextPart.MONTH -> CAPITAL
+    ClockTextPart.HOURS, ClockTextPart.MINUTES, ClockTextPart.DAY, ClockTextPart.YEAR, ClockTextPart.MONTH -> "0123456789"
+    ClockTextPart.WEEKDAY -> "H"
 }
-
-/** The digits of the time and the day of the month. */
-private const val DIGITS = "0123456789"
-
-/** A capital letter: the words of the weekday and the month are centred by the cap height. */
-private const val CAPITAL = "H"
 
 private fun cellBitmap(
     size: DpSize,
@@ -322,9 +349,8 @@ private fun cellBitmap(
 
 /**
  * The clock format with the font spans attached. The home screen resolves the family name
- * itself; the typeface span is the fallback for the in-process preview of a font the
- * system does not name — the host would drop it (see [CellFont]). Without a font the
- * [textStyle] bits style the text of the default font.
+ * itself (see [CellFont]). Without a font the [textStyle] bits style the text of the
+ * default font.
  */
 private fun styledClockFormat(
     format: String,
@@ -332,16 +358,12 @@ private fun styledClockFormat(
     textStyle: Int,
 ): CharSequence = when {
     font == null || Android.Below.Q -> format.withStyle(textStyle)
-    font.family != null -> SpannableString(format).apply {
+    else -> SpannableString(format).apply {
         setSpan(TypefaceSpan(font.family), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         if (font.style != Typeface.NORMAL) {
             setSpan(StyleSpan(font.style), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
-    font.typeface != null -> SpannableString(format).apply {
-        setSpan(TypefaceSpan(font.typeface), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-    }
-    else -> format
 }
 
 /** The format with the style bits of the default font, or the format itself for the normal style. */

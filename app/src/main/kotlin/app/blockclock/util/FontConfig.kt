@@ -36,7 +36,10 @@ object FontConfig {
     /** The configurations of the device: the declarations of the platform and of the vendors. */
     private val configs: List<File> by lazy(LazyThreadSafetyMode.NONE) {
         dirs.flatMap { dir ->
-            File(dir).listFiles().orEmpty().filter(::declaresFamilies).sortedBy(File::getName)
+            File(dir).listFiles()
+                ?.filter(::declaresFamilies)
+                ?.sortedBy(File::getName)
+                ?: emptyList()
         }
     }
 
@@ -52,6 +55,19 @@ object FontConfig {
 
     /** The family of the font [file], or null when the configuration does not name it. */
     fun family(file: File): String? = names[file.name]
+
+    /**
+     * True for a name the platform resolves to a font family: a declared family or an alias
+     * of one. The names live in the same configurations the platform reads, and no API
+     * answers the question before the 31st level — `Typeface.getSystemFontFamilyName`
+     * appears there and is missing from 28 to 30, where calling it fails the whole lookup.
+     */
+    fun canResolve(name: String): Boolean = name in families || name in aliases
+
+    /** The alias names of the device: the alternative names of the declared families. */
+    private val aliases: Set<String> by lazy(LazyThreadSafetyMode.NONE) {
+        configs.flatMap(::readAliases).toSet()
+    }
 
     /** The families declared in the configuration [file], in the order of the file. */
     internal fun read(file: File): List<Family> = try {
@@ -70,6 +86,19 @@ object FontConfig {
                     else -> Family(name, files, family.getAttribute(CUSTOMIZATION) == REPLACE)
                 }
             }
+    } catch (_: Exception) {
+        emptyList()
+    }
+
+    /** The alias names declared in the configuration [file]. */
+    internal fun readAliases(file: File): List<String> = try {
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(file)
+            .documentElement
+            .children(ALIAS)
+            .map { it.getAttribute(NAME) }
+            .filter(String::isNotEmpty)
     } catch (_: Exception) {
         emptyList()
     }
@@ -97,12 +126,16 @@ object FontConfig {
      * they like. The head is read generously: the `fonts.xml` of the platform carries a long
      * deprecation comment before the root.
      */
-    internal fun declaresFamilies(file: File): Boolean = file.isFile && file.name.endsWith(EXTENSION) && try {
-        val head = ByteArray(HEAD)
-        val size = file.inputStream().use { it.read(head) }
-        ROOTS.any(head.decodeToString(endIndex = size.coerceAtLeast(0))::contains)
-    } catch (_: Exception) {
-        false
+    internal fun declaresFamilies(file: File): Boolean = when {
+        !file.isFile -> false
+        !file.name.endsWith(EXTENSION) -> false
+        else -> try {
+            val head = ByteArray(HEAD)
+            val size = file.inputStream().use { it.read(head) }
+            ROOTS.any(head.decodeToString(endIndex = size.coerceAtLeast(0))::contains)
+        } catch (_: Exception) {
+            false
+        }
     }
 
     /** The children of this element with the [tag] name. */
@@ -121,6 +154,7 @@ object FontConfig {
     )
 
     private const val FAMILY = "family"
+    private const val ALIAS = "alias"
     private const val FONT = "font"
     private const val NAME = "name"
     private const val CUSTOMIZATION = "customizationType"
