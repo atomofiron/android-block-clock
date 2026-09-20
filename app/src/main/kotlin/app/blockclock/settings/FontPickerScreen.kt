@@ -120,7 +120,10 @@ fun FontPickerScreen(
                     SearchButton(
                         searching,
                         searchQuery,
-                        onToggle = { searching = !searching },
+                        onToggle = {
+                            searching = !searching
+                            searchQuery = ""
+                        },
                         onReset = { searchQuery = "" },
                     )
                 },
@@ -137,7 +140,7 @@ fun FontPickerScreen(
                 visible = fonts != null,
                 enter = fadeIn(),
             ) {
-                FontList(visibleFonts, onPick)
+                FontList(showDefault = searchQuery == "", visibleFonts, onPick)
             }
         }
     }
@@ -146,6 +149,7 @@ fun FontPickerScreen(
 @RequiresApi(Q)
 @Composable
 private fun FontList(
+    showDefault: Boolean,
     fonts: List<WidgetFont>,
     onPick: (WidgetFont?) -> Unit,
 ) {
@@ -158,7 +162,7 @@ private fun FontList(
             .add(WindowInsets(left = Padding.Common, right = Padding.Common, bottom = Padding.Common))
             .asPaddingValues(),
     ) {
-        item {
+        if (showDefault) item {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
