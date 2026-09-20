@@ -466,7 +466,6 @@ private fun ClickablePoint(
             .clickable(enabled = clickable, onClick = onClick)
             .padding(Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Padding.Semi)
     ) {
         val iconSize = if (largeIcon) Dimens.LargeIconSize else Dimens.IconSize
         when {
@@ -482,7 +481,9 @@ private fun ClickablePoint(
             )
         }
         Text(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .padding(start = Padding.Semi)
+                .weight(1f),
             text = stringResource(label),
             style = MaterialTheme.typography.titleMedium,
             maxLines = 1,
