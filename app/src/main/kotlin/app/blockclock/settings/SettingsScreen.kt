@@ -369,8 +369,7 @@ fun SettingsScreen(
                         ProgressIndicator(
                             modifier = Modifier
                                 .padding(horizontal = Padding.Common)
-                                .fillMaxWidth()
-                                .offset(y = (-6).dp),
+                                .fillMaxWidth(),
                             progress = updateState.progress(),
                             visible = updateState.processing(),
                         )
