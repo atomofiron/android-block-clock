@@ -6,6 +6,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
@@ -32,12 +33,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SegmentedButton(
     modifier: Modifier = Modifier,
+    contentPadding: Dp = 0.dp,
     content: @Composable SingleChoiceSegmentedButtonRowScope.() -> Unit,
 ) = BoxWithConstraints(modifier = modifier) {
     SingleChoiceSegmentedButtonRow(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
-            .widthIn(min = maxWidth),
+            .widthIn(min = maxWidth)
+            .padding(horizontal = contentPadding),
         space = (-2).dp,
         content = content,
     )

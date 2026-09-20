@@ -230,7 +230,7 @@ fun SettingsScreen(
             ) {
                 item {
                     SectionCard(stringResource(R.string.color)) {
-                        Row {
+                        Row(Modifier.padding(horizontal = Padding.Common)) {
                             ColorField(
                                 modifier = Modifier.padding(end = Padding.Half).weight(1f),
                                 label = stringResource(R.string.background),
@@ -245,6 +245,7 @@ fun SettingsScreen(
                             )
                         }
                         TransparencySlider(
+                            modifier = Modifier.padding(horizontal = Padding.Common),
                             transparency = settings.transparency,
                             onChange = {
                                 previewSettings = previewSettings.copy(transparency = it)
@@ -256,6 +257,7 @@ fun SettingsScreen(
                 item {
                     SectionCard(stringResource(R.string.shape)) {
                         RoundingSlider(
+                            modifier = Modifier.padding(horizontal = Padding.Common),
                             label = stringResource(R.string.label_corner_radius),
                             value = settings.cornerRadiusDp,
                             onChange = {
@@ -264,6 +266,7 @@ fun SettingsScreen(
                             onChangeFinished = { apply(settings.copy(cornerRadiusDp = it)) },
                         )
                         GapSlider(
+                            modifier = Modifier.padding(horizontal = Padding.Common),
                             gap = settings.gapDp,
                             onChange = { previewSettings = previewSettings.copy(gapDp = it) },
                             onChangeFinished = { apply(settings.copy(gapDp = it)) },
@@ -275,7 +278,9 @@ fun SettingsScreen(
                         when {
                             Android.Q -> {
                                 FontField(
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier
+                                        .padding(horizontal = Padding.Common)
+                                        .fillMaxWidth(),
                                     font = settings.font,
                                     onClick = { showFontPicker = true },
                                 )
@@ -289,6 +294,7 @@ fun SettingsScreen(
                             }
                             // The system fonts need Android 10, the styles of the default font do not.
                             else -> TextStyleGroup(
+                                contentPadding = Padding.Common,
                                 selected = settings.textStyle,
                                 onStyle = { apply(settings.copy(textStyle = it)) },
                             )
@@ -299,9 +305,11 @@ fun SettingsScreen(
                     SectionCard(title = null) {
                         val clockApp = remember(settings.clockApp) { settings.clockApp ?: defaultClockApp(context) }
                         val calendarApp = remember(settings.calendarApp) { settings.calendarApp ?: defaultCalendarApp(context) }
-                        Row {
+                        Row(Modifier.padding(horizontal = Padding.Common)) {
                             ClickablePoint(
-                                modifier = Modifier.padding(end = Padding.Half).weight(1f),
+                                modifier = Modifier
+                                    .padding(end = Padding.Half)
+                                    .weight(1f),
                                 icon = rememberAppIconPainter(clockApp?.packageName),
                                 label = R.string.clock_app,
                                 tintedIcon = false,
@@ -320,6 +328,7 @@ fun SettingsScreen(
                             }
                         }
                         SettingSwitch(
+                            modifier = Modifier.padding(horizontal = Padding.Common),
                             label = stringResource(R.string.option_month_first),
                             checked = !settings.dayFirst,
                             onCheckedChange = { checked ->
@@ -330,7 +339,7 @@ fun SettingsScreen(
                 }
                 item {
                     SectionCard(title = null) {
-                        Row {
+                        Row(Modifier.padding(horizontal = Padding.Common)) {
                             ClickablePoint(
                                 modifier = Modifier.padding(end = Padding.Half).weight(1f),
                                 icon = painterResource(R.drawable.ic_github),
@@ -348,19 +357,26 @@ fun SettingsScreen(
                         }
                         val updateState by UpdateStore.self.state.collectAsState()
                         ClickablePoint(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .padding(horizontal = Padding.Common)
+                                .fillMaxWidth(),
                             icon = painterResource(updateState.icon()),
                             label = updateState.label(),
                             clickable = updateState.interactable,
                             onClick = updateState::action,
                         )
                         ProgressIndicator(
-                            modifier = Modifier.fillMaxWidth().offset(y = (-6).dp),
+                            modifier = Modifier
+                                .padding(horizontal = Padding.Common)
+                                .fillMaxWidth()
+                                .offset(y = (-6).dp),
                             progress = updateState.progress(),
                             visible = updateState.processing(),
                         )
                         Row(
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            modifier = Modifier
+                                .padding(horizontal = Padding.Common)
+                                .align(Alignment.CenterHorizontally),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             val (icon, tint) = when (UpdateStore.self.source) {
@@ -484,12 +500,12 @@ private fun SectionCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(Padding.Common),
+                .padding(vertical = Padding.Common),
         ) {
             if (title != null) {
                 Text(
                     title,
-                    modifier = Modifier.padding(bottom = Padding.Half),
+                    modifier = Modifier.padding(bottom = Padding.Half, start = Padding.Common),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -585,11 +601,13 @@ private fun ColumnScope.FontVariations(
 ) {
     when {
         font == null -> TextStyleGroup(
+            contentPadding = Padding.Common,
             selected = textStyle,
             onStyle = onStyle,
         )
         font.vf -> font.axes.forEach { axis ->
             VariationSlider(
+                modifier = Modifier.padding(horizontal = Padding.Common),
                 axis = axis,
                 value = font.variation(axis.tag, axis.default),
                 onChange = { onFont(font.copy(variations = font.variations + (axis.tag to it))) },
@@ -597,19 +615,27 @@ private fun ColumnScope.FontVariations(
         }
         else -> remember(font, systemFonts) { systemFonts.familyStyles(font) }
             .takeIf { it.size > 1 }
-            ?.let { StyleGroup(styles = it, selected = font, onFont = onFont) }
+            ?.let {
+                StyleGroup(
+                    contentPadding = Padding.Common,
+                    styles = it,
+                    selected = font,
+                    onFont = onFont,
+                )
+            }
     }
 }
 
 /** The slider of one variable font axis, e.g. `wght`. */
 @Composable
 private fun VariationSlider(
+    modifier: Modifier = Modifier,
     axis: FontAxis,
     value: Float,
     onChange: (Float) -> Unit,
 ) {
     var current by remember(axis, value) { mutableFloatStateOf(value) }
-    Column {
+    Column(modifier) {
         SubTitle(
             title = axis.tag,
             value = current.roundToInt().toString(),
@@ -628,10 +654,11 @@ private fun VariationSlider(
 @Composable
 private fun TextStyleGroup(
     selected: TextStyle,
+    contentPadding: Dp = 0.dp,
     onStyle: (TextStyle) -> Unit,
 ) {
     val styles = TextStyle.entries
-    SegmentedButton(Modifier.fillMaxWidth()) {
+    SegmentedButton(Modifier.fillMaxWidth(), contentPadding) {
         styles.forEachIndexed { index, style ->
             GroupItem(
                 index = index,
@@ -661,11 +688,15 @@ private fun TextStyle.label(): Int = when (this) {
 @RequiresApi(Q)
 @Composable
 private fun StyleGroup(
+    contentPadding: Dp = 0.dp,
     styles: List<WidgetFont>,
     selected: WidgetFont,
     onFont: (WidgetFont?) -> Unit,
 ) {
-    SegmentedButton(Modifier.fillMaxWidth()) {
+    SegmentedButton(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = contentPadding,
+    ) {
         styles.forEachIndexed { index, style ->
             GroupItem(
                 index = index,
@@ -685,12 +716,13 @@ private fun StyleGroup(
 /** The transparency slider: the higher the value, the more transparent the rectangles. */
 @Composable
 private fun TransparencySlider(
+    modifier: Modifier = Modifier,
     transparency: Float,
     onChange: (Float) -> Unit,
     onChangeFinished: (Float) -> Unit,
 ) {
     var value by remember { mutableFloatStateOf(transparency) }
-    Column {
+    Column(modifier) {
         SubTitle(
             title = stringResource(R.string.label_transparency),
             value = "${(value * PercentFactor).toInt()} %",
@@ -708,9 +740,17 @@ private fun TransparencySlider(
 }
 
 @Composable
-private fun GapSlider(gap: Int, onChange: (Int) -> Unit, onChangeFinished: (Int) -> Unit) {
+private fun GapSlider(
+    modifier: Modifier = Modifier,
+    gap: Int,
+    onChange: (Int) -> Unit,
+    onChangeFinished: (Int) -> Unit,
+) {
     var value by remember { mutableFloatStateOf(gap.toFloat().coerceIn(GapRange)) }
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(
+        modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
         SubTitle(
             title = stringResource(R.string.label_gap),
             value = value.roundToInt().toString(),
@@ -730,13 +770,14 @@ private fun GapSlider(gap: Int, onChange: (Int) -> Unit, onChangeFinished: (Int)
 
 @Composable
 private fun RoundingSlider(
+    modifier: Modifier = Modifier,
     label: String,
     value: Int,
     onChange: (Int) -> Unit,
     onChangeFinished: (Int) -> Unit,
 ) {
     var current by remember { mutableFloatStateOf(value.toFloat()) }
-    Column {
+    Column(modifier) {
         SubTitle(
             title = label,
             value = current.toInt().toString(),
@@ -757,12 +798,13 @@ private fun RoundingSlider(
 /** A settings row with a Switch: the whole row is clickable. */
 @Composable
 private fun SettingSwitch(
+    modifier: Modifier = Modifier,
     label: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(ShapeDefaults.Medium)
             .clickable { onCheckedChange(!checked) }
