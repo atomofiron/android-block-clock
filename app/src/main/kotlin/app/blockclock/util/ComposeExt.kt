@@ -3,6 +3,8 @@ package app.blockclock.util
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
@@ -45,7 +47,7 @@ fun Modifier.windowInsetsPadding(action: @Composable WindowInsets.Companion.() -
 fun animatedBackgroundColor(transparent: Boolean): Color {
     val background = MaterialTheme.colorScheme.background
     var targetBackgroundColor by remember { mutableStateOf(background) }
-    val backgroundColor by animateColorAsState(targetBackgroundColor)
+    val backgroundColor by animateColorAsState(targetBackgroundColor, animationSpec = spring(stiffness = Spring.StiffnessVeryLow))
     LaunchedEffect(background, transparent) {
         targetBackgroundColor = if (transparent) Color.Transparent else background
     }
