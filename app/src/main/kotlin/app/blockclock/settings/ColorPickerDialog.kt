@@ -85,19 +85,34 @@ internal fun ColorPickerDialog(
             Column(verticalArrangement = Arrangement.spacedBy(Padding.Common)) {
                 if (wallpaper != null) Row(horizontalArrangement = Arrangement.spacedBy(Padding.Common)) {
                     wallpaper.primary.let { color ->
-                        ColorBox(Modifier.weight(1f), color) {
+                        ColorBox(
+                            modifier = Modifier
+                            .height(Dimens.WallpaperColorHeight)
+                            .weight(1f),
+                            color,
+                        ) {
                             source = ColorSource.Primary
                             set(color)
                         }
                     }
                     wallpaper.secondary?.let { color ->
-                        ColorBox(Modifier.weight(1f), color) {
+                        ColorBox(
+                            modifier = Modifier
+                                .height(Dimens.WallpaperColorHeight)
+                                .weight(1f),
+                            color,
+                        ) {
                             source = ColorSource.Secondary
                             set(color)
                         }
                     }
                     wallpaper.tertiary?.let { color ->
-                        ColorBox(Modifier.weight(1f), color) {
+                        ColorBox(
+                            modifier = Modifier
+                                .height(Dimens.WallpaperColorHeight)
+                                .weight(1f),
+                            color,
+                        ) {
                             source = ColorSource.Tertiary
                             set(color)
                         }

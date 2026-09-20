@@ -62,7 +62,6 @@ fun ColorBox(
     onClick: (() -> Unit)? = null,
 ) = Box(
     modifier = modifier
-        .height(Dimens.SwatchSize)
         .clip(ShapeDefaults.Medium)
         .background(color)
         .border(Dimens.SwatchBorderWidth, Colors.SwatchBorder, ShapeDefaults.Medium)

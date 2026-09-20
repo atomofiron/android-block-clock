@@ -10,6 +10,7 @@ object Dimens {
     val GridColumnMinWidth = 320.dp
     val PickerColumnMinWidth = 169.dp
     val WidePickerColumnMinWidth = 320.dp
+    val WallpaperColorHeight = 36.dp
     val SwatchSize = 24.dp
     val SwatchBorderWidth = 1.dp
     val IconSize = 24.dp
@@ -18,5 +19,5 @@ object Dimens {
     val MarkerRadius = 8.dp
     val MarkerBorderWidth = 2.dp
     val SvBoxHeight = 160.dp
-    val HueSliderHeight = 28.dp
+    val HueSliderHeight = 24.dp
 }
