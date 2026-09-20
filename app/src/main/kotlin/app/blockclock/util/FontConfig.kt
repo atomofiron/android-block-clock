@@ -66,8 +66,26 @@ object FontConfig {
 
     /** The alias names of the device: the alternative names of the declared families. */
     private val aliases: Set<String> by lazy(LazyThreadSafetyMode.NONE) {
-        configs.flatMap(::readAliases).toSet()
+        configs.flatMap(::readAliases).map(Alias::name).toSet()
     }
+
+    /** The aliases that ask for a weight: the family name to the weight and the alias name. */
+    private val weighted: Map<String, Map<Int, String>> by lazy(LazyThreadSafetyMode.NONE) {
+        configs.flatMap(::readAliases)
+            .filter { it.weight != null && it.to.isNotEmpty() }
+            .groupBy(Alias::to)
+            .mapValues { (_, aliases) -> aliases.asReversed().associate { it.weight!! to it.name } }
+    }
+
+    /**
+     * The alias that asks the [family] for this [weight], or null when the device declares none.
+     *
+     * An alias of the configuration is a name of its own that the platform resolves to the family
+     * with the requested weight, e.g. `source-sans-pro-semi-bold` asks `source-sans-pro` for the
+     * 600. It is the only way to ask the host for a weight: `RemoteViews` reaches the style bits
+     * alone, so the faces of a family that declares several weights would look the same.
+     */
+    fun alias(family: String, weight: Int): String? = weighted[family]?.get(weight)
 
     /** The families declared in the configuration [file], in the order of the file. */
     internal fun read(file: File): List<Family> = try {
@@ -90,15 +108,21 @@ object FontConfig {
         emptyList()
     }
 
-    /** The alias names declared in the configuration [file]. */
-    internal fun readAliases(file: File): List<String> = try {
+    /** The aliases declared in the configuration [file]: the name, the family and the weight. */
+    internal fun readAliases(file: File): List<Alias> = try {
         DocumentBuilderFactory.newInstance()
             .newDocumentBuilder()
             .parse(file)
             .documentElement
             .children(ALIAS)
-            .map { it.getAttribute(NAME) }
-            .filter(String::isNotEmpty)
+            .map { alias ->
+                Alias(
+                    name = alias.getAttribute(NAME),
+                    to = alias.getAttribute(TO),
+                    weight = alias.getAttribute(WEIGHT).toIntOrNull(),
+                )
+            }
+            .filter { it.name.isNotEmpty() }
     } catch (_: Exception) {
         emptyList()
     }
@@ -153,10 +177,19 @@ object FontConfig {
         val replace: Boolean = false,
     )
 
+    /** An alias of a configuration: the name, the family it points to and the weight it asks. */
+    internal data class Alias(
+        val name: String,
+        val to: String,
+        val weight: Int?,
+    )
+
     private const val FAMILY = "family"
     private const val ALIAS = "alias"
     private const val FONT = "font"
     private const val NAME = "name"
+    private const val TO = "to"
+    private const val WEIGHT = "weight"
     private const val CUSTOMIZATION = "customizationType"
     private const val REPLACE = "replace"
     private const val EXTENSION = ".xml"

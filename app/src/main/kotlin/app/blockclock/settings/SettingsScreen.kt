@@ -595,7 +595,7 @@ private fun FontField(
 
 /**
  * The font variations: the style of the default font as a group of buttons,
- * the axes of a variable font as sliders, or the styles of the same font
+ * the axes a widget renders as sliders ([FontAxis.DELIVERED]), or the styles of the same font
  * family as a group of buttons — the group of a family with a single style
  * is not shown: there is nothing to choose.
  */
@@ -616,7 +616,7 @@ private fun ColumnScope.FontVariations(
             selected = textStyle,
             onStyle = onStyle,
         )
-        font.vf -> font.axes.forEach { axis ->
+        font.vf -> font.axes.filter { it.tag in FontAxis.DELIVERED }.forEach { axis ->
             VariationSlider(
                 modifier = modifier.padding(horizontal = Padding.Common),
                 axis = axis,

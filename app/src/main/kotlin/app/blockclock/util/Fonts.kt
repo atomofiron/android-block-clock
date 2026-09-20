@@ -9,9 +9,11 @@ import androidx.compose.ui.text.font.Font as ComposeFont
 import androidx.compose.ui.text.font.FontFamily as ComposeFontFamily
 import androidx.compose.ui.text.font.FontVariation
 import app.blockclock.model.CellFont
+import app.blockclock.model.FontAxis
 import app.blockclock.model.WidgetFont
 import java.io.File
 import java.io.IOException
+import kotlin.math.roundToInt
 
 @RequiresApi(Q)
 fun Font.toWidgetFont(): WidgetFont? {
@@ -68,32 +70,30 @@ fun WidgetFont.toFontFamily(): ComposeFontFamily = ComposeFontFamily(
  * host would draw its own default font for such a pick, ignoring the choice entirely: the
  * result is null, and [getSystemFonts] leaves those fonts out of the picker.
  *
- * The weight of the file goes to a family alias when the platform declares one, otherwise
- * to the bold bit and to the axes: the alias weight is applied by the host when it builds
- * the font, the bold bit picks a heavier face of the family, and the axes pick a weight
- * inside a variable font.
- *
- * The axes reach the host only from Android 15 on: `RemoteViews` calls a method of a widget
- * view only when the platform marks it as `@RemotableViewMethod`, and
- * `TextView.setFontVariationSettings` gets the mark there (it is missing from 9 to 14, where
- * the call would fail the whole RemoteViews). On the older versions the weight comes from
- * the family alias and the style bits only.
+ * The weight of the file goes to the alias the configuration declares for it when there is one
+ * ([FontConfig.alias]), otherwise to the bold bit: the host applies the weight of the alias when
+ * it builds the font, the bold bit picks a heavier face of the family. The axes of the file are passed as well, but the host
+ * drops them: `TextView.setFontVariationSettings` keeps the value in a `Typeface` it builds
+ * itself, and the family arrives as a `TypefaceSpan`, which calls `setTypeface` right after and
+ * clears it ([android.graphics.Paint.setFontVariationSettings] documents that). The slant is
+ * the one axis a style bit expresses, see [slant].
  */
 @RequiresApi(Q)
 fun WidgetFont.toCellFont(): CellFont? {
-    val weight = variations[WEIGHT_TAG]?.toInt() ?: font.style.weight
+    val weight = variations[FontAxis.WEIGHT]?.toInt() ?: font.style.weight
     val names = listOfNotNull(FontConfig.family(file), family)
-    val alias = WEIGHT_ALIASES[weight]
-        ?.takeIf { WEIGHT_TAG !in variations }
-        ?.let { suffix -> names.firstNotNullOfOrNull { "$it$suffix".takeIf(::isSystemFamily) } }
-    val name = alias ?: names.firstOrNull(::isSystemFamily) ?: return null
+    val family = names.firstOrNull(::isSystemFamily) ?: return null
+    // The alias is the only way to ask the host for a weight of its own: the style bits carry the
+    // bold bit alone, so the faces of a family that declares several weights look the same.
+    val alias = FontConfig.alias(family, weight)
+    val name = alias ?: family
     val axes = when {
-        alias == null -> variations + (WEIGHT_TAG to weight.toFloat())
+        alias == null -> variations + (FontAxis.WEIGHT to weight.toFloat())
         else -> variations
     }
     return CellFont(
         family = name,
-        style = italic() or when {
+        style = italic() or slant() or when {
             alias != null -> Typeface.NORMAL // the alias carries the weight
             weight >= BOLD_WEIGHT -> Typeface.BOLD
             else -> Typeface.NORMAL
@@ -118,19 +118,18 @@ private fun WidgetFont.italic(): Int = when (font.style.slant) {
 }
 
 /** The variable font axes in the `TextView.setFontVariationSettings` syntax. */
-private fun Map<String, Float>.toSettings(): String = entries.joinToString(", ") { "'${it.key}' ${it.value}" }
+private fun Map<String, Float>.toSettings(): String = entries.joinToString(", ") { "'${it.key}' ${it.value.roundToInt()}" }
 
-/** The axis of the weight; a variable font picks the weight from it. */
-private const val WEIGHT_TAG = "wght"
+/**
+ * The italic bit of the slant axes. The host gets a slant as the bit and as nothing finer: the
+ * axes of the files are continuous, the bit is not, so any value but the upright one asks for
+ * the italic face of the family, or for the synthetic slant when the family has no such face.
+ */
+@RequiresApi(Q)
+private fun WidgetFont.slant(): Int = when {
+    FontAxis.SLANTS.none { (variations[it] ?: 0f) != 0f } -> Typeface.NORMAL
+    else -> Typeface.ITALIC
+}
 
 /** The weight the bold bit asks for; `TypefaceSpan` adds it to the weight of the family. */
 private const val BOLD_WEIGHT = 600
-
-/** The family suffixes for the weights the platform declares aliases for. */
-private val WEIGHT_ALIASES = mapOf(
-    100 to "-thin",
-    300 to "-light",
-    500 to "-medium",
-    700 to "-bold",
-    900 to "-black",
-)
