@@ -86,3 +86,9 @@ fun SearchField(
         shape = ShapeDefaults.Medium,
     )
 }
+
+@Composable
+fun ForwardIcon() = Icon(
+    painter = painterResource(R.drawable.ic_forward_12),
+    contentDescription = null,
+)

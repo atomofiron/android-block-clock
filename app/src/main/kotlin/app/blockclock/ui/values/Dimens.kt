@@ -10,7 +10,7 @@ object Dimens {
     val GridColumnMinWidth = 320.dp
     val PickerColumnMinWidth = 169.dp
     val WidePickerColumnMinWidth = 320.dp
-    val SwatchSize = 36.dp
+    val SwatchSize = 24.dp
     val SwatchBorderWidth = 1.dp
     val IconSize = 24.dp
     val LargeIconSize = 36.dp

@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import app.blockclock.ui.values.clickable
 
 @Composable
 fun SegmentedButton(
@@ -81,7 +82,7 @@ fun SingleChoiceSegmentedButtonRowScope.GroupItem(
         colors = SegmentedButtonDefaults.colors(
             activeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             activeContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            inactiveContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            inactiveContainerColor = MaterialTheme.colorScheme.clickable,
             inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         border = SegmentedButtonDefaults.borderStroke(Color.Transparent),

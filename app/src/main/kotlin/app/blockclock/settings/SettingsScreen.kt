@@ -4,13 +4,9 @@ import android.content.Intent
 import android.os.Build.VERSION_CODES.Q
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,18 +28,14 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.ShapeDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRowScope
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -61,11 +53,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -83,10 +72,12 @@ import app.blockclock.model.TextStyle
 import app.blockclock.model.WallpaperColors
 import app.blockclock.model.WidgetFont
 import app.blockclock.ui.ColorBox
+import app.blockclock.ui.ForwardIcon
 import app.blockclock.ui.GroupItem
 import app.blockclock.ui.SegmentedButton
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
+import app.blockclock.ui.values.clickable
 import app.blockclock.update.AppSource
 import app.blockclock.update.UpdateService
 import app.blockclock.update.UpdateStore
@@ -230,15 +221,18 @@ fun SettingsScreen(
             ) {
                 item {
                     SectionCard(stringResource(R.string.color)) {
-                        Row(Modifier.padding(horizontal = Padding.Common)) {
+                        Row(
+                            Modifier.padding(horizontal = Padding.Common),
+                            horizontalArrangement = Arrangement.spacedBy(Padding.Half),
+                        ) {
                             ColorField(
-                                modifier = Modifier.padding(end = Padding.Half).weight(1f),
+                                modifier = Modifier.weight(1f),
                                 label = stringResource(R.string.background),
                                 color = settings.background,
                                 onClick = { colorTarget = ColorTarget.Rect },
                             )
                             ColorField(
-                                modifier = Modifier.padding(start = Padding.Half).weight(1f),
+                                modifier = Modifier.weight(1f),
                                 label = stringResource(R.string.text),
                                 color = settings.text,
                                 onClick = { colorTarget = ColorTarget.Text },
@@ -305,24 +299,27 @@ fun SettingsScreen(
                     SectionCard(title = null) {
                         val clockApp = remember(settings.clockApp) { settings.clockApp ?: defaultClockApp(context) }
                         val calendarApp = remember(settings.calendarApp) { settings.calendarApp ?: defaultCalendarApp(context) }
-                        Row(Modifier.padding(horizontal = Padding.Common)) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = Padding.Common),
+                            horizontalArrangement = Arrangement.spacedBy(Padding.Half),
+                        ) {
                             ClickablePoint(
-                                modifier = Modifier
-                                    .padding(end = Padding.Half)
-                                    .weight(1f),
+                                modifier = Modifier.weight(1f),
                                 icon = rememberAppIconPainter(clockApp?.packageName),
                                 label = R.string.clock_app,
                                 tintedIcon = false,
                                 largeIcon = true,
+                                withArrow = true,
                             ) {
                                 appPicker = AppPickerTarget.Clock
                             }
                             ClickablePoint(
-                                modifier = Modifier.padding(start = Padding.Half).weight(1f),
+                                modifier = Modifier.weight(1f),
                                 icon = rememberAppIconPainter(calendarApp?.packageName),
                                 label = R.string.calendar_app,
                                 tintedIcon = false,
                                 largeIcon = true,
+                                withArrow = true,
                             ) {
                                 appPicker = AppPickerTarget.Calendar
                             }
@@ -339,18 +336,22 @@ fun SettingsScreen(
                 }
                 item {
                     SectionCard(title = null) {
-                        Row(Modifier.padding(horizontal = Padding.Common)) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = Padding.Common),
+                            horizontalArrangement = Arrangement.spacedBy(Padding.Half),
+                        ) {
                             ClickablePoint(
-                                modifier = Modifier.padding(end = Padding.Half).weight(1f),
+                                modifier = Modifier.weight(1f),
                                 icon = painterResource(R.drawable.ic_github),
-                                R.string.github_repository,
+                                label = R.string.github_repository,
                             ) {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, GITHUB_URL.toUri()))
                             }
                             ClickablePoint(
-                                modifier = Modifier.padding(start = Padding.Half).weight(1f),
-                                painterResource(R.drawable.ic_license),
-                                R.string.licenses,
+                                modifier = Modifier.weight(1f),
+                                icon = painterResource(R.drawable.ic_license),
+                                label = R.string.licenses,
+                                withArrow = true,
                             ) {
                                 showLicenses = true
                             }
@@ -456,14 +457,17 @@ private fun ClickablePoint(
     clickable: Boolean = true,
     tintedIcon: Boolean = true,
     largeIcon: Boolean = false,
+    withArrow: Boolean = false,
     onClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
             .clip(ShapeDefaults.Medium)
+            .background(colorScheme.clickable)
             .clickable(enabled = clickable, onClick = onClick)
-            .padding(vertical = Padding.Semi),
+            .padding(Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Padding.Semi)
     ) {
         val iconSize = if (largeIcon) Dimens.LargeIconSize else Dimens.IconSize
         when {
@@ -479,12 +483,11 @@ private fun ClickablePoint(
             )
         }
         Text(
-            modifier = Modifier
-                .padding(start = Padding.Semi)
-                .weight(1f),
+            modifier = Modifier.weight(1f),
             text = stringResource(label),
             style = MaterialTheme.typography.titleMedium,
         )
+        if (withArrow) ForwardIcon()
     }
 }
 
@@ -501,13 +504,14 @@ private fun SectionCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = Padding.Common),
+            verticalArrangement = Arrangement.spacedBy(Padding.Half),
         ) {
             if (title != null) {
                 Text(
                     title,
                     modifier = Modifier.padding(bottom = Padding.Half, start = Padding.Common),
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = colorScheme.primary,
                 )
             }
             content()
@@ -528,7 +532,7 @@ private fun SubTitle(title: String, value: String) {
         Text(
             text = value,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -543,13 +547,16 @@ private fun ColorField(
     Row(
         modifier = modifier
             .clip(ShapeDefaults.Medium)
+            .background(colorScheme.clickable)
             .clickable(onClick = onClick)
-            .padding(vertical = Padding.Semi),
+            .padding(Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         ColorBox(Modifier.size(Dimens.SwatchSize), color)
         Text(
-            modifier = Modifier.padding(start = Padding.Semi),
+            modifier = Modifier
+                .padding(start = Padding.Semi)
+                .weight(1f),
             text = label,
             style = MaterialTheme.typography.bodyLarge,
             overflow = TextOverflow.MiddleEllipsis,
@@ -569,8 +576,9 @@ private fun FontField(
     Row(
         modifier = modifier
             .clip(ShapeDefaults.Medium)
+            .background(colorScheme.clickable)
             .clickable(onClick = onClick)
-            .padding(vertical = Padding.Common),
+            .padding(Padding.Semi),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -581,6 +589,7 @@ private fun FontField(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+        ForwardIcon()
     }
 }
 
@@ -593,6 +602,7 @@ private fun FontField(
 @RequiresApi(Q)
 @Composable
 private fun ColumnScope.FontVariations(
+    modifier: Modifier = Modifier,
     font: WidgetFont?,
     textStyle: TextStyle,
     systemFonts: List<WidgetFont>,
@@ -601,13 +611,14 @@ private fun ColumnScope.FontVariations(
 ) {
     when {
         font == null -> TextStyleGroup(
+            modifier = modifier,
             contentPadding = Padding.Common,
             selected = textStyle,
             onStyle = onStyle,
         )
         font.vf -> font.axes.forEach { axis ->
             VariationSlider(
-                modifier = Modifier.padding(horizontal = Padding.Common),
+                modifier = modifier.padding(horizontal = Padding.Common),
                 axis = axis,
                 value = font.variation(axis.tag, axis.default),
                 onChange = { onFont(font.copy(variations = font.variations + (axis.tag to it))) },
@@ -617,6 +628,7 @@ private fun ColumnScope.FontVariations(
             .takeIf { it.size > 1 }
             ?.let {
                 StyleGroup(
+                    modifier = modifier,
                     contentPadding = Padding.Common,
                     styles = it,
                     selected = font,
@@ -653,16 +665,16 @@ private fun VariationSlider(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TextStyleGroup(
+    modifier: Modifier = Modifier,
     selected: TextStyle,
     contentPadding: Dp = 0.dp,
     onStyle: (TextStyle) -> Unit,
 ) {
-    val styles = TextStyle.entries
-    SegmentedButton(Modifier.fillMaxWidth(), contentPadding) {
-        styles.forEachIndexed { index, style ->
+    SegmentedButton(modifier.fillMaxWidth(), contentPadding) {
+        TextStyle.entries.forEachIndexed { index, style ->
             GroupItem(
                 index = index,
-                count = styles.size,
+                count = TextStyle.entries.size,
                 selected = style == selected,
                 onClick = { onStyle(style) },
             ) {
@@ -688,13 +700,14 @@ private fun TextStyle.label(): Int = when (this) {
 @RequiresApi(Q)
 @Composable
 private fun StyleGroup(
+    modifier: Modifier = Modifier,
     contentPadding: Dp = 0.dp,
     styles: List<WidgetFont>,
     selected: WidgetFont,
     onFont: (WidgetFont?) -> Unit,
 ) {
     SegmentedButton(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         contentPadding = contentPadding,
     ) {
         styles.forEachIndexed { index, style ->
@@ -807,8 +820,9 @@ private fun SettingSwitch(
         modifier = modifier
             .fillMaxWidth()
             .clip(ShapeDefaults.Medium)
+            .background(colorScheme.clickable)
             .clickable { onCheckedChange(!checked) }
-            .padding(),
+            .padding(horizontal = Padding.Semi, vertical = Padding.Mini),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

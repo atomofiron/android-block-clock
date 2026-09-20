@@ -1,5 +1,6 @@
 package app.blockclock.ui.values
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 
 object Colors {
@@ -14,3 +15,5 @@ object Colors {
     val SwatchBorder = Color(0x50808080)
     val MarkerBorder = Color(0xff808080)
 }
+
+val ColorScheme.clickable get() = surfaceContainerLowest
