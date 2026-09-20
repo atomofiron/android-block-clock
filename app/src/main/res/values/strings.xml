@@ -15,6 +15,7 @@
     <string name="shape">Shape</string>
     <string name="font">Font</string>
     <string name="font_default">Default</string>
+    <string name="font_axes_note">The axes may work incompletely: the widget renders the values the system declares</string>
     <string name="style_normal">Normal</string>
     <string name="style_bold">Bold</string>
     <string name="style_italic">Italic</string>

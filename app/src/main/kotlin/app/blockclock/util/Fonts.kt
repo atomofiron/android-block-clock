@@ -80,7 +80,7 @@ fun WidgetFont.toFontFamily(): ComposeFontFamily = ComposeFontFamily(
  */
 @RequiresApi(Q)
 fun WidgetFont.toCellFont(): CellFont? {
-    val weight = variations[FontAxis.WEIGHT]?.toInt() ?: font.style.weight
+    val weight = variations[FontAxis.WEIGHT]?.roundToInt() ?: font.style.weight
     val names = listOfNotNull(FontConfig.family(file), family)
     val family = names.firstOrNull(::isSystemFamily) ?: return null
     // The alias is the only way to ask the host for a weight of its own: the style bits carry the

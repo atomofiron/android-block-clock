@@ -12,6 +12,7 @@
     <string name="shape">Пішін</string>
     <string name="font">Қаріп</string>
     <string name="font_default">Әдепкі</string>
+    <string name="font_axes_note">Осьтер толық жұмыс істемеуі мүмкін: виджет жүйе жариялаған мәндерді ғана салады</string>
     <string name="style_normal">Қалыпты</string>
     <string name="style_bold">Қалың</string>
     <string name="style_italic">Көлбеу</string>

@@ -12,6 +12,7 @@
     <string name="shape">Oblik</string>
     <string name="font">Font</string>
     <string name="font_default">Podrazumevano</string>
+    <string name="font_axes_note">Ose mogu raditi nepotpuno: vidžet iscrtava samo vrednosti koje sistem objavljuje</string>
     <string name="style_normal">Obično</string>
     <string name="style_bold">Podebljano</string>
     <string name="style_italic">Kurziv</string>

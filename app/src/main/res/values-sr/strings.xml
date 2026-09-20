@@ -12,6 +12,7 @@
     <string name="shape">Облик</string>
     <string name="font">Фонт</string>
     <string name="font_default">Подразумевано</string>
+    <string name="font_axes_note">Осе могу радити непотпуно: виџет исцртава само вредности које систем објављује</string>
     <string name="style_normal">Обично</string>
     <string name="style_bold">Подебљано</string>
     <string name="style_italic">Курзив</string>

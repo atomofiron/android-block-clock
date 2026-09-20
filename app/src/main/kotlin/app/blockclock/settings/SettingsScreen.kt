@@ -67,6 +67,7 @@ import app.blockclock.model.AppPickerTarget
 import app.blockclock.model.ColorSource
 import app.blockclock.model.ColorTarget
 import app.blockclock.model.FontAxis
+import app.blockclock.model.FontAxis.Companion.SLANTS
 import app.blockclock.model.TextStyle
 import app.blockclock.model.WallpaperColors
 import app.blockclock.model.WidgetFont
@@ -595,7 +596,8 @@ private fun FontField(
 
 /**
  * The font variations: the style of the default font as a group of buttons,
- * the axes a widget renders as sliders ([FontAxis.DELIVERED]), or the styles of the same font
+ * the axes a widget renders as sliders ([FontAxis.DELIVERED]) with a note that they apply
+ * as far as the platform allows, or the styles of the same font
  * family as a group of buttons — the group of a family with a single style
  * is not shown: there is nothing to choose.
  */
@@ -616,13 +618,22 @@ private fun ColumnScope.FontVariations(
             selected = textStyle,
             onStyle = onStyle,
         )
-        font.vf -> font.axes.filter { it.tag in FontAxis.DELIVERED }.forEach { axis ->
-            VariationSlider(
+        font.vf -> {
+            Text(
+                text = stringResource(R.string.font_axes_note),
                 modifier = modifier.padding(horizontal = Padding.Common),
-                axis = axis,
-                value = font.variation(axis.tag, axis.default),
-                onChange = { onFont(font.copy(variations = font.variations + (axis.tag to it))) },
+                style = MaterialTheme.typography.labelSmall,
+                color = colorScheme.onSurfaceVariant,
             )
+            font.axes.filter { it.tag in FontAxis.DELIVERED }.forEach { axis ->
+                VariationSlider(
+                    modifier = modifier.padding(horizontal = Padding.Common),
+                    axis = axis,
+                    value = font.variation(axis.tag, axis.default),
+                    withSteps = axis.tag in SLANTS,
+                    onChange = { onFont(font.copy(variations = font.variations + (axis.tag to it))) },
+                )
+            }
         }
         else -> remember(font, systemFonts) { systemFonts.familyStyles(font) }
             .takeIf { it.size > 1 }
@@ -644,6 +655,7 @@ private fun VariationSlider(
     modifier: Modifier = Modifier,
     axis: FontAxis,
     value: Float,
+    withSteps: Boolean,
     onChange: (Float) -> Unit,
 ) {
     var current by remember(axis, value) { mutableFloatStateOf(value) }
@@ -655,8 +667,9 @@ private fun VariationSlider(
         Slider(
             value = current,
             onValueChange = { current = it },
-            onValueChangeFinished = { onChange(current) },
+            onValueChangeFinished = { onChange(current.roundToInt().toFloat()) },
             valueRange = axis.range,
+            steps = if (withSteps) axis.range.steps() else 0,
         )
     }
 }
