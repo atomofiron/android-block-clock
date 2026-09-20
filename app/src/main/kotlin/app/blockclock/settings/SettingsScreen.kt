@@ -783,7 +783,7 @@ private fun SettingSwitch(
 private fun UpdateState.icon() = when (this) {
     is UpdateState.Unknown,
     is UpdateState.Checking,
-    is UpdateState.Error -> R.drawable.ic_update
+    is UpdateState.Error -> R.drawable.ic_retry
     is UpdateState.Available,
     is UpdateState.Downloading,
     is UpdateState.Completable,
