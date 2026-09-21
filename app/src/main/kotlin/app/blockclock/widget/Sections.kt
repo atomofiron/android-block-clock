@@ -119,18 +119,22 @@ internal fun DateSection(
 /**
  * A single cell with rounded corners and padding per the [part] gap flags.
  *
- * The size is [part.calcSize]: the [cellSize] cell times the weight plus
- * the gaps (each flag adds [gap]/2, wide parts add [Part.gapInside] more).
- * The font is a fraction of the cell height minus the top/bottom gaps:
- * 70% for time parts ([Part.time]), 60% for date parts.
+ * The size is [part.calcSize]: the [cellSize] cell times the [Part.weight] plus the gaps —
+ * [gap]/2 on each flagged side, and a part wider or taller than a single cell gets
+ * [Part.gapInside] × [gap] more. The padding takes those halves back from the text, so the
+ * text height is the cell height minus the halves of the top and the bottom flags, and the
+ * font is a fraction of it: 70% for time parts ([Part.time]), 60% for date parts.
  *
- * The background is drawn by Glance on Android 12+ and by a cell bitmap
- * (color with transparency and corners baked in) on Android 11 and below;
- * at [gap] = 0 cells are transparent (the shared [CellBackground] draws).
- * The text is a native [android.widget.TextClock] that updates itself.
- * The font goes to the home screen as a family name it resolves itself —
- * a typeface would not survive the trip (see [CellFont]); without a font the
- * [WidgetSettings.textStyle] bits style the text of the default font.
+ * The background is drawn by Glance on Android 12+ and by a cell bitmap (color with
+ * transparency and corners baked in) on Android 11 and below; at [gap] = 0 cells are
+ * transparent (the shared [CellBackground] draws).
+ *
+ * The text is a native [android.widget.TextClock] that updates itself. The font reaches the
+ * home screen as a name the host resolves itself — the family of the file, or an alias of it
+ * that asks for the weight of the file — with the style bits beside it: a typeface would not
+ * survive the trip (see [CellFont]). The axes of a variable font go as a string as well, but
+ * the host drops them, so only the weight and the slant the platform expresses as style bits
+ * are rendered. Without a font the [WidgetSettings.textStyle] bits style the default font.
  */
 @Composable
 internal fun Cell(
