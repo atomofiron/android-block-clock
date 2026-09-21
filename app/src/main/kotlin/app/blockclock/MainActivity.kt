@@ -16,8 +16,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
@@ -30,7 +28,6 @@ import app.blockclock.model.ColorTarget
 import app.blockclock.model.WallpaperColors
 import app.blockclock.settings.SettingsScreen
 import app.blockclock.ui.LocalScreenCorners
-import app.blockclock.ui.insets.InsetsBackground
 import app.blockclock.ui.insets.ScreenCorners
 import app.blockclock.ui.theme.AppTheme
 import app.blockclock.update.UpdateService
@@ -78,7 +75,6 @@ class MainActivity : AppCompatActivity() {
             ) {
                 AppTheme {
                     SettingsScreen(store, wallpaperColors.value, isEnterAnimationCompleted.value)
-                    InsetsBackground(Modifier.alpha(0.5f))
                 }
             }
         }

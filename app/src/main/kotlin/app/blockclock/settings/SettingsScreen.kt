@@ -75,6 +75,7 @@ import app.blockclock.ui.ColorBox
 import app.blockclock.ui.ForwardIcon
 import app.blockclock.ui.GroupItem
 import app.blockclock.ui.SegmentedButton
+import app.blockclock.ui.insets.InsetsBackground
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
 import app.blockclock.ui.values.clickable
@@ -400,6 +401,7 @@ fun SettingsScreen(
             }
         }
     }
+    InsetsBackground(Modifier.alpha(0.5f))
     if (showLicenses) {
         LicensesScreen(onClose = { showLicenses = false })
     }
