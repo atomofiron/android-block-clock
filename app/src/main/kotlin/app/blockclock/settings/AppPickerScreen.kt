@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -38,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,6 +47,7 @@ import app.blockclock.ui.SearchField
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
 import app.blockclock.util.appIcon
+import app.blockclock.util.onClick
 import app.blockclock.util.toPainter
 import app.blockclock.widget.getInstalledApps
 import kotlinx.coroutines.Dispatchers
@@ -162,11 +160,7 @@ private fun AppList(
     ) {
         items(apps, key = UserApp::key) { app ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(ShapeDefaults.Medium)
-                    .clickable { onPick(app.toTarget()) }
-                    .padding(vertical = Padding.Half),
+                modifier = Modifier.onClick { onPick(app.toTarget()) },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(

@@ -2,17 +2,14 @@ package app.blockclock.licenses
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,11 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import app.blockclock.R
 import app.blockclock.model.License
 import app.blockclock.ui.BackButton
 import app.blockclock.ui.values.Padding
-import androidx.core.net.toUri
+import app.blockclock.util.onClick
 
 /**
  * A full-screen OSS licenses list: a tap on a text license opens its
@@ -69,15 +67,12 @@ fun LicensesScreen(onClose: () -> Unit) {
             ) {
                 itemsIndexed(licenses, key = { i, _ -> i }) { _, license ->
                     Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                when (license) {
-                                    is License.Text -> selected = license
-                                    is License.Url -> context.startActivity(Intent(Intent.ACTION_VIEW, license.url.toUri()))
-                                }
+                        modifier = Modifier.onClick {
+                            when (license) {
+                                is License.Text -> selected = license
+                                is License.Url -> context.startActivity(Intent(Intent.ACTION_VIEW, license.url.toUri()))
                             }
-                            .padding(vertical = Padding.Half),
+                        },
                         text = license.name,
                         style = MaterialTheme.typography.titleMedium,
                     )

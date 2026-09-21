@@ -49,6 +49,7 @@ import app.blockclock.ui.SearchField
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
 import app.blockclock.util.getSystemFonts
+import app.blockclock.util.onClick
 import app.blockclock.util.toFontFamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -175,11 +176,7 @@ private fun FontList(
         }
         items(fonts, key = { it.path }) { font ->
             Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(ShapeDefaults.Medium)
-                    .clickable { onPick(font) }
-                    .padding(vertical = Padding.Common),
+                modifier = Modifier.onClick { onPick(font) },
                 text = font.name,
                 fontFamily = font.toFontFamily(),
                 style = MaterialTheme.typography.bodyLarge,

@@ -5,12 +5,16 @@ import android.graphics.drawable.Drawable
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -29,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.DpSize
 import androidx.glance.GlanceModifier
 import androidx.glance.layout.size
+import app.blockclock.ui.values.Padding
 
 operator fun WindowInsets.plus(other: WindowInsets) = union(other)
 
@@ -42,6 +48,12 @@ inline operator fun WindowInsets.Companion.invoke(block: WindowInsets.Companion.
 fun Modifier.windowInsetsPadding(action: @Composable WindowInsets.Companion.() -> WindowInsets): Modifier {
     return windowInsetsPadding(WindowInsets.action())
 }
+
+@Composable
+fun Modifier.onClick(onClick: () -> Unit): Modifier = fillMaxWidth()
+    .clip(ShapeDefaults.Medium)
+    .clickable { onClick() }
+    .padding(vertical = Padding.Semi)
 
 @Composable
 fun animatedBackgroundColor(transparent: Boolean): Color {
