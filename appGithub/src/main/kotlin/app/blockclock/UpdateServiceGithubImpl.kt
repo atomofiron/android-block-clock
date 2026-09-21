@@ -98,7 +98,7 @@ class UpdateServiceGithubImpl(
 
     private fun List<GithubRelease>.findAsset(userAction: Boolean) = filter { release -> release.assets.any { it.name.endsWith(EXT_APK) } }
         .maxByOrNull { it.publishedAt }
-        ?.takeIf { it.isNewerThan(BuildConfig.UPDATE_THRESHOLD) || userAction && BuildConfig.DEBUG }
+        ?.takeIf { it.isNewerThan(BuildConfig.UPDATE_THRESHOLD) /*|| userAction && BuildConfig.DEBUG*/ }
         ?.assets
         ?.firstOrNull { it.name.endsWith(EXT_APK) }
 
