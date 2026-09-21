@@ -600,7 +600,7 @@ private fun FontField(
  */
 @RequiresApi(Q)
 @Composable
-private fun ColumnScope.FontVariations(
+private fun FontVariations(
     modifier: Modifier = Modifier,
     font: WidgetFont?,
     textStyle: TextStyle,

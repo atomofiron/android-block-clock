@@ -1,5 +1,6 @@
 package app.blockclock
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -96,7 +97,9 @@ class UpdateServiceGithubImpl(
         }
     }
 
-    private fun List<GithubRelease>.findAsset(userAction: Boolean) = filter { release -> release.assets.any { it.name.endsWith(EXT_APK) } }
+    private fun List<GithubRelease>.findAsset(
+        @Suppress("unused") userAction: Boolean,
+    ) = filter { release -> release.assets.any { it.name.endsWith(EXT_APK) } }
         .maxByOrNull { it.publishedAt }
         ?.takeIf { it.isNewerThan(BuildConfig.UPDATE_THRESHOLD) /*|| userAction && BuildConfig.DEBUG*/ }
         ?.assets
@@ -140,6 +143,7 @@ class UpdateServiceGithubImpl(
         takeIf { verified }
     }
 
+    @SuppressLint("RequestInstallPackagesPolicy")
     private fun installApk(path: String, action: String, stringId: String? = null, silently: Boolean = false): Rslt<Unit> = try {
         val stream = FileInputStream(path)
         val length = stream.available().toLong()
