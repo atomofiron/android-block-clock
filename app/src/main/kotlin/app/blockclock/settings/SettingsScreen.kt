@@ -405,7 +405,6 @@ fun SettingsScreen(
     }
     if (showFontPicker && Android.Q) {
         FontPickerScreen(
-            title = stringResource(R.string.font),
             onPick = { font ->
                 showFontPicker = false
                 apply(settings.copy(font = font))
@@ -413,17 +412,14 @@ fun SettingsScreen(
             onClose = { showFontPicker = false },
         )
     }
-    appPicker?.let { picker ->
+    appPicker?.let { target ->
         AppPickerScreen(
-            title = when (picker) {
-                AppPickerTarget.Clock -> R.string.clock_app
-                AppPickerTarget.Calendar -> R.string.calendar_app
-            }.let { stringResource(it) },
-            onPick = { target ->
+            target,
+            onPick = { app ->
                 appPicker = null
-                when (picker) {
-                    AppPickerTarget.Clock -> apply(settings.copy(clockApp = target))
-                    AppPickerTarget.Calendar -> apply(settings.copy(calendarApp = target))
+                when (target) {
+                    AppPickerTarget.Clock -> apply(settings.copy(clockApp = app))
+                    AppPickerTarget.Calendar -> apply(settings.copy(calendarApp = app))
                 }
             },
             onClose = { appPicker = null },
