@@ -85,7 +85,7 @@ import app.blockclock.update.UpdateStore
 import app.blockclock.update.model.UpdateState
 import app.blockclock.update.model.UpdateType
 import app.blockclock.util.Android
-import app.blockclock.util.PERCENT
+import app.blockclock.util.Percents
 import app.blockclock.util.animatedBackgroundColor
 import app.blockclock.util.familyStyles
 import app.blockclock.util.getSystemFonts
@@ -105,7 +105,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
-private const val PercentFactor = 100f
 private val TransparencyRange = 0f..1f
 private val RoundingRange = 0f..32f
 private val GapRange = 0f..16f
@@ -785,7 +784,7 @@ private fun TransparencySlider(
     Column(modifier) {
         SubTitle(
             title = stringResource(R.string.label_transparency),
-            value = "${(value * PercentFactor).toInt()} %",
+            value = "${(value * Percents).toInt()} %",
         )
         Slider(
             value = value,
@@ -869,7 +868,7 @@ private fun SliderPoint(
     Column(modifier) {
         SubTitle(
             title = label,
-            value = "${if (current >= PERCENT) "+" else ""}${(current - PERCENT).toInt()}%",
+            value = "${if (current >= Percents) "+" else ""}${(current - Percents).toInt()}%",
         )
         Slider(
             value = current,

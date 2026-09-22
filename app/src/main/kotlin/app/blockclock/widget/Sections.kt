@@ -43,7 +43,7 @@ import androidx.glance.layout.wrapContentSize
 import app.blockclock.R
 import app.blockclock.model.CellFont
 import app.blockclock.util.Android
-import app.blockclock.util.PERCENT
+import app.blockclock.util.Percents
 import app.blockclock.util.size
 import app.blockclock.util.toCellFont
 import kotlin.math.roundToInt
@@ -171,8 +171,8 @@ internal fun Cell(
         height -= gap / 2
     }
     val factor = when (part.time) {
-        true -> TEXT_HEIGHT_FACTOR * settings.timeFontPercent / PERCENT
-        false -> TEXT_HEIGHT_FACTOR * settings.dateFontPercent / PERCENT
+        true -> TEXT_HEIGHT_FACTOR * settings.timeFontPercent / Percents
+        false -> TEXT_HEIGHT_FACTOR * settings.dateFontPercent / Percents
     }
     val fontSize = (height.value * factor).sp
     val cellHeightPx = height.value * context.resources.displayMetrics.density

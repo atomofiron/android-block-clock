@@ -1,3 +1,3 @@
 package app.blockclock.util
 
-const val PERCENT = 100f
+const val Percents = 100f
