@@ -3,8 +3,10 @@ package app.blockclock.util
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -59,7 +61,8 @@ fun Modifier.onClick(onClick: () -> Unit): Modifier = fillMaxWidth()
 fun animatedBackgroundColor(transparent: Boolean): Color {
     val background = MaterialTheme.colorScheme.background
     var targetBackgroundColor by remember { mutableStateOf(background) }
-    val backgroundColor by animateColorAsState(targetBackgroundColor, animationSpec = spring(stiffness = Spring.StiffnessVeryLow))
+    val animationSpec: AnimationSpec<Color> = if (transparent) spring(stiffness = Spring.StiffnessVeryLow) else tween(0)
+    val backgroundColor by animateColorAsState(targetBackgroundColor, animationSpec = animationSpec)
     LaunchedEffect(background, transparent) {
         targetBackgroundColor = if (transparent) Color.Transparent else background
     }

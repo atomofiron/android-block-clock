@@ -12,7 +12,7 @@ enum class ClockPart(
     HOURS("HH", "hh"),
     MINUTES("mm"),
     WEEKDAY("EEEE"),
-    AM_PM_WEEKDAY("a   EEEE"),
+    AM_PM_WEEKDAY("a  EEEE"),
     DAY("d"),
     MONTH("M"),
     YEAR("yyyy"),

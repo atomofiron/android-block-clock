@@ -38,13 +38,17 @@ import app.blockclock.util.contains
 import app.blockclock.util.get
 import app.blockclock.widget.WidgetSettingsStore
 import app.blockclock.widget.updateWidgets
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : AppCompatActivity() {
 
     private val isEnterAnimationCompleted = mutableStateOf(false)
     private val wallpaperColors = mutableStateOf<WallpaperColors?>(null)
+    private var onStartJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,14 +84,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        onStartJob?.cancel()
+        onStartJob = lifecycleScope.launch {
+            delay(1000.milliseconds)
+            isEnterAnimationCompleted.value = true
+        }
+    }
+
     override fun onEnterAnimationComplete() {
         super.onEnterAnimationComplete()
         isEnterAnimationCompleted.value = true
+        onStartJob?.cancel()
     }
 
     override fun onStop() {
         super.onStop()
         isEnterAnimationCompleted.value = false
+        onStartJob?.cancel()
     }
 
     override fun onDestroy() {
