@@ -62,7 +62,7 @@ fun WidgetFont.toFontFamily(): ComposeFontFamily = ComposeFontFamily(
 
 /**
  * The font as the widget passes it to the home screen: the family name the host resolves
- * itself, the style bits and the variable font axes; null for a font the system does not name.
+ * itself and the style bits; null for a font the system does not name.
  *
  * A `Typeface` cannot be passed to the launcher process ([CellFont]), so the font travels as a
  * name the host builds itself, see [FontConfig]. A file the system does not name has none to
@@ -72,11 +72,10 @@ fun WidgetFont.toFontFamily(): ComposeFontFamily = ComposeFontFamily(
  *
  * The weight of the file goes to the alias the configuration declares for it when there is one
  * ([FontConfig.alias]), otherwise to the bold bit: the host applies the weight of the alias when
- * it builds the font, the bold bit picks a heavier face of the family. The axes of the file are passed as well, but the host
- * drops them: `TextView.setFontVariationSettings` keeps the value in a `Typeface` it builds
- * itself, and the family arrives as a `TypefaceSpan`, which calls `setTypeface` right after and
- * clears it ([android.graphics.Paint.setFontVariationSettings] documents that). The slant is
- * the one axis a style bit expresses, see [slant].
+ * it builds the font, the bold bit picks a heavier face of the family. The slant is the one axis
+ * a style bit expresses, see [slant]: the rest of the axes have no channel at all, the family
+ * travels as a `TypefaceSpan`, which builds its own typeface and clears the variation instance
+ * the axes would have built.
  */
 @RequiresApi(Q)
 fun WidgetFont.toCellFont(): CellFont? {
@@ -87,10 +86,6 @@ fun WidgetFont.toCellFont(): CellFont? {
     // bold bit alone, so the faces of a family that declares several weights look the same.
     val alias = FontConfig.alias(family, weight)
     val name = alias ?: family
-    val axes = when {
-        alias == null -> variations + (FontAxis.WEIGHT to weight.toFloat())
-        else -> variations
-    }
     return CellFont(
         family = name,
         style = italic() or slant() or when {
@@ -98,7 +93,6 @@ fun WidgetFont.toCellFont(): CellFont? {
             weight >= BOLD_WEIGHT -> Typeface.BOLD
             else -> Typeface.NORMAL
         },
-        variationSettings = axes.takeIf { it.isNotEmpty() && Android.V }?.toSettings(),
     )
 }
 
@@ -116,9 +110,6 @@ private fun WidgetFont.italic(): Int = when (font.style.slant) {
     FontStyle.FONT_SLANT_UPRIGHT -> Typeface.NORMAL
     else -> Typeface.ITALIC
 }
-
-/** The variable font axes in the `TextView.setFontVariationSettings` syntax. */
-private fun Map<String, Float>.toSettings(): String = entries.joinToString(", ") { "'${it.key}' ${it.value.roundToInt()}" }
 
 /**
  * The italic bit of the slant axes. The host gets a slant as the bit and as nothing finer: the

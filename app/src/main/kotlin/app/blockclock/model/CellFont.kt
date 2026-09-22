@@ -5,7 +5,7 @@ import androidx.annotation.RequiresApi
 
 /**
  * The font of a widget cell as the home screen sees it: the family name the host resolves
- * itself, the style bits and the variable font axes.
+ * itself and the style bits.
  *
  * The font travels as [family], because a `Typeface` does not survive the transfer to the
  * launcher process: `TypefaceSpan` writes it into `android.graphics.LeakyTypefaceStorage`, a
@@ -21,6 +21,4 @@ data class CellFont(
     val family: String,
     /** The `Typeface.BOLD`/`Typeface.ITALIC` bits; a family alias carries the weight itself. */
     val style: Int,
-    /** The variable font axes in the `TextView.setFontVariationSettings` syntax. */
-    val variationSettings: String?,
 )

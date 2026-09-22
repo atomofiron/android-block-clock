@@ -271,7 +271,6 @@ private fun textRemoteViews(
         shift > 0 -> views.setViewPadding(R.id.clock_text, 0, shift, 0, 0)
         shift < 0 -> views.setViewPadding(R.id.clock_text, 0, 0, 0, -shift)
     }
-    font?.variationSettings?.let { views.setString(R.id.clock_text, "setFontVariationSettings", it) }
     views.setCharSequence(R.id.clock_text, "setFormat24Hour", styledClockFormat(part.format24, font, textStyle))
     views.setCharSequence(R.id.clock_text, "setFormat12Hour", styledClockFormat(part.format12, font, textStyle))
     return views
