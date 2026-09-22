@@ -121,18 +121,18 @@ internal fun DateSection(
 }
 
 /**
- * A single cell with rounded corners and padding per the [part] gap flags.
+ * A single cell with rounded corners and padding per the gap flags of its [Part].
  *
- * The size is [part.calcSize]: the [cellSize] cell times the [Part.weight] plus the gaps —
- * [gap]/2 on each flagged side, and a part wider or taller than a single cell gets
- * [Part.gapInside] × [gap] more. The padding takes those halves back from the text, so the
- * text height is the cell height minus the halves of the top and the bottom flags, and the
- * font is a percentage of it ([WidgetSettings.timeFontPercent] for time parts ([Part.time]),
- * [WidgetSettings.dateFontPercent] for date parts).
+ * The size is [Part.calcSize]: the [cellSize] cell times the [Part.weight] plus the gaps —
+ * [WidgetSettings.gapDp]/2 on each flagged side, and a part wider or taller than a single
+ * cell gets [Part.gapInside] × [WidgetSettings.gapDp] more. The padding takes those halves
+ * back from the text, so the text height is the cell height minus the halves of the top and
+ * the bottom flags, and the font is a percentage of it ([WidgetSettings.timeFontPercent] for
+ * time parts ([Part.time]), [WidgetSettings.dateFontPercent] for date parts).
  *
  * The background is drawn by Glance on Android 12+ and by a cell bitmap (color with
- * transparency and corners baked in) on Android 11 and below; at [gap] = 0 cells are
- * transparent (the shared [CellBackground] draws).
+ * transparency and corners baked in) on Android 11 and below; at a zero
+ * [WidgetSettings.gapDp] the cells are transparent (the shared [CellBackground] draws).
  *
  * The text is a native [android.widget.TextClock] that updates itself. The font reaches the
  * home screen as a name the host resolves itself — the family of the file, or an alias of it
