@@ -348,7 +348,7 @@ fun SettingsScreen(
                             modifier = Modifier.padding(horizontal = Padding.Common),
                             horizontalArrangement = Arrangement.spacedBy(Padding.Half),
                         ) {
-                            SettingSwitch(
+                            if (!store.systemDayFirst) SettingSwitch(
                                 modifier = Modifier.weight(1f),
                                 label = stringResource(R.string.option_month_first),
                                 checked = !settings.dayFirst,

@@ -42,7 +42,7 @@ class WidgetSettingsStore(context: Context) {
     }
 
     private val sp = context.getSharedPreferences("widget_settings", Context.MODE_PRIVATE)
-    private val systemDayFirst by unsafeLazy {
+    val systemDayFirst by unsafeLazy {
         DateFormat.getDateFormatOrder(context).run { indexOf('d') < indexOf('M') }
     }
     /** True when the system shows the time on the 12-hour clock, so a marker makes sense. */
