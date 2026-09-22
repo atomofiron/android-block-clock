@@ -27,6 +27,7 @@
     <string name="label_gap">Spacing</string>
     <string name="label_time_size">Time size</string>
     <string name="label_date_size">Date size</string>
+    <string name="label_width">Width</string>
     <string name="option_month_first">Month first</string>
     <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Done</string>

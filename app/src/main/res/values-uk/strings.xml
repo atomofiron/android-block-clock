@@ -24,6 +24,7 @@
     <string name="label_gap">Відступи</string>
     <string name="label_time_size">Розмір часу</string>
     <string name="label_date_size">Розмір дати</string>
+    <string name="label_width">Ширина</string>
     <string name="option_month_first">Спочатку місяць</string>
     <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Готово</string>

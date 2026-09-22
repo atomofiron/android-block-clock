@@ -137,9 +137,12 @@ internal fun DateSection(
  * The text is a native [android.widget.TextClock] that updates itself. The font reaches the
  * home screen as a name the host resolves itself — the family of the file, or an alias of it
  * that asks for the weight of the file — with the style bits beside it: a typeface would not
- * survive the trip (see [CellFont]). The axes of a variable font go as a string as well, but
- * the host drops them, so only the weight and the slant the platform expresses as style bits
- * are rendered. Without a font the [WidgetSettings.textStyle] bits style the default font.
+ * survive the trip (see [CellFont]). The axes of a variable font do not reach the drawing: the
+ * family arrives as a `TypefaceSpan`, which builds its own typeface and wipes the variation
+ * instance the axes had built. So only the weight and the slant the platform expresses as style
+ * bits or a family alias are rendered. Without a font the [WidgetSettings.textStyle] bits style
+ * the default font. The width of the text is not one of the axes: the host gets it as a plain
+ * scale of the text (a percentage of [WidgetSettings.textScale]).
  */
 @Composable
 internal fun Cell(
@@ -185,7 +188,7 @@ internal fun Cell(
     val textStyle = settings.textStyle.bits
     Box(modifier = modifier) {
         if (gap <= 0.dp) {
-            CellRemoteViews(textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, font, textStyle))
+            CellRemoteViews(textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, settings.textScale, font, textStyle))
         } else if (SDK_INT >= AndroidS) {
             Box(
                 modifier = GlanceModifier
@@ -194,13 +197,13 @@ internal fun Cell(
                     .cornerRadius(cornerRadiusDp.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                CellRemoteViews(textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, font, textStyle))
+                CellRemoteViews(textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, settings.textScale, font, textStyle))
             }
         } else {
             val density = context.resources.displayMetrics.density
             val cell = RemoteViews(context.packageName, R.layout.cell_bg)
             cell.setImageViewBitmap(R.id.cell_bg, cellBitmap(size, rectColor, cornerRadiusDp, density))
-            cell.addView(R.id.cell_root, textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, font, textStyle))
+            cell.addView(R.id.cell_root, textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, settings.textScale, font, textStyle))
             CellRemoteViews(cell)
         }
     }
@@ -254,6 +257,7 @@ private fun textRemoteViews(
     textColor: Color,
     fontSize: TextUnit,
     cellHeightPx: Float,
+    textScale: Float,
     font: CellFont?,
     textStyle: Int,
 ): RemoteViews {
@@ -271,6 +275,10 @@ private fun textRemoteViews(
         shift > 0 -> views.setViewPadding(R.id.clock_text, 0, shift, 0, 0)
         shift < 0 -> views.setViewPadding(R.id.clock_text, 0, 0, 0, -shift)
     }
+    // The width of the text: a plain scale of it, the one font property a remote setter delivers
+    // ([android.widget.TextView.setTextScaleX]), so it is not the axis of a variable font and
+    // works for a static family as well. A hundred percent is what the layout already has.
+    views.setFloat(R.id.clock_text, "setTextScaleX", textScale)
     views.setCharSequence(R.id.clock_text, "setFormat24Hour", styledClockFormat(part.format24, font, textStyle))
     views.setCharSequence(R.id.clock_text, "setFormat12Hour", styledClockFormat(part.format12, font, textStyle))
     return views

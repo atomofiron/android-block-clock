@@ -28,6 +28,7 @@ class WidgetSettingsStore(context: Context) {
         private const val KEY_CORNER_RADIUS_DP = "corner_radius_dp"
         private const val KEY_TIME_FONT_PERCENT = "time_font_percent"
         private const val KEY_DATE_FONT_PERCENT = "date_font_percent"
+        private const val KEY_TEXT_SCALE_PERCENT = "text_scale_percent"
         private const val KEY_CLOCK_APP = "clock_app"
         private const val KEY_CALENDAR_APP = "calendar_app"
         private const val KEY_RECT_SOURCE = "rect_source"
@@ -56,6 +57,7 @@ class WidgetSettingsStore(context: Context) {
         cornerRadiusDp = sp.getInt(KEY_CORNER_RADIUS_DP, Defaults.cornerRadiusDp),
         timeFontPercent = sp.getInt(KEY_TIME_FONT_PERCENT, Defaults.timeFontPercent),
         dateFontPercent = sp.getInt(KEY_DATE_FONT_PERCENT, Defaults.dateFontPercent),
+        textScale = sp.getFloat(KEY_TEXT_SCALE_PERCENT, Defaults.textScale),
         dayFirst = sp.getBoolean(KEY_DAY_FIRST, systemDayFirst),
         amPm = systemAmPm && sp.getBoolean(KEY_AM_PM, systemAmPm),
         clockApp = sp.getString(KEY_CLOCK_APP, null).toAppTarget(),
@@ -88,6 +90,7 @@ class WidgetSettingsStore(context: Context) {
             putInt(KEY_CORNER_RADIUS_DP, settings.cornerRadiusDp)
             putInt(KEY_TIME_FONT_PERCENT, settings.timeFontPercent)
             putInt(KEY_DATE_FONT_PERCENT, settings.dateFontPercent)
+            putFloat(KEY_TEXT_SCALE_PERCENT, settings.textScale)
 
             when (settings.dayFirst) {
                 systemDayFirst -> remove(KEY_DAY_FIRST)

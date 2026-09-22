@@ -22,6 +22,8 @@ data class WidgetSettings(
     val timeFontPercent: Int = 116,
     /** The height of the date text as a percentage of the cell height. */
     val dateFontPercent: Int = 100,
+    /** The horizontal scale of the text as a percentage; the host applies it to the text itself. */
+    val textScale: Float = 1f,
     /** The app opened by the clock tap; null = the default clock app. */
     val clockApp: TargetApp? = null,
     /** The app opened by the date tap; null = the default calendar app. */

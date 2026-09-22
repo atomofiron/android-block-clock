@@ -112,6 +112,9 @@ private val RoundingRange = 0f..32f
 private val GapRange = 0f..16f
 private val FontSizeRange = 68f..132f
 
+/** The steps the size sliders offer, the width slider being twice as fine. */
+private const val DEFAULT_FONT_SIZE_STEP = 8
+
 private const val GITHUB_URL = "https://github.com/atomofiron/android-block-clock"
 private const val ShowPreviewFactory = false
 
@@ -291,6 +294,14 @@ fun SettingsScreen(
                                 onChangeFinished = { apply(settings.copy(dateFontPercent = it)) },
                             )
                         }
+                        SliderPoint(
+                            modifier = Modifier.padding(horizontal = Padding.Common),
+                            label = stringResource(R.string.label_width),
+                            percent = (previewSettings.textScale * Percents).toInt(),
+                            step = 4,
+                            onChange = { previewSettings = previewSettings.copy(textScale = it / Percents) },
+                            onChangeFinished = { apply(settings.copy(textScale = it / Percents)) },
+                        )
                         when {
                             Android.Q -> {
                                 FontField(
@@ -876,6 +887,7 @@ private fun SliderPoint(
     modifier: Modifier = Modifier,
     label: String,
     percent: Int,
+    step: Int = DEFAULT_FONT_SIZE_STEP,
     onChange: (Int) -> Unit,
     onChangeFinished: (Int) -> Unit,
 ) {
@@ -888,7 +900,7 @@ private fun SliderPoint(
         Slider(
             value = current,
             valueRange = FontSizeRange,
-            steps = 7,
+            steps = FontSizeRange.steps() / step,
             onValueChange = {
                 current = it
                 onChange(it.roundToInt())

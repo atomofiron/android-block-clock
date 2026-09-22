@@ -24,6 +24,7 @@
     <string name="label_gap">ინტერვალები</string>
     <string name="label_time_size">დროის ზომა</string>
     <string name="label_date_size">თარიღის ზომა</string>
+    <string name="label_width">სიგანე</string>
     <string name="option_month_first">ჯერ თვე</string>
     <string name="option_am_pm">AM/PM</string>
     <string name="button_done">მზადაა</string>
