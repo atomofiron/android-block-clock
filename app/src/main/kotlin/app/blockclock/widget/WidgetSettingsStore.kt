@@ -22,6 +22,7 @@ class WidgetSettingsStore(context: Context) {
         private const val KEY_RECT_TRANSPARENCY = "rect_transparency"
         private const val KEY_TEXT_COLOR = "text_color"
         private const val KEY_DAY_FIRST = "day_first"
+        private const val KEY_AM_PM = "am_pm"
         private const val KEY_GAP_DP = "gap_dp"
         private const val KEY_CORNER_RADIUS_DP = "corner_radius_dp"
         private const val KEY_CLOCK_APP = "clock_app"
@@ -41,6 +42,8 @@ class WidgetSettingsStore(context: Context) {
     private val systemDayFirst by lazy(LazyThreadSafetyMode.NONE) {
         DateFormat.getDateFormatOrder(context).run { indexOf('d') < indexOf('M') }
     }
+    /** True when the system shows the time on the 12-hour clock, so a marker makes sense. */
+    val systemAmPm by lazy(LazyThreadSafetyMode.NONE) { !DateFormat.is24HourFormat(context) }
 
     fun read() = WidgetSettings(
         background = Color(sp.getInt(KEY_RECT_COLOR, Defaults.background.toArgb())),
@@ -49,6 +52,7 @@ class WidgetSettingsStore(context: Context) {
         gapDp = sp.getInt(KEY_GAP_DP, Defaults.gapDp),
         cornerRadiusDp = sp.getInt(KEY_CORNER_RADIUS_DP, Defaults.cornerRadiusDp),
         dayFirst = sp.getBoolean(KEY_DAY_FIRST, systemDayFirst),
+        amPm = systemAmPm && sp.getBoolean(KEY_AM_PM, systemAmPm),
         clockApp = sp.getString(KEY_CLOCK_APP, null).toAppTarget(),
         calendarApp = sp.getString(KEY_CALENDAR_APP, null).toAppTarget(),
         font = when {
@@ -81,6 +85,10 @@ class WidgetSettingsStore(context: Context) {
             when (settings.dayFirst) {
                 systemDayFirst -> remove(KEY_DAY_FIRST)
                 else -> putBoolean(KEY_DAY_FIRST, settings.dayFirst)
+            }
+            when (settings.amPm) {
+                systemAmPm -> remove(KEY_AM_PM)
+                else -> putBoolean(KEY_AM_PM, settings.amPm)
             }
             when (val target = settings.clockApp) {
                 null -> remove(KEY_CLOCK_APP)

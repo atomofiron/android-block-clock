@@ -80,8 +80,8 @@ internal fun TimeSection(
     onClick: Action,
 ) {
     Row(modifier = modifier.wrapContentSize().clickable(onClick)) {
-        Cell(ClockTextPart.HOURS, structure.hours, cellSize, settings)
-        Cell(ClockTextPart.MINUTES, structure.minutes, cellSize, settings)
+        Cell(ClockPart.HOURS, structure.hours, cellSize, settings)
+        Cell(ClockPart.MINUTES, structure.minutes, cellSize, settings)
     }
 }
 
@@ -94,7 +94,11 @@ internal fun WeekdaySection(
     onClick: Action,
 ) {
     Row(modifier = modifier.wrapContentSize().clickable(onClick)) {
-        Cell(ClockTextPart.WEEKDAY, part, cellSize, settings)
+        val clockPart = when {
+            settings.amPm -> ClockPart.AM_PM_WEEKDAY
+            else -> ClockPart.WEEKDAY
+        }
+        Cell(clockPart, part, cellSize, settings)
     }
 }
 
@@ -106,13 +110,13 @@ internal fun DateSection(
     onClick: Action,
 ) {
     val (firstPart, secondPart) = when {
-        settings.dayFirst -> ClockTextPart.DAY to ClockTextPart.MONTH
-        else -> ClockTextPart.MONTH to ClockTextPart.DAY
+        settings.dayFirst -> ClockPart.DAY to ClockPart.MONTH
+        else -> ClockPart.MONTH to ClockPart.DAY
     }
     Row(modifier = GlanceModifier.wrapContentSize().clickable(onClick)) {
         Cell(firstPart, structure.first, cellSize, settings)
         Cell(secondPart, structure.second, cellSize, settings)
-        Cell(ClockTextPart.YEAR, structure.year, cellSize, settings)
+        Cell(ClockPart.YEAR, structure.year, cellSize, settings)
     }
 }
 
@@ -138,7 +142,7 @@ internal fun DateSection(
  */
 @Composable
 internal fun Cell(
-    layoutPart: ClockTextPart,
+    clockPart: ClockPart,
     part: Part,
     cellSize: DpSize,
     settings: WidgetSettings,
@@ -180,7 +184,7 @@ internal fun Cell(
     val textStyle = settings.textStyle.bits
     Box(modifier = modifier) {
         if (gap <= 0.dp) {
-            CellRemoteViews(textRemoteViews(context, layoutPart, textColor, fontSize, cellHeightPx, font, textStyle))
+            CellRemoteViews(textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, font, textStyle))
         } else if (SDK_INT >= AndroidS) {
             Box(
                 modifier = GlanceModifier
@@ -189,13 +193,13 @@ internal fun Cell(
                     .cornerRadius(cornerRadiusDp.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                CellRemoteViews(textRemoteViews(context, layoutPart, textColor, fontSize, cellHeightPx, font, textStyle))
+                CellRemoteViews(textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, font, textStyle))
             }
         } else {
             val density = context.resources.displayMetrics.density
             val cell = RemoteViews(context.packageName, R.layout.cell_bg)
             cell.setImageViewBitmap(R.id.cell_bg, cellBitmap(size, rectColor, cornerRadiusDp, density))
-            cell.addView(R.id.cell_root, textRemoteViews(context, layoutPart, textColor, fontSize, cellHeightPx, font, textStyle))
+            cell.addView(R.id.cell_root, textRemoteViews(context, clockPart, textColor, fontSize, cellHeightPx, font, textStyle))
             CellRemoteViews(cell)
         }
     }
@@ -245,7 +249,7 @@ internal fun CellBackground(
 @Composable
 private fun textRemoteViews(
     context: Context,
-    part: ClockTextPart,
+    part: ClockPart,
     textColor: Color,
     fontSize: TextUnit,
     cellHeightPx: Float,
@@ -328,9 +332,9 @@ private fun CellFont?.textShift(
 }
 
 /** The sample of the cell text: the digits of a font share one ink box. */
-private fun ClockTextPart.sample(): String = when (this) {
-    ClockTextPart.HOURS, ClockTextPart.MINUTES, ClockTextPart.DAY, ClockTextPart.YEAR, ClockTextPart.MONTH -> "0123456789"
-    ClockTextPart.WEEKDAY -> "H"
+private fun ClockPart.sample(): String = when (this) {
+    ClockPart.HOURS, ClockPart.MINUTES, ClockPart.DAY, ClockPart.YEAR, ClockPart.MONTH -> "0123456789"
+    ClockPart.WEEKDAY, ClockPart.AM_PM_WEEKDAY -> "H"
 }
 
 private fun cellBitmap(

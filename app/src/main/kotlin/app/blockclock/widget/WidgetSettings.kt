@@ -14,6 +14,8 @@ data class WidgetSettings(
     val transparency: Float = 0.3f,
     val text: Color = Color.Black,
     val dayFirst: Boolean = true,
+    /** True adds the AM/PM marker to the weekday cell; the clock format follows the system. */
+    val amPm: Boolean = false,
     val gapDp: Int = 6,
     val cornerRadiusDp: Int = 12,
     /** The app opened by the clock tap; null = the default clock app. */
