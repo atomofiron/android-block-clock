@@ -26,6 +26,8 @@ class WidgetSettingsStore(context: Context) {
         private const val KEY_AM_PM = "am_pm"
         private const val KEY_GAP_DP = "gap_dp"
         private const val KEY_CORNER_RADIUS_DP = "corner_radius_dp"
+        private const val KEY_TIME_FONT_PERCENT = "time_font_percent"
+        private const val KEY_DATE_FONT_PERCENT = "date_font_percent"
         private const val KEY_CLOCK_APP = "clock_app"
         private const val KEY_CALENDAR_APP = "calendar_app"
         private const val KEY_RECT_SOURCE = "rect_source"
@@ -52,6 +54,8 @@ class WidgetSettingsStore(context: Context) {
         text = Color(sp.getInt(KEY_TEXT_COLOR, Defaults.text.toArgb())),
         gapDp = sp.getInt(KEY_GAP_DP, Defaults.gapDp),
         cornerRadiusDp = sp.getInt(KEY_CORNER_RADIUS_DP, Defaults.cornerRadiusDp),
+        timeFontPercent = sp.getInt(KEY_TIME_FONT_PERCENT, Defaults.timeFontPercent),
+        dateFontPercent = sp.getInt(KEY_DATE_FONT_PERCENT, Defaults.dateFontPercent),
         dayFirst = sp.getBoolean(KEY_DAY_FIRST, systemDayFirst),
         amPm = systemAmPm && sp.getBoolean(KEY_AM_PM, systemAmPm),
         clockApp = sp.getString(KEY_CLOCK_APP, null).toAppTarget(),
@@ -82,6 +86,8 @@ class WidgetSettingsStore(context: Context) {
             putInt(KEY_TEXT_COLOR, settings.text.toArgb())
             putInt(KEY_GAP_DP, settings.gapDp)
             putInt(KEY_CORNER_RADIUS_DP, settings.cornerRadiusDp)
+            putInt(KEY_TIME_FONT_PERCENT, settings.timeFontPercent)
+            putInt(KEY_DATE_FONT_PERCENT, settings.dateFontPercent)
 
             when (settings.dayFirst) {
                 systemDayFirst -> remove(KEY_DAY_FIRST)
@@ -99,13 +105,14 @@ class WidgetSettingsStore(context: Context) {
                 null -> remove(KEY_CALENDAR_APP)
                 else -> putString(KEY_CALENDAR_APP, target.encode())
             }
-            when (val font = settings.font) {
-                null -> {
+            when {
+                settings.font == null -> {
                     remove(KEY_FONT_PATH)
                     remove(KEY_FONT_TTC_INDEX)
                     remove(KEY_FONT_VARIATIONS)
                 }
-                else -> {
+                Android.Q -> {
+                    val font = settings.font
                     putString(KEY_FONT_PATH, font.path)
                     putInt(KEY_FONT_TTC_INDEX, font.ttcIndex)
                     when (font.variations.isEmpty()) {

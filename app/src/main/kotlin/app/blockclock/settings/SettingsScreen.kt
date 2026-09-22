@@ -85,6 +85,7 @@ import app.blockclock.update.UpdateStore
 import app.blockclock.update.model.UpdateState
 import app.blockclock.update.model.UpdateType
 import app.blockclock.util.Android
+import app.blockclock.util.PERCENT
 import app.blockclock.util.animatedBackgroundColor
 import app.blockclock.util.familyStyles
 import app.blockclock.util.getSystemFonts
@@ -108,6 +109,7 @@ private const val PercentFactor = 100f
 private val TransparencyRange = 0f..1f
 private val RoundingRange = 0f..32f
 private val GapRange = 0f..16f
+private val FontSizeRange = 68f..132f
 
 private const val GITHUB_URL = "https://github.com/atomofiron/android-block-clock"
 private const val ShowPreviewFactory = false
@@ -269,6 +271,25 @@ fun SettingsScreen(
                 }
                 item {
                     SectionCard(stringResource(R.string.font)) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = Padding.Common),
+                            horizontalArrangement = Arrangement.spacedBy(Padding.Common),
+                        ) {
+                            SliderPoint(
+                                modifier = Modifier.weight(1f),
+                                label = stringResource(R.string.label_time_size),
+                                percent = previewSettings.timeFontPercent,
+                                onChange = { previewSettings = previewSettings.copy(timeFontPercent = it) },
+                                onChangeFinished = { apply(settings.copy(timeFontPercent = it)) },
+                            )
+                            SliderPoint(
+                                modifier = Modifier.weight(1f),
+                                label = stringResource(R.string.label_date_size),
+                                percent = previewSettings.dateFontPercent,
+                                onChange = { previewSettings = previewSettings.copy(dateFontPercent = it) },
+                                onChangeFinished = { apply(settings.copy(dateFontPercent = it)) },
+                            )
+                        }
                         when {
                             Android.Q -> {
                                 FontField(
@@ -533,7 +554,7 @@ private fun SectionCard(
 }
 
 @Composable
-private fun SubTitle(title: String, value: String) {
+private fun SubTitle(title: String, value: String? = null) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = Padding.Half, bottom = Padding.Mini),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -542,7 +563,7 @@ private fun SubTitle(title: String, value: String) {
             text = title,
             style = MaterialTheme.typography.labelLarge,
         )
-        Text(
+        if (value != null) Text(
             text = value,
             style = MaterialTheme.typography.labelLarge,
             color = colorScheme.onSurfaceVariant,
@@ -835,6 +856,34 @@ private fun RoundingSlider(
 }
 
 /** A settings row with a Switch: the whole row is clickable. */
+/** The slider of the text size: the percentage of the cell height the font takes. */
+@Composable
+private fun SliderPoint(
+    modifier: Modifier = Modifier,
+    label: String,
+    percent: Int,
+    onChange: (Int) -> Unit,
+    onChangeFinished: (Int) -> Unit,
+) {
+    var current by remember { mutableFloatStateOf(percent.toFloat().coerceIn(FontSizeRange)) }
+    Column(modifier) {
+        SubTitle(
+            title = label,
+            value = "${if (current >= PERCENT) "+" else ""}${(current - PERCENT).toInt()}%",
+        )
+        Slider(
+            value = current,
+            valueRange = FontSizeRange,
+            steps = 7,
+            onValueChange = {
+                current = it
+                onChange(it.roundToInt())
+            },
+            onValueChangeFinished = { onChangeFinished(current.roundToInt()) },
+        )
+    }
+}
+
 @Composable
 private fun SettingSwitch(
     modifier: Modifier = Modifier,

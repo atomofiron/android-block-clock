@@ -43,13 +43,13 @@ import androidx.glance.layout.wrapContentSize
 import app.blockclock.R
 import app.blockclock.model.CellFont
 import app.blockclock.util.Android
+import app.blockclock.util.PERCENT
 import app.blockclock.util.size
 import app.blockclock.util.toCellFont
 import kotlin.math.roundToInt
 import android.os.Build.VERSION_CODES.S as AndroidS
 
-private const val TIME_TEXT_HEIGHT_FACTOR = 0.7f
-private const val DATE_TEXT_HEIGHT_FACTOR = 0.6f
+private const val TEXT_HEIGHT_FACTOR = 0.6f
 
 /**
  * Reactively loads the settings: while the widget composition is alive it
@@ -127,7 +127,8 @@ internal fun DateSection(
  * [gap]/2 on each flagged side, and a part wider or taller than a single cell gets
  * [Part.gapInside] × [gap] more. The padding takes those halves back from the text, so the
  * text height is the cell height minus the halves of the top and the bottom flags, and the
- * font is a fraction of it: 70% for time parts ([Part.time]), 60% for date parts.
+ * font is a percentage of it ([WidgetSettings.timeFontPercent] for time parts ([Part.time]),
+ * [WidgetSettings.dateFontPercent] for date parts).
  *
  * The background is drawn by Glance on Android 12+ and by a cell bitmap (color with
  * transparency and corners baked in) on Android 11 and below; at [gap] = 0 cells are
@@ -170,8 +171,8 @@ internal fun Cell(
         height -= gap / 2
     }
     val factor = when (part.time) {
-        true -> TIME_TEXT_HEIGHT_FACTOR
-        false -> DATE_TEXT_HEIGHT_FACTOR
+        true -> TEXT_HEIGHT_FACTOR * settings.timeFontPercent / PERCENT
+        false -> TEXT_HEIGHT_FACTOR * settings.dateFontPercent / PERCENT
     }
     val fontSize = (height.value * factor).sp
     val cellHeightPx = height.value * context.resources.displayMetrics.density

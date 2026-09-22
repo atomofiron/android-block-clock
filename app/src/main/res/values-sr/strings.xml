@@ -19,6 +19,8 @@
     <string name="label_transparency">Провидно</string>
     <string name="label_corner_radius">Заобљавање</string>
     <string name="label_gap">Размаци</string>
+    <string name="label_time_size">Величина времена</string>
+    <string name="label_date_size">Величина датума</string>
     <string name="option_month_first">Прво месец</string>
     <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Готово</string>

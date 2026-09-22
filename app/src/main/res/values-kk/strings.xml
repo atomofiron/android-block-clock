@@ -19,6 +19,8 @@
     <string name="label_transparency">Мөлдірлік</string>
     <string name="label_corner_radius">Дөңгелектеу</string>
     <string name="label_gap">Аралықтар</string>
+    <string name="label_time_size">Уақыт өлшемі</string>
+    <string name="label_date_size">Күн өлшемі</string>
     <string name="option_month_first">Алдымен ай</string>
     <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Дайын</string>
