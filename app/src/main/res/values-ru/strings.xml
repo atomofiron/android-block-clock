@@ -12,7 +12,7 @@
     <string name="shape">Форма</string>
     <string name="font">Шрифт</string>
     <string name="font_default">По умолчанию</string>
-    <string name="font_axes_note">Оси могут работать не полностью: виджет рисует только значения, объявленные системой</string>
+    <string name="font_note">Может не работать, а настройки могут работать не полноценно</string>
     <string name="style_normal">Обычный</string>
     <string name="style_bold">Полужирный</string>
     <string name="style_italic">Курсив</string>
@@ -20,6 +20,7 @@
     <string name="label_corner_radius">Закругление</string>
     <string name="label_gap">Отступы</string>
     <string name="option_month_first">Сначала месяц</string>
+    <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Готово</string>
     <string name="button_cancel">Отмена</string>
     <string name="button_close">Закрыть</string>

@@ -12,7 +12,7 @@
     <string name="shape">Облик</string>
     <string name="font">Фонт</string>
     <string name="font_default">Подразумевано</string>
-    <string name="font_axes_note">Осе могу радити непотпуно: виџет исцртава само вредности које систем објављује</string>
+    <string name="font_note">Можда не ради, а подешавања могу радити непотпуно</string>
     <string name="style_normal">Обично</string>
     <string name="style_bold">Подебљано</string>
     <string name="style_italic">Курзив</string>
@@ -20,6 +20,7 @@
     <string name="label_corner_radius">Заобљавање</string>
     <string name="label_gap">Размаци</string>
     <string name="option_month_first">Прво месец</string>
+    <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Готово</string>
     <string name="button_cancel">Откажи</string>
     <string name="button_close">Затвори</string>

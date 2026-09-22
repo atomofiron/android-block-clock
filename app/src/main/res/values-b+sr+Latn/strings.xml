@@ -12,7 +12,7 @@
     <string name="shape">Oblik</string>
     <string name="font">Font</string>
     <string name="font_default">Podrazumevano</string>
-    <string name="font_axes_note">Ose mogu raditi nepotpuno: vidžet iscrtava samo vrednosti koje sistem objavljuje</string>
+    <string name="font_note">Možda ne radi, a podešavanja mogu raditi nepotpuno</string>
     <string name="style_normal">Obično</string>
     <string name="style_bold">Podebljano</string>
     <string name="style_italic">Kurziv</string>
@@ -20,6 +20,7 @@
     <string name="label_corner_radius">Zaobljavanje</string>
     <string name="label_gap">Razmaci</string>
     <string name="option_month_first">Prvo mesec</string>
+    <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Gotovo</string>
     <string name="button_cancel">Otkaži</string>
     <string name="button_close">Zatvori</string>

@@ -12,7 +12,7 @@
     <string name="shape">Форма</string>
     <string name="font">Шрифт</string>
     <string name="font_default">За замовчуванням</string>
-    <string name="font_axes_note">Осі можуть працювати не повністю: віджет малює лише значення, оголошені системою</string>
+    <string name="font_note">Може не працювати, а налаштування можуть працювати не повністю</string>
     <string name="style_normal">Звичайний</string>
     <string name="style_bold">Напівжирний</string>
     <string name="style_italic">Курсив</string>
@@ -20,6 +20,7 @@
     <string name="label_corner_radius">Заокруглення</string>
     <string name="label_gap">Відступи</string>
     <string name="option_month_first">Спочатку місяць</string>
+    <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Готово</string>
     <string name="button_cancel">Скасувати</string>
     <string name="button_close">Закрити</string>

@@ -15,7 +15,7 @@
     <string name="shape">Shape</string>
     <string name="font">Font</string>
     <string name="font_default">Default</string>
-    <string name="font_axes_note">The axes may work incompletely: the widget renders the values the system declares</string>
+    <string name="font_note">It may not work, and the settings may work incompletely</string>
     <string name="style_normal">Normal</string>
     <string name="style_bold">Bold</string>
     <string name="style_italic">Italic</string>
@@ -23,6 +23,7 @@
     <string name="label_corner_radius">Rounding</string>
     <string name="label_gap">Spacing</string>
     <string name="option_month_first">Month first</string>
+    <string name="option_am_pm">AM/PM</string>
     <string name="button_done">Done</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_close">Close</string>

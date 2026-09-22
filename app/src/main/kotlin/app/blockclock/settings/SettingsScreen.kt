@@ -192,7 +192,6 @@ fun SettingsScreen(
                 settings = previewSettings,
             )
         }
-
         val gridState = rememberLazyStaggeredGridState()
         val columns = gridState.layoutInfo.visibleItemsInfo
             .maxOfOrNull { it.lane }
@@ -594,11 +593,10 @@ private fun FontField(
 }
 
 /**
- * The font variations: the style of the default font as a group of buttons,
- * the axes a widget renders as sliders ([FontAxis.DELIVERED]) with a note that they apply
- * as far as the platform allows, or the styles of the same font
- * family as a group of buttons — the group of a family with a single style
- * is not shown: there is nothing to choose.
+ * The font variations: the style of the default font as a group of buttons, a note that the picked
+ * font applies as far as the platform allows and the axes a widget renders as sliders
+ * ([FontAxis.DELIVERED]), or the styles of the same font family as a group of buttons — the group
+ * of a family with a single style is not shown: there is nothing to choose.
  */
 @RequiresApi(Q)
 @Composable
@@ -617,34 +615,36 @@ private fun FontVariations(
             selected = textStyle,
             onStyle = onStyle,
         )
-        font.vf -> {
+        else -> {
             Text(
-                text = stringResource(R.string.font_axes_note),
+                text = stringResource(R.string.font_note),
                 modifier = modifier.padding(horizontal = Padding.Common),
                 style = MaterialTheme.typography.labelSmall,
                 color = colorScheme.onSurfaceVariant,
             )
-            font.axes.filter { it.tag in FontAxis.DELIVERED }.forEach { axis ->
-                VariationSlider(
-                    modifier = modifier.padding(horizontal = Padding.Common),
-                    axis = axis,
-                    value = font.variation(axis.tag, axis.default),
-                    withSteps = axis.tag in SLANTS,
-                    onChange = { onFont(font.copy(variations = font.variations + (axis.tag to it))) },
-                )
+            when {
+                font.vf -> font.axes.filter { it.tag in FontAxis.DELIVERED }.forEach { axis ->
+                    VariationSlider(
+                        modifier = modifier.padding(horizontal = Padding.Common),
+                        axis = axis,
+                        value = font.variation(axis.tag, axis.default),
+                        withSteps = axis.tag in SLANTS,
+                        onChange = { onFont(font.copy(variations = font.variations + (axis.tag to it))) },
+                    )
+                }
+                else -> remember(font, systemFonts) { systemFonts.familyStyles(font) }
+                    .takeIf { it.size > 1 }
+                    ?.let {
+                        StyleGroup(
+                            modifier = modifier,
+                            contentPadding = Padding.Common,
+                            styles = it,
+                            selected = font,
+                            onFont = onFont,
+                        )
+                    }
             }
         }
-        else -> remember(font, systemFonts) { systemFonts.familyStyles(font) }
-            .takeIf { it.size > 1 }
-            ?.let {
-                StyleGroup(
-                    modifier = modifier,
-                    contentPadding = Padding.Common,
-                    styles = it,
-                    selected = font,
-                    onFont = onFont,
-                )
-            }
     }
 }
 
