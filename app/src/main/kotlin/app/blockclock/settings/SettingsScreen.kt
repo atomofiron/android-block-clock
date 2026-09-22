@@ -75,7 +75,9 @@ import app.blockclock.ui.ColorBox
 import app.blockclock.ui.ForwardIcon
 import app.blockclock.ui.GroupItem
 import app.blockclock.ui.SegmentedButton
+import app.blockclock.ui.apply
 import app.blockclock.ui.insets.InsetsBackground
+import app.blockclock.ui.rememberVerticalSpacing
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
 import app.blockclock.ui.values.clickable
@@ -533,11 +535,13 @@ private fun SectionCard(
         modifier = Modifier.fillMaxWidth(),
         shape = ShapeDefaults.ExtraLarge,
     ) {
+        val spacing = rememberVerticalSpacing(Padding.Half)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = Padding.Common),
-            verticalArrangement = Arrangement.spacedBy(Padding.Half),
+                .padding(vertical = Padding.Common)
+                .apply(spacing),
+            verticalArrangement = spacing,
         ) {
             if (title != null) {
                 Text(
