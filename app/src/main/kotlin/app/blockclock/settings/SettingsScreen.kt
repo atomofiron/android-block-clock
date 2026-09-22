@@ -698,7 +698,7 @@ private fun VariationSlider(
     var current by remember(axis, value) { mutableFloatStateOf(value) }
     Column(modifier) {
         SubTitle(
-            title = axis.tag,
+            title = axis.label()?.let { stringResource(it) } ?: axis.tag,
             value = current.roundToInt().toString(),
         )
         Slider(
@@ -735,6 +735,17 @@ private fun TextStyleGroup(
             }
         }
     }
+}
+
+/**
+ * The name of the axis for a reader: the delivered axes have one, the rest go by their tag,
+ * which says nothing to anyone but the font itself.
+ */
+private fun FontAxis.label(): Int? = when (tag) {
+    FontAxis.WEIGHT -> R.string.axis_weight
+    FontAxis.SLANT -> R.string.axis_slant
+    FontAxis.ITALIC -> R.string.axis_italic
+    else -> null
 }
 
 /** The label of the text style. */

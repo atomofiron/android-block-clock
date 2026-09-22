@@ -16,8 +16,14 @@ data class FontAxis(
         /** The weight axis: the host gets its value through a family alias or the bold bit. */
         const val WEIGHT = "wght"
 
+        /** The slant axis: the angle of the lean, in degrees. */
+        const val SLANT = "slnt"
+
+        /** The italic axis: a flag rather than an angle, the coarser of the two slants. */
+        const val ITALIC = "ital"
+
         /** The slant axes: the host gets them as a single italic bit and nothing finer. */
-        val SLANTS = listOf("slnt", "ital")
+        val SLANTS = listOf(SLANT, ITALIC)
 
         /**
          * The axes the sliders offer: the ones a style bit expresses, so the only ones the

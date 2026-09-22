@@ -16,6 +16,9 @@
     <string name="style_normal">ჩვეულებრივი</string>
     <string name="style_bold">მსხვილი</string>
     <string name="style_italic">დახრილი</string>
+    <string name="axis_weight">წონა</string>
+    <string name="axis_slant">დახრილობა</string>
+    <string name="axis_italic">კურსივი</string>
     <string name="label_transparency">გამჭვირვალობა</string>
     <string name="label_corner_radius">დამრგვალება</string>
     <string name="label_gap">ინტერვალები</string>

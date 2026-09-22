@@ -19,6 +19,9 @@
     <string name="style_normal">Normal</string>
     <string name="style_bold">Bold</string>
     <string name="style_italic">Italic</string>
+    <string name="axis_weight">Weight</string>
+    <string name="axis_slant">Slant</string>
+    <string name="axis_italic">Italic</string>
     <string name="label_transparency">Transparency</string>
     <string name="label_corner_radius">Rounding</string>
     <string name="label_gap">Spacing</string>

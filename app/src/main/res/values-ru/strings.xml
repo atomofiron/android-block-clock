@@ -16,6 +16,9 @@
     <string name="style_normal">Обычный</string>
     <string name="style_bold">Полужирный</string>
     <string name="style_italic">Курсив</string>
+    <string name="axis_weight">Жирность</string>
+    <string name="axis_slant">Наклон</string>
+    <string name="axis_italic">Курсив</string>
     <string name="label_transparency">Прозрачность</string>
     <string name="label_corner_radius">Закругление</string>
     <string name="label_gap">Отступы</string>

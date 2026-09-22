@@ -16,6 +16,9 @@
     <string name="style_normal">Обично</string>
     <string name="style_bold">Подебљано</string>
     <string name="style_italic">Курзив</string>
+    <string name="axis_weight">Дебљина</string>
+    <string name="axis_slant">Наклон</string>
+    <string name="axis_italic">Курзив</string>
     <string name="label_transparency">Провидно</string>
     <string name="label_corner_radius">Заобљавање</string>
     <string name="label_gap">Размаци</string>

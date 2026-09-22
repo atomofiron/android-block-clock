@@ -16,6 +16,9 @@
     <string name="style_normal">Қалыпты</string>
     <string name="style_bold">Қалың</string>
     <string name="style_italic">Көлбеу</string>
+    <string name="axis_weight">Салмақ</string>
+    <string name="axis_slant">Көлбеу</string>
+    <string name="axis_italic">Курсив</string>
     <string name="label_transparency">Мөлдірлік</string>
     <string name="label_corner_radius">Дөңгелектеу</string>
     <string name="label_gap">Аралықтар</string>

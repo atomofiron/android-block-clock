@@ -16,6 +16,9 @@
     <string name="style_normal">Звичайний</string>
     <string name="style_bold">Напівжирний</string>
     <string name="style_italic">Курсив</string>
+    <string name="axis_weight">Товщина</string>
+    <string name="axis_slant">Нахил</string>
+    <string name="axis_italic">Курсив</string>
     <string name="label_transparency">Прозорість</string>
     <string name="label_corner_radius">Заокруглення</string>
     <string name="label_gap">Відступи</string>
