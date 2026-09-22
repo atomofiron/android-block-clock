@@ -25,3 +25,5 @@ fun <T, V : Any> T.ifNotNull(value: V?, action: T.(V) -> T): T = when (value) {
 fun AndroidColor.toComposeColor() = Color(toArgb())
 
 inline infix fun Int.contains(flags: Int): Boolean = (this and flags) == flags
+
+fun <T> unsafeLazy(initializer: () -> T) = lazy(LazyThreadSafetyMode.NONE, initializer)

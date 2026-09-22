@@ -13,6 +13,7 @@ import app.blockclock.model.ColorTarget
 import app.blockclock.model.TargetApp
 import app.blockclock.model.TextStyle
 import app.blockclock.util.Android
+import app.blockclock.util.unsafeLazy
 import app.blockclock.util.widgetFont
 
 class WidgetSettingsStore(context: Context) {
@@ -39,11 +40,11 @@ class WidgetSettingsStore(context: Context) {
     }
 
     private val sp = context.getSharedPreferences("widget_settings", Context.MODE_PRIVATE)
-    private val systemDayFirst by lazy(LazyThreadSafetyMode.NONE) {
+    private val systemDayFirst by unsafeLazy {
         DateFormat.getDateFormatOrder(context).run { indexOf('d') < indexOf('M') }
     }
     /** True when the system shows the time on the 12-hour clock, so a marker makes sense. */
-    val systemAmPm by lazy(LazyThreadSafetyMode.NONE) { !DateFormat.is24HourFormat(context) }
+    val systemAmPm by unsafeLazy { !DateFormat.is24HourFormat(context) }
 
     fun read() = WidgetSettings(
         background = Color(sp.getInt(KEY_RECT_COLOR, Defaults.background.toArgb())),

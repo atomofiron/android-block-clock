@@ -34,7 +34,7 @@ object FontConfig {
     private val dirs = listOf("/system/etc", "/system_ext/etc", "/product/etc", "/vendor/etc", "/odm/etc")
 
     /** The configurations of the device: the declarations of the platform and of the vendors. */
-    private val configs: List<File> by lazy(LazyThreadSafetyMode.NONE) {
+    private val configs: List<File> by unsafeLazy {
         dirs.flatMap { dir ->
             File(dir).listFiles()
                 ?.filter(::declaresFamilies)
@@ -44,12 +44,12 @@ object FontConfig {
     }
 
     /** The named families of the device: the family name to the file names it declares. */
-    private val families: Map<String, List<String>> by lazy(LazyThreadSafetyMode.NONE) {
+    private val families: Map<String, List<String>> by unsafeLazy {
         merge(configs.flatMap(::read))
     }
 
     /** The family name of every declared file, e.g. `Roboto-Regular.ttf` to `sans-serif`. */
-    private val names: Map<String, String> by lazy(LazyThreadSafetyMode.NONE) {
+    private val names: Map<String, String> by unsafeLazy {
         byFile(families)
     }
 
@@ -65,12 +65,12 @@ object FontConfig {
     fun canResolve(name: String): Boolean = name in families || name in aliases
 
     /** The alias names of the device: the alternative names of the declared families. */
-    private val aliases: Set<String> by lazy(LazyThreadSafetyMode.NONE) {
+    private val aliases: Set<String> by unsafeLazy {
         configs.flatMap(::readAliases).map(Alias::name).toSet()
     }
 
     /** The aliases that ask for a weight: the family name to the weight and the alias name. */
-    private val weighted: Map<String, Map<Int, String>> by lazy(LazyThreadSafetyMode.NONE) {
+    private val weighted: Map<String, Map<Int, String>> by unsafeLazy {
         configs.flatMap(::readAliases)
             .filter { it.weight != null && it.to.isNotEmpty() }
             .groupBy(Alias::to)
