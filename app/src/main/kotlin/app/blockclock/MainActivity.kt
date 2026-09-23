@@ -15,7 +15,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
@@ -47,7 +49,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : AppCompatActivity() {
 
-    private val isEnterAnimationCompleted = mutableStateOf(false)
+    private var isEnterAnimationCompleted by mutableStateOf(false)
     private val wallpaperColors = mutableStateOf<WallpaperColors?>(null)
     private var onStartJob: Job? = null
     private val store by unsafeLazy { WidgetSettingsStore(this) }
@@ -79,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                 LocalScreenCorners provides window.decorView.screenCorners(),
             ) {
                 AppTheme {
-                    SettingsScreen(store, wallpaperColors.value, isEnterAnimationCompleted.value)
+                    SettingsScreen(store, wallpaperColors.value, uiStarted = isEnterAnimationCompleted)
                 }
             }
         }
@@ -90,20 +92,20 @@ class MainActivity : AppCompatActivity() {
         onStartJob?.cancel()
         onStartJob = lifecycleScope.launch {
             delay(1000.milliseconds)
-            isEnterAnimationCompleted.value = true
+            isEnterAnimationCompleted = true
         }
         store.updateSystemPreferences()
     }
 
     override fun onEnterAnimationComplete() {
         super.onEnterAnimationComplete()
-        isEnterAnimationCompleted.value = true
+        isEnterAnimationCompleted = true
         onStartJob?.cancel()
     }
 
     override fun onStop() {
         super.onStop()
-        isEnterAnimationCompleted.value = false
+        isEnterAnimationCompleted = false
         onStartJob?.cancel()
     }
 
