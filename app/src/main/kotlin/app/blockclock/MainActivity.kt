@@ -36,6 +36,7 @@ import app.blockclock.util.Android
 import app.blockclock.util.collect
 import app.blockclock.util.contains
 import app.blockclock.util.get
+import app.blockclock.util.unsafeLazy
 import app.blockclock.widget.WidgetSettingsStore
 import app.blockclock.widget.updateWidgets
 import kotlinx.coroutines.Job
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     private val isEnterAnimationCompleted = mutableStateOf(false)
     private val wallpaperColors = mutableStateOf<WallpaperColors?>(null)
     private var onStartJob: Job? = null
+    private val store by unsafeLazy { WidgetSettingsStore(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +64,6 @@ class MainActivity : AppCompatActivity() {
         UpdateStore.self.alerts.collect(lifecycleScope) {
             Toast.makeText(this, resources[it.text], Toast.LENGTH_LONG).show()
         }
-        val store = WidgetSettingsStore(this)
         if (Android.O1) {
             handleWallpaperColors { colors ->
                 wallpaperColors.value = colors
@@ -91,6 +92,7 @@ class MainActivity : AppCompatActivity() {
             delay(1000.milliseconds)
             isEnterAnimationCompleted.value = true
         }
+        store.updateSystemPreferences()
     }
 
     override fun onEnterAnimationComplete() {

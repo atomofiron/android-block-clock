@@ -3,6 +3,10 @@ package app.blockclock.widget
 import android.content.Context
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.text.format.DateFormat
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.edit
@@ -13,9 +17,10 @@ import app.blockclock.model.ColorTarget
 import app.blockclock.model.TargetApp
 import app.blockclock.model.TextStyle
 import app.blockclock.util.Android
-import app.blockclock.util.unsafeLazy
+import app.blockclock.util.UpdatableLazy
 import app.blockclock.util.widgetFont
 
+@Stable
 class WidgetSettingsStore(context: Context) {
     companion object {
         private const val FLAG_EMPTY = "empty"
@@ -43,11 +48,21 @@ class WidgetSettingsStore(context: Context) {
     }
 
     private val sp = context.getSharedPreferences("widget_settings", Context.MODE_PRIVATE)
-    val systemDayFirst by unsafeLazy {
-        DateFormat.getDateFormatOrder(context).run { indexOf('d') < indexOf('M') }
+
+    private val lazySystemDayFirst = UpdatableLazy {
+        DateFormat.getDateFormatOrder(context)
+            .run { indexOf('d') < indexOf('M') }
+            .also { systemDayFirst = it }
     }
-    /** True when the system shows the time on the 12-hour clock, so a marker makes sense. */
-    val systemAmPm by unsafeLazy { !DateFormat.is24HourFormat(context) }
+    var systemDayFirst by mutableStateOf(false)
+        private set
+
+    private val lazySystemAmPm = UpdatableLazy {
+        (!DateFormat.is24HourFormat(context))
+            .also { systemAmPm = it }
+    }
+    var systemAmPm by mutableStateOf(false)
+        private set
 
     fun read() = WidgetSettings(
         background = Color(sp.getInt(KEY_RECT_COLOR, Defaults.background.toArgb())),
@@ -155,6 +170,11 @@ class WidgetSettingsStore(context: Context) {
 
     fun removeListener(listener: OnSharedPreferenceChangeListener) {
         sp.unregisterOnSharedPreferenceChangeListener(listener)
+    }
+
+    fun updateSystemPreferences() {
+        lazySystemDayFirst.update()
+        lazySystemAmPm.update()
     }
 }
 
