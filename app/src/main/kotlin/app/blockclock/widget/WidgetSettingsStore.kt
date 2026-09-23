@@ -63,7 +63,7 @@ class WidgetSettingsStore(context: Context) {
         clockApp = sp.getString(KEY_CLOCK_APP, null).toAppTarget(),
         calendarApp = sp.getString(KEY_CALENDAR_APP, null).toAppTarget(),
         font = when {
-            Android.Q -> sp.getString(KEY_FONT_PATH, null)?.let { path ->
+            Android.SupportFonts -> sp.getString(KEY_FONT_PATH, null)?.let { path ->
                 widgetFont(
                     path = path,
                     ttcIndex = sp.getInt(KEY_FONT_TTC_INDEX, 0),
@@ -114,7 +114,7 @@ class WidgetSettingsStore(context: Context) {
                     remove(KEY_FONT_TTC_INDEX)
                     remove(KEY_FONT_VARIATIONS)
                 }
-                Android.Q -> {
+                Android.SupportFonts -> {
                     val font = settings.font
                     putString(KEY_FONT_PATH, font.path)
                     putInt(KEY_FONT_TTC_INDEX, font.ttcIndex)

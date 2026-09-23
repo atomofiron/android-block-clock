@@ -181,7 +181,7 @@ internal fun Cell(
     val cellHeightPx = height.value * context.resources.displayMetrics.density
     val font = remember(settings.font) {
         when {
-            settings.font == null || !Android.Q -> null
+            settings.font == null || !Android.SupportFonts -> null
             else -> settings.font.toCellFont()
         }
     }
@@ -373,7 +373,7 @@ private fun styledClockFormat(
     font: CellFont?,
     textStyle: Int,
 ): CharSequence = when {
-    font == null || Android.Below.Q -> format.withStyle(textStyle)
+    font == null || !Android.SupportFonts -> format.withStyle(textStyle)
     else -> SpannableString(format).apply {
         setSpan(TypefaceSpan(font.family), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         if (font.style != Typeface.NORMAL) {

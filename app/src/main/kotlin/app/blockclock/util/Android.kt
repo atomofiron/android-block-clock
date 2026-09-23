@@ -36,4 +36,7 @@ object Android {
         val R = !Android.R
         val T = !Android.T
     }
+
+    @ChecksSdkIntAtLeast(api = Sdk.Q)
+    val SupportFonts = Q
 }

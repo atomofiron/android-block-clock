@@ -140,7 +140,7 @@ fun SettingsScreen(
     var systemFonts by remember { mutableStateOf<List<WidgetFont>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        if (Android.Q) {
+        if (Android.SupportFonts) {
             systemFonts = withContext(Dispatchers.Default) { getSystemFonts() }
         }
     }
@@ -303,7 +303,7 @@ fun SettingsScreen(
                             onChangeFinished = { apply(settings.copy(textScale = it / Percents)) },
                         )
                         when {
-                            Android.Q -> {
+                            Android.SupportFonts -> {
                                 FontField(
                                     modifier = Modifier
                                         .padding(horizontal = Padding.Common)
@@ -451,7 +451,7 @@ fun SettingsScreen(
     if (showLicenses) {
         LicensesScreen(onClose = { showLicenses = false })
     }
-    if (showFontPicker && Android.Q) {
+    if (showFontPicker && Android.SupportFonts) {
         FontPickerScreen(
             onPick = { font ->
                 showFontPicker = false

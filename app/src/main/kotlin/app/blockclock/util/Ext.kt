@@ -51,7 +51,7 @@ val Any?.simpleName: String get() = when {
  */
 @RequiresApi(Q)
 fun getSystemFonts(): List<WidgetFont> = when {
-    Android.Q -> SystemFonts.getAvailableFonts()
+    Android.SupportFonts -> SystemFonts.getAvailableFonts()
         .asSequence()
         .mapNotNull { it.toWidgetFont() }
         .filter { it.toCellFont() != null }

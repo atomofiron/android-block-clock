@@ -102,7 +102,7 @@ fun WidgetFont.toCellFont(): CellFont? {
  * the 31st level: `Typeface.getSystemFontFamilyName` appears there, and calling it on the
  * older versions fails the lookup instead of answering.
  */
-private fun isSystemFamily(name: String): Boolean = Android.Q && FontConfig.canResolve(name)
+private fun isSystemFamily(name: String): Boolean = Android.SupportFonts && FontConfig.canResolve(name)
 
 /** The italic bit of the file. */
 @RequiresApi(Q)
