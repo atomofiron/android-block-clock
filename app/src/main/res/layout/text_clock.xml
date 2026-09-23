@@ -6,4 +6,6 @@
     android:gravity="center"
     android:includeFontPadding="false"
     android:elegantTextHeight="false"
+    android:maxLines="1"
+    android:ellipsize="end"
     />
