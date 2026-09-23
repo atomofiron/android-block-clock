@@ -4,6 +4,7 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.annotation.ChecksSdkIntAtLeast
 import android.os.Build.VERSION_CODES as Sdk
 
+@Suppress("unused")
 object Android {
 
     @ChecksSdkIntAtLeast(api = Sdk.N_MR1)
