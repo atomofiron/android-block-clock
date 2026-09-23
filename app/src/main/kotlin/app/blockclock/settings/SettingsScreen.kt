@@ -41,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -199,14 +200,14 @@ fun SettingsScreen(
             )
         }
         val gridState = rememberLazyStaggeredGridState()
-        val columns = gridState.layoutInfo.visibleItemsInfo
-            .maxOfOrNull { it.lane }
-            ?.inc() ?: 1
-        val clipShape = StaggeredGridClipShape(
-            columns = columns,
-            padding = Padding.Common,
-            cornerRadius = Dimens.ClipCornerRadius,
-        )
+        val columns by remember(gridState) {
+            derivedStateOf {
+                gridState.layoutInfo.visibleItemsInfo.maxOfOrNull { it.lane }?.inc() ?: 1
+            }
+        }
+        val clipShape = remember(columns) {
+            StaggeredGridClipShape(columns, padding = Padding.Common, cornerRadius = Dimens.ClipCornerRadius)
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -568,7 +569,9 @@ private fun SectionCard(
 @Composable
 private fun SubTitle(title: String, value: String? = null) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = Padding.Half, bottom = Padding.Mini),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = Padding.Half, bottom = Padding.Mini),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
