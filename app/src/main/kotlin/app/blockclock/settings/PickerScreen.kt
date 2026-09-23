@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,14 +12,12 @@ import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -33,11 +30,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import app.blockclock.R
 import app.blockclock.ui.BackButton
@@ -62,7 +59,8 @@ fun <T> PickerScreen(
     showDefault: Boolean = false,
     onPick: (T?) -> Unit,
     onClose: () -> Unit,
-    itemContent: @Composable (Modifier, T) -> Unit,
+    defaultItemContent: (@Composable (Modifier, TextStyle) -> Unit)? = null,
+    itemContent: @Composable (Modifier, TextStyle, T) -> Unit,
 ) {
     var items by remember { mutableStateOf<List<T>?>(null) }
     val context = LocalContext.current
@@ -143,6 +141,7 @@ fun <T> PickerScreen(
                 visible = items != null,
                 enter = fadeIn(),
             ) {
+                val textStyle = MaterialTheme.typography.bodyLarge
                 LazyVerticalGrid(
                     modifier = Modifier
                         .fillMaxSize()
@@ -161,18 +160,15 @@ fun <T> PickerScreen(
                         .asPaddingValues(),
                 ) {
                     if (showDefault) item {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(ShapeDefaults.Medium)
-                                .clickable { onPick(null) }
-                                .padding(vertical = Padding.Common),
-                            text = stringResource(R.string.font_default),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
+                        defaultItemContent?.invoke(Modifier.onClick { onPick(null) }, textStyle)
+                            ?: Text(
+                                modifier = Modifier.onClick { onPick(null) },
+                                text = stringResource(R.string.font_default),
+                                style = textStyle,
+                            )
                     }
                     itemsIndexed(visibleItems, key = { index, it -> keys(it, index) }) { _, it ->
-                        itemContent(Modifier.onClick { onPick(it) }, it)
+                        itemContent(Modifier.onClick { onPick(it) }, textStyle, it)
                     }
                 }
             }

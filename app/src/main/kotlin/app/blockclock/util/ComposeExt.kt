@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,8 +33,12 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntSize
 import androidx.glance.GlanceModifier
 import androidx.glance.layout.size
 import app.blockclock.ui.values.Padding
@@ -52,10 +57,20 @@ fun Modifier.windowInsetsPadding(action: @Composable WindowInsets.Companion.() -
 }
 
 @Composable
-fun Modifier.onClick(onClick: () -> Unit): Modifier = fillMaxWidth()
+fun Modifier.onClick(onClick: () -> Unit): Modifier = this
+    .fillMaxWidth()
     .clip(ShapeDefaults.Medium)
     .clickable { onClick() }
     .padding(vertical = Padding.Semi)
+
+@Stable
+@Composable
+fun Modifier.onResize(callback: Density.(IntSize) -> Unit): Modifier {
+    val density = LocalDensity.current
+    return onSizeChanged {
+        density.callback(it)
+    }
+}
 
 @Composable
 fun animatedBackgroundColor(transparent: Boolean): Color {

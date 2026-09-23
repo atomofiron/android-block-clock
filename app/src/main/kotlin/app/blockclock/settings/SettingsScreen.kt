@@ -319,7 +319,6 @@ fun SettingsScreen(
                                     onStyle = { apply(settings.copy(textStyle = it)) },
                                 )
                             }
-                            // The system fonts need Android 10, the styles of the default font do not.
                             else -> TextStyleGroup(
                                 contentPadding = Padding.Common,
                                 selected = settings.textStyle,
@@ -369,7 +368,6 @@ fun SettingsScreen(
                                     apply(settings.copy(dayFirst = !checked))
                                 },
                             )
-                            // The marker belongs to the 12-hour clock: the system is its single source.
                             if (store.systemAmPm) SettingSwitch(
                                 modifier = Modifier.weight(1f),
                                 label = stringResource(R.string.option_am_pm),

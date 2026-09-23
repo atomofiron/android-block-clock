@@ -1,7 +1,6 @@
 package app.blockclock.ui
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -25,11 +24,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import app.blockclock.ui.values.Corners
+import app.blockclock.ui.values.Shapes
+import app.blockclock.ui.values.Springs
 import app.blockclock.ui.values.clickable
+import app.blockclock.util.onResize
 
 @Composable
 fun SegmentedButton(
@@ -66,10 +67,9 @@ fun SingleChoiceSegmentedButtonRowScope.GroupItem(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
-    val density = LocalDensity.current
-    var full by remember { mutableStateOf(20.dp) }
+    var half by remember { mutableStateOf(20.dp) }
     SegmentedButton(
-        modifier = Modifier.onSizeChanged { full = with(density) { (it.height / 2).toDp() } },
+        modifier = Modifier.onResize { half = (it.height / 2).toDp() },
         selected = selected,
         onClick = onClick,
         shape = animatedGroupItemShape(
@@ -77,7 +77,7 @@ fun SingleChoiceSegmentedButtonRowScope.GroupItem(
             count = count,
             selected = selected,
             pressed = pressed,
-            full = full,
+            half = half,
         ),
         colors = SegmentedButtonDefaults.colors(
             activeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -93,15 +93,14 @@ fun SingleChoiceSegmentedButtonRowScope.GroupItem(
 }
 
 /**
- * The corners of the item at [index] of a group of [count]: the ends of the group are pills of the
- * half of [full], the rest of the corners are [inner] — the half of the item makes it a pill of its
- * own, which is the picked look.
+ * The corners of the item at [index] of a group of [count]: the outer ends take [Shapes.Pill] (a
+ * relative half of a side, so the ends are pills at any size) and the rest take [inner]. An item
+ * whose [inner] is the half of its own height is a pill all around — the picked look, the one
+ * [animatedGroupItemShape] travels to.
  */
-private fun groupItemShape(index: Int, count: Int, full: Dp, inner: Dp): RoundedCornerShape {
-    val pill = CornerSize(full)
-    val corner = CornerSize(inner)
-    val start = if (index == 0) pill else corner
-    val end = if (index == count - 1) pill else corner
+private fun groupItemShape(index: Int, count: Int, inner: Dp): RoundedCornerShape {
+    val start = if (index == 0) Shapes.Pill else CornerSize(inner)
+    val end = if (index == count - 1) Shapes.Pill else CornerSize(inner)
     return RoundedCornerShape(
         topStart = start,
         topEnd = end,
@@ -124,17 +123,17 @@ private fun animatedGroupItemShape(
     count: Int,
     selected: Boolean,
     pressed: Boolean,
-    full: Dp,
+    half: Dp,
 ): Shape {
     val target = when {
-        pressed -> 4.dp
-        selected -> full
-        else -> 8.dp
+        pressed -> Corners.Mini
+        selected -> half
+        else -> Corners.Half
     }
     val inner by animateDpAsState(
         targetValue = target,
-        animationSpec = spring<Dp>(dampingRatio = 0.6f, stiffness = 800f),
+        animationSpec = Springs.FastSpatialDp,
         label = "groupItemCorner",
     )
-    return remember(index, count, full, inner) { groupItemShape(index, count, full, inner) }
+    return remember(index, count, half, inner) { groupItemShape(index, count, inner) }
 }

@@ -2,7 +2,6 @@ package app.blockclock.licenses
 
 import android.content.Intent
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,11 +39,11 @@ fun LicensesScreen(onClose: () -> Unit) {
             }
         },
         onClose = onClose,
-    ) { modifier, item ->
+    ) { modifier, style, item ->
         Text(
             modifier = modifier,
             text = item.name,
-            style = MaterialTheme.typography.titleMedium,
+            style = style,
         )
     }
     selected?.let { license ->

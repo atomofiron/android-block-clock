@@ -3,7 +3,6 @@ package app.blockclock.settings
 import android.os.Build.VERSION_CODES.Q
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -35,12 +34,12 @@ fun FontPickerScreen(
     showDefault = true,
     onPick = onPick,
     onClose = onClose,
-) { modifier, item ->
+) { modifier, style, item ->
     Text(
         modifier = modifier,
         text = item.name,
         fontFamily = item.toFontFamily(),
-        style = MaterialTheme.typography.bodyLarge,
+        style = style,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
     )
