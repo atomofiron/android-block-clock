@@ -13,6 +13,7 @@
     <string name="font">Қаріп</string>
     <string name="font_default">Әдепкі</string>
     <string name="font_note">Жұмыс істемеуі мүмкін, ал баптаулар толық жұмыс істемеуі мүмкін</string>
+    <string name="no_any_app">Бұл әрекетті орындай алатын қолданба табылмады</string>
     <string name="style_normal">Қалыпты</string>
     <string name="style_bold">Қалың</string>
     <string name="style_italic">Көлбеу</string>

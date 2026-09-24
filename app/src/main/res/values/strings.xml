@@ -16,6 +16,7 @@
     <string name="font">Font</string>
     <string name="font_default">Default</string>
     <string name="font_note">It may not work, and the settings may work incompletely</string>
+    <string name="no_any_app">No app found that can perform this action</string>
     <string name="style_normal">Normal</string>
     <string name="style_bold">Bold</string>
     <string name="style_italic">Italic</string>

@@ -10,11 +10,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.net.toUri
 import app.blockclock.R
 import app.blockclock.model.License
 import app.blockclock.settings.PickerScreen
 import app.blockclock.ui.values.Dimens
+import app.blockclock.util.Intents
+import app.blockclock.util.tryStartActivity
 
 /**
  * A full-screen OSS licenses list: a tap on a text license opens its
@@ -34,7 +35,7 @@ fun LicensesScreen(onClose: () -> Unit) {
         onPick = {
             when (it) {
                 is License.Text -> selected = it
-                is License.Url -> context.startActivity(Intent(Intent.ACTION_VIEW, it.url.toUri()))
+                is License.Url -> context.tryStartActivity(Intents.license(it.url))
                 null -> Unit
             }
         },

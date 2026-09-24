@@ -13,6 +13,7 @@
     <string name="font">Font</string>
     <string name="font_default">Podrazumevano</string>
     <string name="font_note">Možda ne radi, a podešavanja mogu raditi nepotpuno</string>
+    <string name="no_any_app">Nije pronađena nijedna aplikacija koja može da izvrši ovu radnju</string>
     <string name="style_normal">Obično</string>
     <string name="style_bold">Podebljano</string>
     <string name="style_italic">Kurziv</string>

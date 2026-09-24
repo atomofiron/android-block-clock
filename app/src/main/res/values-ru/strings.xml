@@ -13,6 +13,7 @@
     <string name="font">Шрифт</string>
     <string name="font_default">По умолчанию</string>
     <string name="font_note">Может не работать, а настройки могут работать не полноценно</string>
+    <string name="no_any_app">Приложение, способное выполнить это действие, не найдено</string>
     <string name="style_normal">Обычный</string>
     <string name="style_bold">Полужирный</string>
     <string name="style_italic">Курсив</string>

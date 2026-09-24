@@ -13,6 +13,7 @@
     <string name="font">Шрифт</string>
     <string name="font_default">За замовчуванням</string>
     <string name="font_note">Може не працювати, а налаштування можуть працювати не повністю</string>
+    <string name="no_any_app">Застосунок, який може виконати цю дію, не знайдено</string>
     <string name="style_normal">Звичайний</string>
     <string name="style_bold">Напівжирний</string>
     <string name="style_italic">Курсив</string>

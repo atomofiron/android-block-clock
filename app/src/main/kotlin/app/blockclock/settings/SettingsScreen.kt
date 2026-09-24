@@ -1,6 +1,5 @@
 package app.blockclock.settings
 
-import android.content.Intent
 import android.os.Build.VERSION_CODES.Q
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -60,7 +59,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import app.blockclock.AbstractApp
 import app.blockclock.R
 import app.blockclock.licenses.LicensesScreen
@@ -88,6 +86,7 @@ import app.blockclock.update.UpdateStore
 import app.blockclock.update.model.UpdateState
 import app.blockclock.update.model.UpdateType
 import app.blockclock.util.Android
+import app.blockclock.util.Intents
 import app.blockclock.util.Percents
 import app.blockclock.util.animatedBackgroundColor
 import app.blockclock.util.familyStyles
@@ -97,6 +96,7 @@ import app.blockclock.util.plus
 import app.blockclock.util.rememberAppIconPainter
 import app.blockclock.util.steps
 import app.blockclock.util.toFontFamily
+import app.blockclock.util.tryStartActivity
 import app.blockclock.util.windowInsetsPadding
 import app.blockclock.widget.WidgetSettings
 import app.blockclock.widget.WidgetSettingsStore
@@ -116,7 +116,6 @@ private val FontSizeRange = 68f..132f
 /** The steps the size sliders offer, the width slider being twice as fine. */
 private const val DEFAULT_FONT_SIZE_STEP = 8
 
-private const val GITHUB_URL = "https://github.com/atomofiron/android-block-clock"
 private const val ShowPreviewFactory = false
 
 /**
@@ -390,9 +389,8 @@ fun SettingsScreen(
                                 modifier = Modifier.weight(1f),
                                 icon = painterResource(R.drawable.ic_github),
                                 label = R.string.github_repository,
-                            ) {
-                                context.startActivity(Intent(Intent.ACTION_VIEW, GITHUB_URL.toUri()))
-                            }
+                                onClick = { context.tryStartActivity(Intents.repository) },
+                            )
                             ClickablePoint(
                                 modifier = Modifier.weight(1f),
                                 icon = painterResource(R.drawable.ic_license),

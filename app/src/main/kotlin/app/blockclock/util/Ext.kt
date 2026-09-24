@@ -1,11 +1,15 @@
 package app.blockclock.util
 
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.fonts.SystemFonts
 import android.os.Build.VERSION_CODES.Q
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import app.blockclock.AbstractApp
 import app.blockclock.BuildConfig
+import app.blockclock.R
 import app.blockclock.model.WidgetFont
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -59,4 +63,15 @@ fun getSystemFonts(): List<WidgetFont> = when {
         .sortedBy { it.name }
         .toList()
     else -> emptyList()
+}
+
+/** True when an app able to handle the [intent] is installed. */
+private fun Context.canHandle(intent: Intent): Boolean = when {
+    Android.T -> packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
+    else -> packageManager.queryIntentActivities(intent, 0)
+}.isNotEmpty()
+
+fun Context.tryStartActivity(intent: Intent) = when {
+    canHandle(intent) -> startActivity(intent)
+    else -> Toast.makeText(this, R.string.no_any_app, Toast.LENGTH_LONG).show()
 }

@@ -13,6 +13,7 @@
     <string name="font">ფონტი</string>
     <string name="font_default">ნაგულისხმევი</string>
     <string name="font_note">შეიძლება არ იმუშაოს, ხოლო პარამეტრები შეიძლება არასრულად იმუშაოს</string>
+    <string name="no_any_app">აპლიკაცია, რომელსაც შეუძლია ამ მოქმედების შესრულება, ვერ მოიძებნა</string>
     <string name="style_normal">ჩვეულებრივი</string>
     <string name="style_bold">მსხვილი</string>
     <string name="style_italic">დახრილი</string>
