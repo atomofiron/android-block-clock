@@ -45,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,6 +77,7 @@ import app.blockclock.ui.GroupItem
 import app.blockclock.ui.SegmentedButton
 import app.blockclock.ui.apply
 import app.blockclock.ui.insets.InsetsBackground
+import app.blockclock.ui.overscroll.Overscroll
 import app.blockclock.ui.rememberVerticalSpacing
 import app.blockclock.ui.values.Dimens
 import app.blockclock.ui.values.Padding
@@ -214,230 +216,251 @@ fun SettingsScreen(
                 .padding(horizontal = Padding.Common)
                 .clip(clipShape),
         ) {
-            LazyVerticalStaggeredGrid(
-                state = gridState,
-                columns = StaggeredGridCells.Adaptive(Dimens.GridColumnMinWidth),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = WindowInsets.navigationBars
-                    .only(WindowInsetsSides.Bottom)
-                    .add(WindowInsets(bottom = Padding.Common))
-                    .asPaddingValues(),
-                horizontalArrangement = Arrangement.spacedBy(Padding.Common, Alignment.CenterHorizontally),
-                verticalItemSpacing = Padding.Common,
-            ) {
-                item {
-                    SectionCard(stringResource(R.string.color)) {
-                        Row(
-                            Modifier.padding(horizontal = Padding.Common),
-                            horizontalArrangement = Arrangement.spacedBy(Padding.Half),
-                        ) {
-                            ColorField(
-                                modifier = Modifier.weight(1f),
-                                label = stringResource(R.string.background),
-                                color = settings.background,
-                                onClick = { colorTarget = ColorTarget.Rect },
-                            )
-                            ColorField(
-                                modifier = Modifier.weight(1f),
-                                label = stringResource(R.string.text),
-                                color = settings.text,
-                                onClick = { colorTarget = ColorTarget.Text },
-                            )
-                        }
-                        TransparencySlider(
-                            modifier = Modifier.padding(horizontal = Padding.Common),
-                            transparency = settings.transparency,
-                            onChange = {
-                                previewSettings = previewSettings.copy(transparency = it)
-                            },
-                            onChangeFinished = { apply(settings.copy(transparency = it)) },
-                        )
-                    }
-                }
-                item {
-                    SectionCard(stringResource(R.string.shape)) {
-                        RoundingSlider(
-                            modifier = Modifier.padding(horizontal = Padding.Common),
-                            label = stringResource(R.string.label_corner_radius),
-                            value = settings.cornerRadiusDp,
-                            onChange = {
-                                previewSettings = previewSettings.copy(cornerRadiusDp = it)
-                            },
-                            onChangeFinished = { apply(settings.copy(cornerRadiusDp = it)) },
-                        )
-                        GapSlider(
-                            modifier = Modifier.padding(horizontal = Padding.Common),
-                            gap = settings.gapDp,
-                            onChange = { previewSettings = previewSettings.copy(gapDp = it) },
-                            onChangeFinished = { apply(settings.copy(gapDp = it)) },
-                        )
-                    }
-                }
-                item {
-                    SectionCard(stringResource(R.string.font)) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = Padding.Common),
-                            horizontalArrangement = Arrangement.spacedBy(Padding.Common),
-                        ) {
-                            SliderPoint(
-                                modifier = Modifier.weight(1f),
-                                label = stringResource(R.string.label_time_size),
-                                percent = previewSettings.timeFontPercent,
-                                onChange = { previewSettings = previewSettings.copy(timeFontPercent = it) },
-                                onChangeFinished = { apply(settings.copy(timeFontPercent = it)) },
-                            )
-                            SliderPoint(
-                                modifier = Modifier.weight(1f),
-                                label = stringResource(R.string.label_date_size),
-                                percent = previewSettings.dateFontPercent,
-                                onChange = { previewSettings = previewSettings.copy(dateFontPercent = it) },
-                                onChangeFinished = { apply(settings.copy(dateFontPercent = it)) },
-                            )
-                        }
-                        SliderPoint(
-                            modifier = Modifier.padding(horizontal = Padding.Common),
-                            label = stringResource(R.string.label_width),
-                            percent = (previewSettings.textScale * Percents).toInt(),
-                            step = 4,
-                            onChange = { previewSettings = previewSettings.copy(textScale = it / Percents) },
-                            onChangeFinished = { apply(settings.copy(textScale = it / Percents)) },
-                        )
-                        when {
-                            Android.SupportFonts -> {
-                                FontField(
-                                    modifier = Modifier
-                                        .padding(horizontal = Padding.Common)
-                                        .fillMaxWidth(),
-                                    font = settings.font,
-                                    onClick = { showFontPicker = true },
+
+            Overscroll(rememberCoroutineScope()) { columnModifier, itemModifier ->
+                LazyVerticalStaggeredGrid(
+                    modifier = columnModifier.fillMaxSize(),
+                    state = gridState,
+                    columns = StaggeredGridCells.Adaptive(Dimens.GridColumnMinWidth),
+                    contentPadding = WindowInsets.navigationBars
+                        .only(WindowInsetsSides.Bottom)
+                        .add(WindowInsets(bottom = Padding.Common))
+                        .asPaddingValues(),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        Padding.Common,
+                        Alignment.CenterHorizontally
+                    ),
+                    verticalItemSpacing = Padding.Common,
+                ) {
+                    item {
+                        SectionCard(itemModifier, title = stringResource(R.string.color)) {
+                            Row(
+                                Modifier.padding(horizontal = Padding.Common),
+                                horizontalArrangement = Arrangement.spacedBy(Padding.Half),
+                            ) {
+                                ColorField(
+                                    modifier = Modifier.weight(1f),
+                                    label = stringResource(R.string.background),
+                                    color = settings.background,
+                                    onClick = { colorTarget = ColorTarget.Rect },
                                 )
-                                FontVariations(
-                                    font = settings.font,
-                                    textStyle = settings.textStyle,
-                                    systemFonts = systemFonts,
-                                    onFont = { apply(settings.copy(font = it)) },
+                                ColorField(
+                                    modifier = Modifier.weight(1f),
+                                    label = stringResource(R.string.text),
+                                    color = settings.text,
+                                    onClick = { colorTarget = ColorTarget.Text },
+                                )
+                            }
+                            TransparencySlider(
+                                modifier = Modifier.padding(horizontal = Padding.Common),
+                                transparency = settings.transparency,
+                                onChange = {
+                                    previewSettings = previewSettings.copy(transparency = it)
+                                },
+                                onChangeFinished = { apply(settings.copy(transparency = it)) },
+                            )
+                        }
+                    }
+                    item {
+                        SectionCard(itemModifier, title = stringResource(R.string.shape)) {
+                            RoundingSlider(
+                                modifier = Modifier.padding(horizontal = Padding.Common),
+                                label = stringResource(R.string.label_corner_radius),
+                                value = settings.cornerRadiusDp,
+                                onChange = {
+                                    previewSettings = previewSettings.copy(cornerRadiusDp = it)
+                                },
+                                onChangeFinished = { apply(settings.copy(cornerRadiusDp = it)) },
+                            )
+                            GapSlider(
+                                modifier = Modifier.padding(horizontal = Padding.Common),
+                                gap = settings.gapDp,
+                                onChange = { previewSettings = previewSettings.copy(gapDp = it) },
+                                onChangeFinished = { apply(settings.copy(gapDp = it)) },
+                            )
+                        }
+                    }
+                    item {
+                        SectionCard(itemModifier, title = stringResource(R.string.font)) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = Padding.Common),
+                                horizontalArrangement = Arrangement.spacedBy(Padding.Common),
+                            ) {
+                                SliderPoint(
+                                    modifier = Modifier.weight(1f),
+                                    label = stringResource(R.string.label_time_size),
+                                    percent = previewSettings.timeFontPercent,
+                                    onChange = {
+                                        previewSettings = previewSettings.copy(timeFontPercent = it)
+                                    },
+                                    onChangeFinished = { apply(settings.copy(timeFontPercent = it)) },
+                                )
+                                SliderPoint(
+                                    modifier = Modifier.weight(1f),
+                                    label = stringResource(R.string.label_date_size),
+                                    percent = previewSettings.dateFontPercent,
+                                    onChange = {
+                                        previewSettings = previewSettings.copy(dateFontPercent = it)
+                                    },
+                                    onChangeFinished = { apply(settings.copy(dateFontPercent = it)) },
+                                )
+                            }
+                            SliderPoint(
+                                modifier = Modifier.padding(horizontal = Padding.Common),
+                                label = stringResource(R.string.label_width),
+                                percent = (previewSettings.textScale * Percents).toInt(),
+                                step = 4,
+                                onChange = {
+                                    previewSettings =
+                                        previewSettings.copy(textScale = it / Percents)
+                                },
+                                onChangeFinished = { apply(settings.copy(textScale = it / Percents)) },
+                            )
+                            when {
+                                Android.SupportFonts -> {
+                                    FontField(
+                                        modifier = Modifier
+                                            .padding(horizontal = Padding.Common)
+                                            .fillMaxWidth(),
+                                        font = settings.font,
+                                        onClick = { showFontPicker = true },
+                                    )
+                                    FontVariations(
+                                        font = settings.font,
+                                        textStyle = settings.textStyle,
+                                        systemFonts = systemFonts,
+                                        onFont = { apply(settings.copy(font = it)) },
+                                        onStyle = { apply(settings.copy(textStyle = it)) },
+                                    )
+                                }
+
+                                else -> TextStyleGroup(
+                                    contentPadding = Padding.Common,
+                                    selected = settings.textStyle,
                                     onStyle = { apply(settings.copy(textStyle = it)) },
                                 )
                             }
-                            else -> TextStyleGroup(
-                                contentPadding = Padding.Common,
-                                selected = settings.textStyle,
-                                onStyle = { apply(settings.copy(textStyle = it)) },
-                            )
                         }
                     }
-                }
-                item {
-                    SectionCard(title = null) {
-                        val clockApp = remember(settings.clockApp) { settings.clockApp ?: defaultClockApp(context) }
-                        val calendarApp = remember(settings.calendarApp) { settings.calendarApp ?: defaultCalendarApp(context) }
-                        Row(
-                            modifier = Modifier.padding(horizontal = Padding.Common),
-                            horizontalArrangement = Arrangement.spacedBy(Padding.Half),
-                        ) {
-                            ClickablePoint(
-                                modifier = Modifier.weight(1f),
-                                icon = rememberAppIconPainter(clockApp?.packageName),
-                                label = R.string.clock_app,
-                                tintedIcon = false,
-                                largeIcon = true,
-                                withArrow = true,
-                            ) {
-                                appPicker = AppPickerTarget.Clock
+                    item {
+                        SectionCard(itemModifier, title = null) {
+                            val clockApp = remember(settings.clockApp) {
+                                settings.clockApp ?: defaultClockApp(context)
                             }
-                            ClickablePoint(
-                                modifier = Modifier.weight(1f),
-                                icon = rememberAppIconPainter(calendarApp?.packageName),
-                                label = R.string.calendar_app,
-                                tintedIcon = false,
-                                largeIcon = true,
-                                withArrow = true,
-                            ) {
-                                appPicker = AppPickerTarget.Calendar
+                            val calendarApp = remember(settings.calendarApp) {
+                                settings.calendarApp ?: defaultCalendarApp(context)
                             }
-                        }
-                        Row(
-                            modifier = Modifier.padding(horizontal = Padding.Common),
-                            horizontalArrangement = Arrangement.spacedBy(Padding.Half),
-                        ) {
-                            if (!store.systemDayFirst) SettingSwitch(
-                                modifier = Modifier.weight(1f),
-                                label = stringResource(R.string.option_month_first),
-                                checked = !settings.dayFirst,
-                                onCheckedChange = { checked ->
-                                    apply(settings.copy(dayFirst = !checked))
-                                },
-                            )
-                            if (store.systemAmPm) SettingSwitch(
-                                modifier = Modifier.weight(1f),
-                                label = stringResource(R.string.option_am_pm),
-                                checked = settings.amPm,
-                                onCheckedChange = { checked ->
-                                    apply(settings.copy(amPm = checked))
-                                },
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = Padding.Common),
+                                horizontalArrangement = Arrangement.spacedBy(Padding.Half),
+                            ) {
+                                ClickablePoint(
+                                    modifier = Modifier.weight(1f),
+                                    icon = rememberAppIconPainter(clockApp?.packageName),
+                                    label = R.string.clock_app,
+                                    tintedIcon = false,
+                                    largeIcon = true,
+                                    withArrow = true,
+                                ) {
+                                    appPicker = AppPickerTarget.Clock
+                                }
+                                ClickablePoint(
+                                    modifier = Modifier.weight(1f),
+                                    icon = rememberAppIconPainter(calendarApp?.packageName),
+                                    label = R.string.calendar_app,
+                                    tintedIcon = false,
+                                    largeIcon = true,
+                                    withArrow = true,
+                                ) {
+                                    appPicker = AppPickerTarget.Calendar
+                                }
+                            }
+                            Row(
+                                modifier = Modifier.padding(horizontal = Padding.Common),
+                                horizontalArrangement = Arrangement.spacedBy(Padding.Half),
+                            ) {
+                                if (!store.systemDayFirst) SettingSwitch(
+                                    modifier = Modifier.weight(1f),
+                                    label = stringResource(R.string.option_month_first),
+                                    checked = !settings.dayFirst,
+                                    onCheckedChange = { checked ->
+                                        apply(settings.copy(dayFirst = !checked))
+                                    },
+                                )
+                                if (store.systemAmPm) SettingSwitch(
+                                    modifier = Modifier.weight(1f),
+                                    label = stringResource(R.string.option_am_pm),
+                                    checked = settings.amPm,
+                                    onCheckedChange = { checked ->
+                                        apply(settings.copy(amPm = checked))
+                                    },
+                                )
+                            }
                         }
                     }
-                }
-                item {
-                    SectionCard(title = null) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = Padding.Common),
-                            horizontalArrangement = Arrangement.spacedBy(Padding.Half),
-                        ) {
-                            ClickablePoint(
-                                modifier = Modifier.weight(1f),
-                                icon = painterResource(R.drawable.ic_github),
-                                label = R.string.github_repository,
-                                onClick = { context.tryStartActivity(Intents.repository) },
-                            )
-                            ClickablePoint(
-                                modifier = Modifier.weight(1f),
-                                icon = painterResource(R.drawable.ic_license),
-                                label = R.string.licenses,
-                                withArrow = true,
+                    item {
+                        SectionCard(itemModifier, title = null) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = Padding.Common),
+                                horizontalArrangement = Arrangement.spacedBy(Padding.Half),
                             ) {
-                                showLicenses = true
+                                ClickablePoint(
+                                    modifier = Modifier.weight(1f),
+                                    icon = painterResource(R.drawable.ic_github),
+                                    label = R.string.github_repository,
+                                    onClick = { context.tryStartActivity(Intents.repository) },
+                                )
+                                ClickablePoint(
+                                    modifier = Modifier.weight(1f),
+                                    icon = painterResource(R.drawable.ic_license),
+                                    label = R.string.licenses,
+                                    withArrow = true,
+                                ) {
+                                    showLicenses = true
+                                }
                             }
-                        }
-                        val updateState by UpdateStore.self.state.collectAsState()
-                        ClickablePoint(
-                            modifier = Modifier
-                                .padding(horizontal = Padding.Common)
-                                .fillMaxWidth(),
-                            icon = painterResource(updateState.icon()),
-                            label = updateState.label(),
-                            clickable = updateState.interactable,
-                            onClick = updateState::action,
-                        )
-                        ProgressIndicator(
-                            modifier = Modifier
-                                .padding(horizontal = Padding.Common)
-                                .fillMaxWidth(),
-                            progress = updateState.progress(),
-                            visible = updateState.processing(),
-                        )
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = Padding.Common)
-                                .align(Alignment.CenterHorizontally),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            val (icon, tint) = when (UpdateStore.self.source) {
-                                AppSource.GitHub -> R.drawable.ic_github to ColorFilter.tint(LocalContentColor.current)
-                                AppSource.GooglePlay -> R.drawable.ic_google_play to null
+                            val updateState by UpdateStore.self.state.collectAsState()
+                            ClickablePoint(
+                                modifier = Modifier
+                                    .padding(horizontal = Padding.Common)
+                                    .fillMaxWidth(),
+                                icon = painterResource(updateState.icon()),
+                                label = updateState.label(),
+                                clickable = updateState.interactable,
+                                onClick = updateState::action,
+                            )
+                            ProgressIndicator(
+                                modifier = Modifier
+                                    .padding(horizontal = Padding.Common)
+                                    .fillMaxWidth(),
+                                progress = updateState.progress(),
+                                visible = updateState.processing(),
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .padding(horizontal = Padding.Common)
+                                    .align(Alignment.CenterHorizontally),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                val (icon, tint) = when (UpdateStore.self.source) {
+                                    AppSource.GitHub -> R.drawable.ic_github to ColorFilter.tint(
+                                        LocalContentColor.current
+                                    )
+
+                                    AppSource.GooglePlay -> R.drawable.ic_google_play to null
+                                }
+                                Image(
+                                    modifier = Modifier.size(18.dp),
+                                    painter = painterResource(icon),
+                                    colorFilter = tint,
+                                    contentDescription = null,
+                                )
+                                Text(
+                                    modifier = Modifier.padding(start = Padding.Mini),
+                                    text = stringResource(R.string.version_name),
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
                             }
-                            Image(
-                                modifier = Modifier.size(18.dp),
-                                painter = painterResource(icon),
-                                colorFilter = tint,
-                                contentDescription = null,
-                            )
-                            Text(
-                                modifier = Modifier.padding(start = Padding.Mini),
-                                text = stringResource(R.string.version_name),
-                                style = MaterialTheme.typography.labelSmall,
-                            )
                         }
                     }
                 }
@@ -536,11 +559,12 @@ private fun ClickablePoint(
 
 @Composable
 private fun SectionCard(
+    modifier: Modifier = Modifier,
     title: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = ShapeDefaults.ExtraLarge,
     ) {
         val spacing = rememberVerticalSpacing(Padding.Half)

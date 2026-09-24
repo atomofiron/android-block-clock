@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import app.blockclock.R
 import app.blockclock.ui.BackButton
 import app.blockclock.ui.SearchButton
 import app.blockclock.ui.SearchField
+import app.blockclock.ui.overscroll.Overscroll
 import app.blockclock.ui.values.Padding
 import app.blockclock.util.displayCutout
 import app.blockclock.util.navigationBars
@@ -142,33 +144,37 @@ fun <T> PickerScreen(
                 enter = fadeIn(),
             ) {
                 val textStyle = MaterialTheme.typography.bodyLarge
-                LazyVerticalGrid(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    columns = GridCells.Adaptive(cellMinWidth),
-                    horizontalArrangement = Arrangement.spacedBy(Padding.Common),
-                    contentPadding = WindowInsets.navigationBars { Bottom }
-                        .add(WindowInsets.displayCutout { Start + End })
-                        .add(
-                            WindowInsets(
-                                left = Padding.Common,
-                                right = Padding.Common,
-                                bottom = Padding.Common
+                Overscroll(rememberCoroutineScope()) { columnModifier, itemModifier ->
+                    LazyVerticalGrid(
+                        modifier = columnModifier
+                            .fillMaxSize()
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        columns = GridCells.Adaptive(cellMinWidth),
+                        horizontalArrangement = Arrangement.spacedBy(Padding.Common),
+                        contentPadding = WindowInsets.navigationBars { Bottom }
+                            .add(WindowInsets.displayCutout { Start + End })
+                            .add(
+                                WindowInsets(
+                                    left = Padding.Common,
+                                    right = Padding.Common,
+                                    bottom = Padding.Common
+                                )
                             )
-                        )
-                        .asPaddingValues(),
-                ) {
-                    if (showDefault) item {
-                        defaultItemContent?.invoke(Modifier.onClick { onPick(null) }, textStyle)
-                            ?: Text(
-                                modifier = Modifier.onClick { onPick(null) },
-                                text = stringResource(R.string.font_default),
-                                style = textStyle,
-                            )
-                    }
-                    itemsIndexed(visibleItems, key = { index, it -> keys(it, index) }) { _, it ->
-                        itemContent(Modifier.onClick { onPick(it) }, textStyle, it)
+                            .asPaddingValues(),
+                    ) {
+                        if (showDefault) item {
+                            defaultItemContent?.invoke(itemModifier.onClick { onPick(null) }, textStyle)
+                                ?: Text(
+                                    modifier = itemModifier.onClick { onPick(null) },
+                                    text = stringResource(R.string.font_default),
+                                    style = textStyle,
+                                )
+                        }
+                        itemsIndexed(
+                            visibleItems,
+                            key = { index, it -> keys(it, index) }) { _, it ->
+                            itemContent(itemModifier.onClick { onPick(it) }, textStyle, it)
+                        }
                     }
                 }
             }

@@ -27,3 +27,8 @@ fun AndroidColor.toComposeColor() = Color(toArgb())
 inline infix fun Int.contains(flags: Int): Boolean = (this and flags) == flags
 
 fun <T> unsafeLazy(initializer: () -> T) = lazy(LazyThreadSafetyMode.NONE, initializer)
+
+operator fun CoroutineScope.invoke(block: suspend CoroutineScope.() -> Unit) {
+    launch(block = block)
+}
+
