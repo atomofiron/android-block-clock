@@ -146,6 +146,11 @@ internal class SpringOverscrollEffect(private val scope: CoroutineScope) : Overs
         source: NestedScrollSource,
         performScroll: (Offset) -> Offset,
     ): Offset {
+        if (abs(delta.y) < Epsilon) {
+            // The effect is vertical: the delta of the other axis — the segmented button row
+            // scrolling on its own — is not a pull and has to reach the scroll itself.
+            return performScroll(delta)
+        }
         if (isFlinging) {
             queue.add(System.currentTimeMillis() to delta.y)
             if (queue.size > SCRILL_SPEED_BUFFER) {

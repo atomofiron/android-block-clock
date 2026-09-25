@@ -216,7 +216,6 @@ fun SettingsScreen(
                 .padding(horizontal = Padding.Common)
                 .clip(clipShape),
         ) {
-
             Overscroll(rememberCoroutineScope()) { columnModifier, itemModifier ->
                 LazyVerticalStaggeredGrid(
                     modifier = columnModifier.fillMaxSize(),
@@ -333,7 +332,6 @@ fun SettingsScreen(
                                         onStyle = { apply(settings.copy(textStyle = it)) },
                                     )
                                 }
-
                                 else -> TextStyleGroup(
                                     contentPadding = Padding.Common,
                                     selected = settings.textStyle,
