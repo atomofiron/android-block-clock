@@ -2,6 +2,7 @@ package app.blockclock.settings
 
 import android.graphics.Color.HSVToColor
 import android.graphics.Color.colorToHSV
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -17,8 +18,16 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import app.blockclock.R
@@ -50,9 +60,70 @@ import kotlin.math.roundToInt
 
 private const val HueDegrees = 360f
 
+/** The digits of the hex color: the RGB, the alpha of the widget is its transparency. */
+private const val HexColorLength = 6
+
+/** A hex digit carries a nibble. */
+private const val HexDigitBits = 4
+
+private fun Char.isHexDigit(): Boolean = this in '0'..'9' || this in 'a'..'f' || this in 'A'..'F'
+
+/** The decoration of a pasted color: the `#` and the spaces around it. */
+private fun Char.isHexDecoration(): Boolean = this == '#' || isWhitespace()
+
+private fun hsvColor(hue: Float, sat: Float, value: Float): Color =
+    Color(HSVToColor(floatArrayOf(hue, sat, value)))
+
+/**
+ * The input filter of the hex field: a pasted color comes with the `#` and the spaces around it,
+ * which are dropped, and the input that has anything else in it is rejected as a whole, so that a
+ * wrong character cannot even overwrite what is already typed. A rejected change is reverted along
+ * with the selection, so the caret stays where it was. The transformation is applied to the user
+ * input only, so [onDigits] is the typing and never the field rewritten by the picker.
+ */
+private class HexColorInputTransformation(
+    private val onDigits: (String) -> Unit,
+) : InputTransformation {
+
+    @OptIn(ExperimentalFoundationApi::class)
+    override fun TextFieldBuffer.transformInput() {
+        var rejected = false
+        for (index in changes.changeCount - 1 downTo 0) {
+            val range = changes.getRange(index)
+            if (range.collapsed) continue
+            val input = asCharSequence().subSequence(range.min, range.max).toString()
+            val digits = input.filter(Char::isHexDigit).take(HexColorLength)
+            when {
+                digits.isEmpty() -> rejected = true
+                input.any { !it.isHexDigit() && !it.isHexDecoration() } -> rejected = true
+                digits != input -> replace(range.min, range.max, digits)
+            }
+        }
+        if (rejected || length > HexColorLength) {
+            revertAllChanges()
+        } else {
+            onDigits(asCharSequence().toString())
+        }
+    }
+}
+
+/**
+ * The color of the [digits]: a single digit is a nibble, so they fill the RGB
+ * from the left and any amount of them is already a color, which lets the color
+ * follow the typing. Null for no digits at all.
+ */
+private fun hexColor(digits: String): Color? = digits.toLongOrNull(16)?.let { value ->
+    val shift = (HexColorLength - digits.length) * HexDigitBits
+    Color(0xFF000000.toInt() or (value shl shift).toInt())
+}
+
+/** The hex digits of the [color], e.g. `3A7BD5`. */
+private fun hexDigits(color: Color): String = "%06X".format(color.toArgb() and 0xFFFFFF)
+
 /**
  * The color picker dialog: a saturation × value (SV) gradient field at the
- * selected hue (H) + a hue slider + the current color and its HEX.
+ * selected hue (H) + a hue slider + the current color and its HEX, which is
+ * a field to paste or type a color into, with or without the leading `#`.
  */
 @Composable
 internal fun ColorPickerDialog(
@@ -69,14 +140,28 @@ internal fun ColorPickerDialog(
     var hue by remember { mutableFloatStateOf(hsv[0]) }
     var sat by remember { mutableFloatStateOf(hsv[1]) }
     var value by remember { mutableFloatStateOf(hsv[2]) }
-    val color = remember(hue, sat, value) {
-        Color(HSVToColor(floatArrayOf(hue, sat, value)))
-    }
+    val hex = rememberTextFieldState(hexDigits(initialColor))
+    val color = remember(hue, sat, value) { hsvColor(hue, sat, value) }
     fun set(color: Color) {
         colorToHSV(color.toArgb(), hsv)
         hue = hsv[0]
         sat = hsv[1]
         value = hsv[2]
+    }
+
+    /** The picker has been used: the color follows and the field comes back to its digits. */
+    fun pick(color: Color) {
+        set(color)
+        hex.setTextAndPlaceCursorAtEnd(hexDigits(color))
+    }
+    // The typed digits own the color: every one of them is already a color.
+    val inputTransformation = remember {
+        HexColorInputTransformation { entered ->
+            hexColor(entered)?.let { typed ->
+                source = ColorSource.Manual
+                set(typed)
+            }
+        }
     }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -92,7 +177,7 @@ internal fun ColorPickerDialog(
                             color,
                         ) {
                             source = ColorSource.Primary
-                            set(color)
+                            pick(color)
                         }
                     }
                     wallpaper.secondary?.let { color ->
@@ -103,7 +188,7 @@ internal fun ColorPickerDialog(
                             color,
                         ) {
                             source = ColorSource.Secondary
-                            set(color)
+                            pick(color)
                         }
                     }
                     wallpaper.tertiary?.let { color ->
@@ -114,7 +199,7 @@ internal fun ColorPickerDialog(
                             color,
                         ) {
                             source = ColorSource.Tertiary
-                            set(color)
+                            pick(color)
                         }
                     }
                 }
@@ -124,23 +209,24 @@ internal fun ColorPickerDialog(
                     value = value,
                     onChange = { s, v ->
                         source = ColorSource.Manual
-                        sat = s
-                        value = v
+                        pick(hsvColor(hue, s, v))
                     },
                 )
                 HueSlider(hue = hue) {
                     source = ColorSource.Manual
-                    hue = it
+                    pick(hsvColor(it, sat, value))
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     ColorBox(Modifier.size(Dimens.SwatchSize), color)
-                    Text(
-                        modifier = Modifier.padding(start = Padding.Common),
-                        text = "#%06X".format(color.toArgb() and 0xFFFFFF),
-                        style = MaterialTheme.typography.bodyLarge,
+                    HexColorField(
+                        modifier = Modifier
+                            .padding(start = Padding.Common)
+                            .weight(1f),
+                        state = hex,
+                        inputTransformation = inputTransformation,
                     )
                 }
             }
@@ -155,6 +241,25 @@ internal fun ColorPickerDialog(
                 Text(stringResource(R.string.button_cancel))
             }
         },
+    )
+}
+
+/** The hex color field: the `#` is its prefix decoration, the value is the digits alone. */
+@Composable
+private fun HexColorField(
+    modifier: Modifier = Modifier,
+    state: TextFieldState,
+    inputTransformation: InputTransformation,
+) {
+    OutlinedTextField(
+        modifier = modifier,
+        state = state,
+        prefix = { Text("#") },
+        textStyle = MaterialTheme.typography.bodyLarge,
+        inputTransformation = inputTransformation,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+        lineLimits = TextFieldLineLimits.SingleLine,
+        shape = ShapeDefaults.Medium,
     )
 }
 
