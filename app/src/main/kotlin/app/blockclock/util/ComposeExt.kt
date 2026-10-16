@@ -1,6 +1,7 @@
 package app.blockclock.util
 
 import android.content.Context
+import android.content.pm.PackageManager.NameNotFoundException
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
@@ -100,9 +101,11 @@ fun rememberAppIconPainter(packageName: String?): Painter {
     }
 }
 
-fun Context.appIcon(packageName: String?): Drawable? {
+fun Context.appIcon(packageName: String?): Drawable? = try {
     packageName ?: return null
-    return packageManager.getApplicationIcon(packageName)
+    packageManager.getApplicationIcon(packageName)
+} catch (_: NameNotFoundException) {
+    null
 }
 
 fun Drawable?.toPainter(): Painter {
