@@ -37,8 +37,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             versionName = AppConfig.versionName
         }
         androidResources {
-            //generateLocaleConfig = true
-            //localeFilters += arrayOf("en", "ru", "sr", "b+sr+Latn")
+            generateLocaleConfig = true
         }
         buildTypes {
             getByName("debug") {

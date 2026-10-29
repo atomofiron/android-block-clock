@@ -1,0 +1,9 @@
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en-US"/>
+    <locale android:name="ru-RU"/>
+    <locale android:name="sr-Latn-RS"/>
+    <locale android:name="sr-Cyrl-RS"/>
+    <locale android:name="ka"/>
+    <locale android:name="kk"/>
+    <locale android:name="uk"/>
+</locale-config>
