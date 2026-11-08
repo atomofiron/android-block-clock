@@ -1,6 +1,7 @@
 import app.blockclock.convention.AppConfig
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.TimeZone
 
 plugins {
     alias(libs.plugins.serialization)
@@ -12,7 +13,9 @@ android {
 
     defaultConfig {
         val threshold = Date().apply { time += 1000 * 60 * 60 * 8 }
-        val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(threshold)
+        val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .apply { timeZone = TimeZone.getTimeZone("UTC") }
+            .format(threshold)
         buildConfigField("String", "UPDATE_THRESHOLD", "\"$date\"")
     }
 }

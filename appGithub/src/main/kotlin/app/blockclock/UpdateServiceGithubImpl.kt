@@ -122,9 +122,9 @@ class UpdateServiceGithubImpl(
                 when (downloading) {
                     is Loading.Error -> fallback
                     is Loading.Progress -> UpdateState.Downloading(downloading.progress)
-                    is Loading.Completed -> UpdateState.Completable.also {
-                        this@UpdateServiceGithubImpl.file = file
-                    }
+                    is Loading.Completed -> file.verify(asset)
+                        ?.let { this@UpdateServiceGithubImpl.file = it; UpdateState.Completable }
+                        ?: UpdateState.UpToDate
                 }.let { store.set(it) }
             }
         }
@@ -137,7 +137,7 @@ class UpdateServiceGithubImpl(
         length() != asset.size -> false
         BuildConfig.DEBUG -> true
         else -> context.packageManager.apkInfo(path)
-            ?.let { it.versionCode > BuildConfig.VERSION_CODE }== true
+            ?.let { it.versionCode > BuildConfig.VERSION_CODE } == true
     }.let { verified ->
         if (!verified) delete()
         takeIf { verified }
@@ -146,7 +146,7 @@ class UpdateServiceGithubImpl(
     @SuppressLint("RequestInstallPackagesPolicy")
     private fun installApk(path: String, action: String, stringId: String? = null, silently: Boolean = false): Rslt<Unit> = try {
         val stream = FileInputStream(path)
-        val length = stream.available().toLong()
+        val length = File(path).length()
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
         if (silently) {
             params.setAppPackageName(context.packageName)
