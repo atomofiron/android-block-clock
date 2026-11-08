@@ -52,16 +52,14 @@ class WidgetSettingsStore(context: Context) {
     private val lazySystemDayFirst = UpdatableLazy {
         DateFormat.getDateFormatOrder(context)
             .run { indexOf('d') < indexOf('M') }
-            .also { systemDayFirst = it }
     }
-    var systemDayFirst by mutableStateOf(false)
+    var systemDayFirst by mutableStateOf(lazySystemDayFirst.value)
         private set
 
     private val lazySystemAmPm = UpdatableLazy {
-        (!DateFormat.is24HourFormat(context))
-            .also { systemAmPm = it }
+        !DateFormat.is24HourFormat(context)
     }
-    var systemAmPm by mutableStateOf(false)
+    var systemAmPm by mutableStateOf(lazySystemAmPm.value)
         private set
 
     fun read() = WidgetSettings(
@@ -175,6 +173,9 @@ class WidgetSettingsStore(context: Context) {
     fun updateSystemPreferences() {
         lazySystemDayFirst.update()
         lazySystemAmPm.update()
+        systemDayFirst = lazySystemDayFirst.value
+        systemAmPm = lazySystemAmPm.value
+        store(read())
     }
 }
 

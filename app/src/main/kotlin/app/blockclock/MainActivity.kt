@@ -89,12 +89,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        store.updateSystemPreferences()
+        val firstStart = onStartJob == null
         onStartJob?.cancel()
         onStartJob = lifecycleScope.launch {
+            if (firstStart) { // app just launched or restarted
+                updateWidgets()
+            }
             delay(1000.milliseconds)
             isEnterAnimationCompleted = true
         }
-        store.updateSystemPreferences()
     }
 
     override fun onEnterAnimationComplete() {
